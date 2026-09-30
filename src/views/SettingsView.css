@@ -1,0 +1,296 @@
+.q-settings-page {
+  padding: var(--space-6);
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.q-settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.q-settings-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-1) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.q-settings-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  margin: 0;
+}
+
+.q-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+  gap: var(--space-6);
+}
+
+@media (max-width: 768px) {
+  .q-settings-page {
+    padding: var(--space-4);
+  }
+  .q-settings-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.q-settings-card {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.q-card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.q-card-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.q-card-heading h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.q-card-heading p {
+  margin: var(--space-1) 0 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+/* Switch & Toggle Row */
+.q-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--duration-fast);
+}
+
+.q-toggle-row:hover {
+  border-color: var(--color-border-hover);
+}
+
+.q-toggle-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.q-toggle-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.q-toggle-desc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+/* Switch Component */
+.q-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.q-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.q-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-bg-tertiary, #30363d);
+  transition: background-color var(--duration-fast), transform var(--duration-fast);
+  border-radius: var(--radius-full);
+}
+
+.q-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: transform var(--duration-fast);
+  border-radius: var(--radius-full);
+}
+
+.q-switch input:checked + .q-switch-slider {
+  background-color: var(--color-brand-primary);
+}
+
+.q-switch input:focus + .q-switch-slider {
+  box-shadow: 0 0 0 2px var(--color-brand-focus);
+}
+
+.q-switch input:checked + .q-switch-slider:before {
+  transform: translateX(20px);
+}
+
+/* Recipients Input & Chips */
+.q-recipients-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.q-recipient-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-height: 38px;
+  padding: var(--space-2);
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  align-items: center;
+}
+
+.q-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 4px 10px;
+  background-color: rgba(99, 102, 241, 0.15);
+  color: var(--color-brand-primary);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.q-chip-remove {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  margin-left: 2px;
+  opacity: 0.7;
+  transition: opacity var(--duration-fast);
+}
+
+.q-chip-remove:hover {
+  opacity: 1;
+}
+
+.q-add-recipient-row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.q-input-field {
+  flex: 1;
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  outline: none;
+  transition: border-color var(--duration-fast);
+}
+
+.q-input-field:focus {
+  border-color: var(--color-brand-primary);
+}
+
+/* Form Grid */
+.q-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+@media (max-width: 600px) {
+  .q-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.q-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.q-form-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+/* Banner Feedback */
+.q-feedback-banner {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.q-feedback-banner--success {
+  background-color: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: var(--color-status-success);
+}
+
+.q-feedback-banner--error {
+  background-color: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--color-status-danger);
+}
+
+/* Action Bar */
+.q-settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}

@@ -1,0 +1,235 @@
+/* ==============================================================================
+   ADMINISTRACIÓN DE USUARIOS & SESIONES EN LÍNEA (HOSTINGER DESIGN SYSTEM)
+   ============================================================================== */
+
+.q-users-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.q-users-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.q-users-title-box h1 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.q-users-title-box p {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+/* Tabs de Navegación */
+.q-users-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--color-border-default);
+  padding-bottom: 2px;
+}
+
+.q-tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all var(--motion-fast);
+}
+
+.q-tab-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.q-tab-btn.active {
+  color: var(--color-brand-primary);
+  border-bottom-color: var(--color-brand-primary);
+}
+
+/* Barra de Filtros & Búsqueda */
+.q-users-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.q-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: 0 12px;
+  height: 38px;
+  min-width: 280px;
+}
+
+.q-search-input {
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  width: 100%;
+  outline: none;
+}
+
+.q-filter-select {
+  height: 38px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-default);
+  color: var(--color-text-primary);
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Tabla de Usuarios */
+.q-users-table-card {
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.q-users-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.q-users-table th {
+  background-color: var(--color-surface-muted);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.q-users-table td {
+  padding: 14px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--color-border-default);
+  vertical-align: middle;
+}
+
+.q-users-table tr:last-child td {
+  border-bottom: none;
+}
+
+.q-users-table tr:hover td {
+  background-color: var(--color-surface-muted);
+}
+
+.q-user-info-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.q-user-avatar-sm {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(135deg, var(--color-brand-primary), var(--purple-700));
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Grid de Usuarios en Línea */
+.q-online-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-4);
+}
+
+.q-online-card {
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--motion-fast), box-shadow var(--motion-fast);
+}
+
+.q-online-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.q-online-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.q-online-user-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.q-online-avatar-box {
+  position: relative;
+}
+
+.q-online-pulse-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background-color: #10b981;
+  border: 2px solid var(--color-surface-default);
+  border-radius: 50%;
+}
+
+.q-online-details-box {
+  background-color: var(--color-surface-muted);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--color-text-secondary);
+}
+
+.q-online-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

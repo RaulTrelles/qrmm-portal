@@ -1,0 +1,89 @@
+.q-table-container {
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.q-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.q-table th {
+  background-color: var(--color-surface-muted);
+  padding: 12px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border-default);
+  white-space: nowrap;
+}
+
+.q-table th.q-sortable-th {
+  cursor: pointer;
+  user-select: none;
+  transition: color var(--motion-fast), background-color var(--motion-fast);
+}
+
+.q-table th.q-sortable-th:hover {
+  color: var(--color-brand-primary);
+  background-color: var(--color-surface-hover);
+}
+
+.q-table .q-th-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.q-table .q-sort-indicator {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.q-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--color-border-default);
+  color: var(--color-text-primary);
+  vertical-align: middle;
+}
+
+.q-table tr:last-child td {
+  border-bottom: none;
+}
+
+.q-table tbody tr {
+  transition: background-color var(--motion-fast);
+}
+
+.q-table tbody tr:hover td {
+  background-color: var(--color-surface-hover);
+}
+
+.q-table-hostname {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+}
+
+.q-table-subtext {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-family-mono);
+  margin-top: 2px;
+}
+
+.q-table-empty {
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--color-text-secondary);
+}

@@ -1,0 +1,10 @@
+.q-device-card { background-color: var(--color-surface-default); border: 1px solid var(--color-border-default); border-radius: var(--radius-lg); padding: var(--space-4); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: var(--space-3); transition: all var(--motion-fast); cursor: pointer; }
+.q-device-card:hover { border-color: var(--color-brand-border); box-shadow: var(--shadow-md); }
+.q-device-card-header { display: flex; align-items: flex-start; justify-content: space-between; }
+.q-device-card-title { font-size: 16px; font-weight: 600; color: var(--color-text-primary); display: flex; align-items: center; gap: var(--space-2); }
+.q-device-card-code { font-size: 12px; font-family: var(--font-family-mono); color: var(--color-text-tertiary); }
+.q-device-card-body { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); font-size: 13px; padding: var(--space-3) 0; border-top: 1px solid var(--color-border-default); border-bottom: 1px solid var(--color-border-default); }
+.q-device-card-item { display: flex; flex-direction: column; }
+.q-device-card-label { font-size: 11px; color: var(--color-text-tertiary); text-transform: uppercase; }
+.q-device-card-val { font-weight: 500; color: var(--color-text-secondary); }
+.q-device-card-footer { display: flex; justify-content: flex-end; }

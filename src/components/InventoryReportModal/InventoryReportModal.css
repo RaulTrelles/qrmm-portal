@@ -1,0 +1,393 @@
+/* Modal Overlay & Container */
+.q-report-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--color-surface-overlay, rgba(17, 24, 39, 0.6));
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  animation: fadeIn var(--motion-fast) ease-out;
+}
+
+.q-report-modal {
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 1100px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+}
+
+/* Header */
+.q-report-header {
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-surface-muted);
+}
+
+.q-report-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.q-report-title-group h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.q-report-title-group p {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+.q-report-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Content Body */
+.q-report-body {
+  padding: var(--space-6);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Print Banner for Report Branding */
+.q-report-doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: var(--space-4);
+  border-bottom: 2px solid var(--color-brand-primary);
+}
+
+.q-report-brand-name {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--color-brand-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.q-report-brand-sub {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.q-report-doc-meta {
+  text-align: right;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.q-report-doc-meta strong {
+  color: var(--color-text-primary);
+}
+
+/* KPI Summary Grid */
+.q-report-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3);
+}
+
+.q-report-kpi-card {
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.q-report-kpi-val {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.q-report-kpi-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Filters Bar */
+.q-report-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2) var(--space-4);
+}
+
+.q-report-filter-tabs {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.q-report-filter-tab {
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--motion-fast);
+}
+
+.q-report-filter-tab:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-default);
+}
+
+.q-report-filter-tab--active {
+  background-color: var(--color-brand-primary) !important;
+  color: #ffffff !important;
+}
+
+/* Device Sheets (Fichas Técnicas) */
+.q-report-sheets-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-2);
+}
+
+.q-report-device-card {
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.q-report-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.q-report-card-hostname-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.q-report-card-hostname {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.q-report-card-code {
+  font-family: var(--font-family-mono);
+  font-size: 12px;
+  color: var(--color-brand-primary);
+  background-color: var(--color-surface-selected);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+.q-report-specs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-3);
+}
+
+.q-report-spec-box {
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.q-report-spec-box-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.q-report-spec-box-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.q-report-spec-box-sub {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+/* Peripherals Section (Critical for Desktop) */
+.q-report-peripherals-section {
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.q-report-peripherals-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.q-report-peripherals-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-brand-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.q-report-peripherals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3);
+}
+
+.q-report-peri-item {
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.q-report-peri-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.q-report-peri-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.q-report-peri-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12px;
+  color: var(--color-text-primary);
+}
+
+.q-report-peri-list-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.q-report-printer-default-badge {
+  font-size: 9px;
+  background-color: #10b981;
+  color: #ffffff;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Print Specific Rules */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .q-report-overlay,
+  .q-report-overlay * {
+    visibility: visible;
+  }
+  .q-report-overlay {
+    position: absolute;
+    inset: 0;
+    background: transparent !important;
+    padding: 0 !important;
+    backdrop-filter: none !important;
+  }
+  .q-report-modal {
+    max-width: 100% !important;
+    max-height: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+  .q-report-header,
+  .q-report-filter-bar,
+  .q-non-printable {
+    display: none !important;
+  }
+  .q-report-body {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  .q-report-device-card {
+    border: 1px solid #d1d5db !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 24px !important;
+  }
+}

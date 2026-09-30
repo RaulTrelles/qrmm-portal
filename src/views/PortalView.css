@@ -1,0 +1,607 @@
+/* ==============================================================================
+   PORTAL SAAS - QHAPANA RMM (ESTÉTICA HOSTINGER DESIGN SYSTEM)
+   ============================================================================== */
+
+.q-portal {
+  min-height: 100vh;
+  background-color: var(--color-surface-page);
+  color: var(--color-text-primary);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-sans);
+}
+
+/* Banner de Oferta de Lanzamiento */
+.q-promo-banner {
+  background: linear-gradient(90deg, #673de6, #4f25c7 60%, #2f127a);
+  color: #ffffff;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(103, 61, 230, 0.25);
+  position: relative;
+  z-index: 50;
+}
+
+.q-promo-badge {
+  background-color: #ffd233;
+  color: #111827;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.q-promo-code {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px dashed rgba(255, 255, 255, 0.5);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.q-promo-btn {
+  background: #ffffff;
+  color: var(--color-brand-primary);
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: transform var(--motion-fast);
+}
+
+.q-promo-btn:hover {
+  transform: scale(1.04);
+}
+
+/* Header del Portal */
+.q-portal-header {
+  height: 72px;
+  background-color: var(--color-surface-default);
+  border-bottom: 1px solid var(--color-border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-8);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.q-portal-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.q-portal-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--color-brand-primary), var(--purple-700));
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.q-portal-brand-text {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+.q-portal-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.q-portal-nav a {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--motion-fast);
+}
+
+.q-portal-nav a:hover {
+  color: var(--color-brand-primary);
+}
+
+.q-portal-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.q-country-select-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-3);
+  height: 36px;
+}
+
+.q-country-select {
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Hero Section */
+.q-portal-hero {
+  padding: 80px 24px 60px;
+  text-align: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.q-hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--purple-50);
+  color: var(--color-brand-primary);
+  border: 1px solid var(--purple-200);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: var(--space-6);
+}
+
+.q-portal-hero h1 {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-5);
+}
+
+.q-portal-hero h1 span {
+  background: linear-gradient(135deg, var(--color-brand-primary), #9333ea);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.q-hero-sub {
+  font-size: 18px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  max-width: 720px;
+  margin: 0 auto var(--space-8);
+}
+
+.q-hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.q-hero-features-chips {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  margin-top: 40px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  flex-wrap: wrap;
+}
+
+.q-hero-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Pricing Section */
+.q-portal-pricing {
+  padding: 40px 24px 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.q-pricing-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.q-pricing-header h2 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.q-pricing-cycle-switch {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border-default);
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  gap: 4px;
+  margin-top: 16px;
+}
+
+.q-cycle-btn {
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--motion-fast);
+}
+
+.q-cycle-btn.active {
+  background-color: var(--color-brand-primary);
+  color: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+.q-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+  align-items: stretch;
+}
+
+.q-price-card {
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  transition: transform var(--motion-fast), box-shadow var(--motion-fast);
+}
+
+.q-price-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+.q-price-card--featured {
+  border: 2px solid var(--color-brand-primary);
+  background: linear-gradient(180deg, rgba(103, 61, 230, 0.04) 0%, var(--color-surface-default) 30%);
+  box-shadow: 0 10px 30px rgba(103, 61, 230, 0.15);
+}
+
+.q-popular-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--color-brand-primary);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 14px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: var(--shadow-md);
+}
+
+.q-card-tier-name {
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.q-price-amount-box {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: var(--space-2);
+}
+
+.q-currency {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.q-amount {
+  font-size: 42px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.03em;
+}
+
+.q-amount-original {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+  font-size: 20px;
+  margin-left: 8px;
+}
+
+.q-period {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.q-tier-desc {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+  min-height: 40px;
+}
+
+.q-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.q-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+
+.q-check-icon {
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+/* Modal de Checkout & Tarjeta */
+.q-checkout-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: modalIn 0.2s ease-out;
+}
+
+.q-checkout-modal {
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 860px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: var(--space-8);
+  position: relative;
+  box-shadow: var(--shadow-xl);
+}
+
+.q-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-md);
+  transition: all var(--motion-fast);
+}
+
+.q-modal-close:hover {
+  background-color: var(--color-surface-muted);
+  color: var(--color-text-primary);
+}
+
+.q-checkout-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: var(--space-8);
+  margin-top: var(--space-6);
+}
+
+/* Columna Resumen Checkout */
+.q-checkout-summary {
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.q-summary-title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+}
+
+.q-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.q-summary-total {
+  border-top: 1px solid var(--color-border-default);
+  padding-top: var(--space-3);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-brand-primary);
+}
+
+.q-coupon-box {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.q-coupon-input {
+  flex: 1;
+  height: 38px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: 0 10px;
+  font-size: 13px;
+  text-transform: uppercase;
+  font-weight: 700;
+  background-color: var(--color-surface-default);
+  color: var(--color-text-primary);
+}
+
+/* Columna Formulario de Pago y Registro */
+.q-checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.q-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.q-form-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.q-form-input {
+  height: 40px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: 0 12px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-default);
+  transition: all var(--motion-fast);
+}
+
+.q-form-input:focus {
+  border-color: var(--color-brand-primary);
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+/* Tarjeta de Crédito UI */
+.q-card-input-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.q-card-brand-tag {
+  position: absolute;
+  right: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--color-brand-primary);
+  background-color: var(--purple-50);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.q-card-sub-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+/* Pasarelas de Pago Alternativas */
+.q-gateways-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.q-gateway-tab {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-default);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--motion-fast);
+}
+
+.q-gateway-tab.active {
+  border-color: var(--color-brand-primary);
+  background-color: var(--purple-50);
+  color: var(--color-brand-primary);
+}
+
+/* Footer del Portal */
+.q-portal-footer {
+  background-color: var(--color-surface-default);
+  border-top: 1px solid var(--color-border-default);
+  padding: 40px 24px;
+  text-align: center;
+  margin-top: auto;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 900px) {
+  .q-pricing-grid {
+    grid-template-columns: 1fr;
+  }
+  .q-checkout-grid {
+    grid-template-columns: 1fr;
+  }
+  .q-portal-nav {
+    display: none;
+  }
+  .q-portal-hero h1 {
+    font-size: 32px;
+  }
+}
