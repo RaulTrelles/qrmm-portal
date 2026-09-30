@@ -2,8 +2,25 @@ import type { Device, MobileDeviceCardData } from "../types/device";
 import type { TokenResponseData, UserProfile } from "../types/auth";
 import type { OrganizationItem, CreateOrganizationPayload, UpdateOrganizationPayload } from "../types/organization";
 
-const defaultHost = typeof window !== "undefined" ? window.location.hostname : "localhost";
-export const API_BASE = import.meta.env.VITE_API_BASE || `http://${defaultHost}:8000/api/v1`;
+const getApiBase = (): string => {
+  if (import.meta.env.VITE_API_BASE) {
+    return import.meta.env.VITE_API_BASE.replace(/\/$/, "");
+  }
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    // Detección automática para producción en qhapana.com
+    if (host === "qrmm.qhapana.com" || host.endsWith(".qhapana.com")) {
+      return "https://qrmm-backend.qhapana.com/api/v1";
+    }
+    // Entorno local o IP de red local
+    const port = window.location.port === "5173" ? ":8000" : (window.location.port ? `:${window.location.port}` : "");
+    const proto = window.location.protocol;
+    return `${proto}//${host}${port}/api/v1`;
+  }
+  return "http://localhost:8000/api/v1";
+};
+
+export const API_BASE = getApiBase();
 
 export function getAuthToken(): string | null {
   return typeof window !== "undefined" ? localStorage.getItem("q_token") : null;

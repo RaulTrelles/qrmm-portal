@@ -4,6 +4,7 @@ import { Button } from "../Button/Button";
 import { dashboardSocket } from "../../services/socket";
 import { useAuth } from "../../context/AuthContext";
 import { copyToClipboard } from "../../utils/clipboard";
+import { API_BASE } from "../../services/api";
 import "./EnrollDeviceModal.css";
 
 export interface EnrollDeviceModalProps {
@@ -38,19 +39,16 @@ export const EnrollDeviceModal: React.FC<EnrollDeviceModalProps> = ({
     }
   }, [activeOrganization, organizationsList]);
 
-  // Calcular URL base del servidor API
-  const serverBaseUrl = typeof window !== "undefined"
-    ? `${window.location.protocol}//${window.location.port === "5173" ? `${window.location.hostname}:8000` : window.location.host}`
-    : "http://localhost:8000";
-
   const targetOrg = organizationsList.find((o) => o.id === targetOrgId);
   const tokenParam = targetOrg?.enrollment_token ? `?token=${targetOrg.enrollment_token}` : "";
 
-  // Comandos One-Liner vinculados al cliente
-  const windowsCommand = `irm "${serverBaseUrl}/install.ps1${tokenParam}" | iex`;
-  const linuxCommand = `curl -sSL "${serverBaseUrl}/install.sh${tokenParam}" | sudo bash`;
+  // Comandos One-Liner vinculados al cliente y al backend oficial
+  const windowsCommand = `[Net.ServicePointManager]::SecurityProtocol = 3072; irm "${API_BASE}/install.ps1${tokenParam}" | iex`;
+  const linuxCommand = `curl -sSL "${API_BASE}/install.sh${tokenParam}" | sudo bash`;
 
   const activeCommand = selectedOS === "windows" ? windowsCommand : linuxCommand;
+  const binaryFilename = selectedOS === "windows" ? "qhapana-agent.exe" : "qhapana-agent-linux";
+  const binaryDownloadUrl = `${API_BASE}/downloads/${binaryFilename}`;
 
   // Escuchar en tiempo real si un nuevo dispositivo se vincula mientras el modal está abierto
   useEffect(() => {
@@ -267,11 +265,43 @@ export const EnrollDeviceModal: React.FC<EnrollDeviceModalProps> = ({
                   : "Crea e inicia automáticamente el servicio systemd de arranque automático."}
               </span>
             </div>
-            <div className="q-enroll-feature-item">
-              <Download size={16} className="q-feature-icon" />
-              <span>
-                Descarga directamente el binario compilado nativo (7.7 MB) sin dependencias externas.
-              </span>
+            <div className="q-enroll-feature-item" style={{ alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: "1 1 240px" }}>
+                <Download size={18} className="q-feature-icon" style={{ flexShrink: 0, color: "var(--color-brand-primary)" }} />
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span style={{ fontWeight: 600, color: "var(--color-text-primary)" }}>
+                    Descarga directa del agente ({binaryFilename})
+                  </span>
+                  <span style={{ fontSize: "12px", color: "var(--color-text-secondary)" }}>
+                    Binario nativo compilado oficial (~8.3 MB) listo para ejecución o despliegue manual.
+                  </span>
+                </div>
+              </div>
+              <a
+                href={binaryDownloadUrl}
+                download={binaryFilename}
+                target="_blank"
+                rel="noreferrer"
+                className="q-enroll-direct-download-btn"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "8px 14px",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  backgroundColor: "var(--color-brand-primary)",
+                  color: "#ffffff",
+                  borderRadius: "var(--radius-md, 6px)",
+                  textDecoration: "none",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                  transition: "opacity 0.2s ease",
+                  cursor: "pointer",
+                }}
+              >
+                <Download size={14} />
+                Descargar {binaryFilename}
+              </a>
             </div>
           </div>
         </div>

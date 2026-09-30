@@ -8,8 +8,18 @@ class DashboardSocket {
   private statusListeners: Set<(connected: boolean) => void> = new Set();
   connect() {
     if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) return;
-    const host = typeof window !== "undefined" ? window.location.hostname : "localhost";
-    const url = import.meta.env.VITE_WS_BASE || `ws://${host}:8000/ws/v1/dashboard`;
+    let url = import.meta.env.VITE_WS_BASE;
+    if (!url && typeof window !== "undefined") {
+      const host = window.location.hostname;
+      if (host === "qrmm.qhapana.com" || host.endsWith(".qhapana.com")) {
+        url = "wss://qrmm-backend.qhapana.com/ws/v1/dashboard";
+      } else {
+        const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
+        const port = window.location.port === "5173" ? ":8000" : (window.location.port ? `:${window.location.port}` : "");
+        url = `${proto}//${host}${port}/ws/v1/dashboard`;
+      }
+    }
+    if (!url) url = "ws://localhost:8000/ws/v1/dashboard";
     this.ws = new WebSocket(url);
     this.ws.onopen = () => {
       this.isConnected = true;

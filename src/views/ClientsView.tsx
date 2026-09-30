@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import type { OrganizationItem } from "../types/organization";
-import { createOrganization, regenerateOrgToken } from "../services/api";
+import { createOrganization, regenerateOrgToken, API_BASE } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { KpiCard } from "../components/KpiCard/KpiCard";
 import { Button } from "../components/Button/Button";
@@ -54,10 +54,7 @@ export const ClientsView: React.FC<ClientsViewProps> = ({ onSelectClientForDevic
   );
 
   const handleCopyCommand = async (token: string) => {
-    const host = typeof window !== "undefined" ? window.location.hostname : "localhost";
-    const port = typeof window !== "undefined" && window.location.port === "5173" ? ":8000" : "";
-    const proto = typeof window !== "undefined" ? window.location.protocol : "http:";
-    const cmd = `irm "${proto}//${host}${port}/install.ps1?token=${token}" | iex`;
+    const cmd = `[Net.ServicePointManager]::SecurityProtocol = 3072; irm "${API_BASE}/install.ps1?token=${token}" | iex`;
 
     const success = await copyToClipboard(cmd);
     if (success) {
