@@ -11,6 +11,7 @@ import {
   X,
   ShieldCheck,
   Loader2,
+  Users,
 } from "lucide-react";
 import { Card } from "../components/Card/Card";
 import { Button } from "../components/Button/Button";
@@ -19,6 +20,7 @@ import {
   getAlertSettings,
   updateAlertSettings,
   testAlertEmail,
+  updateClientAreas,
 } from "../services/api";
 import type { AlertSettings } from "../services/api";
 import "./SettingsView.css";
@@ -38,6 +40,12 @@ export const SettingsView: React.FC = () => {
   // Destinatarios múltiples
   const [recipients, setRecipients] = useState<string[]>([]);
   const [newRecipient, setNewRecipient] = useState<string>("");
+
+  // Catálogo de Áreas / Clientes
+  const [clientAreas, setClientAreas] = useState<string[]>(["General"]);
+  const [newAreaInput, setNewAreaInput] = useState<string>("");
+  const [areaError, setAreaError] = useState<string | null>(null);
+  const [savingArea, setSavingArea] = useState<boolean>(false);
 
   // SMTP
   const [smtpHost, setSmtpHost] = useState<string>("");
@@ -68,6 +76,7 @@ export const SettingsView: React.FC = () => {
       setNotifyOnContainerCrash(data.notify_on_container_crash);
       setDeliveryChannel(data.delivery_channel || "google_oauth");
       setRecipients(data.alert_recipients || []);
+      setClientAreas(data.client_areas && data.client_areas.length > 0 ? data.client_areas : ["General"]);
       setSmtpHost(data.smtp_host || "");
       setSmtpPort(data.smtp_port || 587);
       setSmtpUser(data.smtp_user || "");
@@ -80,6 +89,42 @@ export const SettingsView: React.FC = () => {
       setFeedback({ type: "error", message: err.message || "Error al cargar la configuración de alertas" });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddArea = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const trimmed = newAreaInput.trim();
+    if (!trimmed) return;
+    if (clientAreas.some((a) => a.toLowerCase() === trimmed.toLowerCase())) {
+      setAreaError(`El área o cliente "${trimmed}" ya se encuentra registrado.`);
+      return;
+    }
+    const updated = [...clientAreas, trimmed];
+    setClientAreas(updated);
+    setNewAreaInput("");
+    setAreaError(null);
+    try {
+      setSavingArea(true);
+      await updateClientAreas(updated);
+    } catch (err: any) {
+      setAreaError(err.message || "Error al registrar el área en el servidor");
+    } finally {
+      setSavingArea(false);
+    }
+  };
+
+  const handleRemoveArea = async (areaToRemove: string) => {
+    if (areaToRemove.toLowerCase() === "general") return; // "General" no puede eliminarse
+    const updated = clientAreas.filter((a) => a.toLowerCase() !== areaToRemove.toLowerCase());
+    setClientAreas(updated);
+    try {
+      setSavingArea(true);
+      await updateClientAreas(updated);
+    } catch (err: any) {
+      setAreaError(err.message || "Error al eliminar el área en el servidor");
+    } finally {
+      setSavingArea(false);
     }
   };
 
@@ -128,6 +173,7 @@ export const SettingsView: React.FC = () => {
         notify_on_device_offline: notifyOnOffline,
         notify_on_container_crash: notifyOnContainerCrash,
         alert_recipients: recipients,
+        client_areas: clientAreas,
         delivery_channel: deliveryChannel,
         smtp_host: smtpHost,
         smtp_port: smtpPort,
@@ -323,6 +369,99 @@ export const SettingsView: React.FC = () => {
                 ))
               )}
             </div>
+          </div>
+        </Card>
+
+        {/* CARD: CATÁLOGO DE ÁREAS Y CLIENTES */}
+        <Card className="q-settings-card" style={{ gridColumn: "1 / -1" }}>
+          <div className="q-card-header-row">
+            <div className="q-card-heading">
+              <Users size={20} color="var(--color-brand-primary)" />
+              <div>
+                <h3>Catálogo de Áreas y Clientes</h3>
+                <p>Defina las áreas o clientes disponibles para clasificar y etiquetar los equipos de la flota</p>
+              </div>
+            </div>
+            <Badge variant="neutral">
+              {clientAreas.length} área(s) disponible(s)
+            </Badge>
+          </div>
+
+          <p style={{ fontSize: "13px", color: "var(--color-text-secondary)", marginBottom: "14px", lineHeight: "1.5" }}>
+            Estas etiquetas se utilizan en la columna <strong>Área / Cliente</strong> del inventario y del panel de control. El área <strong>General</strong> es el valor predeterminado y está protegido.
+          </p>
+
+          <form onSubmit={handleAddArea} style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
+            <input
+              type="text"
+              className="q-input-field"
+              placeholder="Nombre del área o cliente (ej: Contabilidad, Facturación, Gerencia, Sistemas, Sucursal Lima)..."
+              value={newAreaInput}
+              onChange={(e) => {
+                setNewAreaInput(e.target.value);
+                if (areaError) setAreaError(null);
+              }}
+              style={{ flex: 1 }}
+            />
+            <Button
+              type="submit"
+              variant="secondary"
+              icon={savingArea ? <Loader2 size={16} className="q-spin" /> : <Plus size={16} />}
+              disabled={!newAreaInput.trim() || savingArea}
+            >
+              {savingArea ? "Guardando..." : "Agregar Área / Cliente"}
+            </Button>
+          </form>
+
+          {areaError && (
+            <div style={{ color: "var(--color-status-danger)", fontSize: "12.5px", marginBottom: "12px", display: "flex", alignItems: "center", gap: 6 }}>
+              <AlertTriangle size={14} /> {areaError}
+            </div>
+          )}
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+            {clientAreas.map((area) => {
+              const isGeneral = area.toLowerCase() === "general";
+              return (
+                <span
+                  key={area}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    background: isGeneral ? "rgba(99, 102, 241, 0.15)" : "var(--color-surface-hover, rgba(255, 255, 255, 0.06))",
+                    border: isGeneral ? "1px solid rgba(99, 102, 241, 0.3)" : "1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.1))",
+                    color: isGeneral ? "var(--color-brand-primary)" : "var(--color-text-primary)",
+                    fontWeight: 500,
+                    fontSize: "13px",
+                    padding: "6px 12px",
+                    borderRadius: "6px",
+                  }}
+                >
+                  <span>{area}</span>
+                  {isGeneral ? (
+                    <span style={{ fontSize: "10px", opacity: 0.75, textTransform: "uppercase", fontWeight: 700 }}>Por defecto</span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveArea(area)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "var(--color-text-tertiary)",
+                        cursor: "pointer",
+                        padding: 0,
+                        display: "inline-flex",
+                        alignItems: "center",
+                      }}
+                      title={`Eliminar ${area}`}
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </span>
+              );
+            })}
           </div>
         </Card>
       </div>

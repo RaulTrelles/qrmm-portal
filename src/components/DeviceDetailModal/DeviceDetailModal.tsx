@@ -14,6 +14,8 @@ import {
   executeDeviceTerminalCommand,
   getDeviceSystemLogs,
   terminateDeviceProcess,
+  updateDeviceArea,
+  getClientAreas,
 } from "../../services/api";
 import {
   X,
@@ -23,6 +25,7 @@ import {
   Activity,
   Clock,
   Trash2,
+  Tag,
   List,
   Server,
   RotateCcw,
@@ -130,12 +133,18 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
     setProcessToTerminate(null);
   }, [device?.id]);
 
+  // Estados para Área / Cliente
+  const [deviceArea, setDeviceArea] = useState<string>(device?.client_area || "General");
+  const [availableAreas, setAvailableAreas] = useState<string[]>(["General"]);
+  const [updatingArea, setUpdatingArea] = useState<boolean>(false);
+
   useEffect(() => {
     if (device?.alert_recipients) {
       setDeviceAlertRecipients(device.alert_recipients);
     } else {
       setDeviceAlertRecipients([]);
     }
+    setDeviceArea(device?.client_area || "General");
     setEmailInputError(null);
     setSaveRecipientsSuccess(null);
     setSaveRecipientsError(null);
@@ -145,6 +154,11 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
       } else {
         setSshUser(device.os_type === "linux" ? "root" : "Administrator");
       }
+      getClientAreas()
+        .then((areas) => {
+          if (areas && areas.length > 0) setAvailableAreas(areas);
+        })
+        .catch(() => {});
     }
   }, [device]);
 
@@ -643,6 +657,37 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
             <Badge variant={isOnline ? "success" : "danger"} pulse={isOnline}>
               {device.status.current_state}
             </Badge>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 5, marginLeft: 6 }}>
+              <Tag size={13} style={{ opacity: 0.6 }} />
+              <select
+                className="q-table-area-select"
+                value={deviceArea}
+                disabled={updatingArea}
+                onChange={async (e) => {
+                  const val = e.target.value;
+                  setDeviceArea(val);
+                  if (device) {
+                    try {
+                      setUpdatingArea(true);
+                      device.client_area = val;
+                      await updateDeviceArea(device.id, val);
+                    } catch (err) {
+                      console.error("Error al actualizar área:", err);
+                    } finally {
+                      setUpdatingArea(false);
+                    }
+                  }
+                }}
+                style={{ padding: "3px 8px", fontSize: 12, height: 26 }}
+                title="Área o Cliente asignado a este equipo"
+              >
+                {availableAreas.map((a) => (
+                  <option key={a} value={a}>
+                    {a}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {isOnline && (
@@ -1835,21 +1880,21 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
               <div className="q-alerts-card">
                 <div className="q-alerts-card-header">
                   <Bell size={18} color="var(--color-brand-primary)" />
-                  <span>Destinatarios Específicos para este Equipo</span>
+                  <span>Notificación por Desconexión / Apagado Imprevisto</span>
                   <Badge variant={deviceAlertRecipients.length > 0 ? "success" : "neutral"}>
-                    {deviceAlertRecipients.length} asignado(s)
+                    {deviceAlertRecipients.length > 0 ? `${deviceAlertRecipients.length} cliente(s)` : "Por defecto (Global)"}
                   </Badge>
                 </div>
 
                 <p className="q-alerts-desc">
-                  Asigna a las personas o áreas responsables que deben recibir alertas cuando ocurran eventos críticos (caída a <strong>OFFLINE</strong> o fallas de contenedores Docker) específicamente en <strong>{device.hostname}</strong>.
+                  Configura los correos del cliente o área responsable de este equipo. Si se define al menos un correo aquí, cuando <strong>{device.hostname}</strong> se apague de improviso o pierda conexión, la alerta se enviará exclusivamente a este cliente. Si este campo se deja vacío, la alerta se notificará automáticamente a los destinatarios configurados en las alertas generales de la flota.
                 </p>
 
                 <form onSubmit={handleAddRecipientEmail} className="q-email-input-row">
                   <input
                     type="email"
                     className="q-email-input"
-                    placeholder="Escribe un correo (ej. soporte.local@empresa.com) y presiona Enter o Agregar..."
+                    placeholder="Escribe un correo de cliente (ej. cliente@empresa.com) y presiona Enter o Agregar..."
                     value={newEmailInput}
                     onChange={(e) => {
                       setNewEmailInput(e.target.value);
@@ -1873,12 +1918,12 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
 
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8, textTransform: "uppercase" }}>
-                    Correos Asignados a {device.hostname}:
+                    Correos de Cliente Asignados a {device.hostname}:
                   </div>
 
                   {deviceAlertRecipients.length === 0 ? (
                     <div style={{ fontSize: 13, color: "var(--color-text-tertiary)", fontStyle: "italic", padding: "10px 0" }}>
-                      No hay destinatarios específicos asignados a este equipo. Solo las cuentas de administración general recibirán las alertas.
+                      No hay correos de cliente configurados para este equipo. Las alertas por desconexión o apagado imprevisto se enviarán automáticamente a los administradores generales configurados en "Configuración y Alertas".
                     </div>
                   ) : (
                     <div className="q-email-chips-wrap">

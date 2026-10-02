@@ -1,10 +1,17 @@
 import type { Device, MobileDeviceCardData } from "../types/device";
-import type { TokenResponseData, UserProfile } from "../types/auth";
+import type { TokenResponseData, UserProfile, RegisterPayload } from "../types/auth";
 import type { OrganizationItem, CreateOrganizationPayload, UpdateOrganizationPayload } from "../types/organization";
 
 const getApiBase = (): string => {
   if (import.meta.env.VITE_API_BASE) {
-    return import.meta.env.VITE_API_BASE.replace(/\/$/, "");
+    const base = import.meta.env.VITE_API_BASE.replace(/\/$/, "");
+    if (base.startsWith("http://") || base.startsWith("https://")) {
+      return base;
+    }
+    if (typeof window !== "undefined") {
+      return `${window.location.origin}${base}`;
+    }
+    return `http://localhost:5173${base}`;
   }
   if (typeof window !== "undefined") {
     const host = window.location.hostname;
@@ -42,7 +49,8 @@ function getAuthHeaders(customHeaders: Record<string, string> = {}): Record<stri
 }
 
 export async function getDevices(organizationId?: string | null): Promise<Device[]> {
-  const url = new URL(API_BASE + "/devices");
+  const baseOrigin = typeof window !== "undefined" ? window.location.origin : "http://localhost:5173";
+  const url = new URL(API_BASE + "/devices", baseOrigin);
   if (organizationId && organizationId !== "all") {
     url.searchParams.set("organization_id", organizationId);
   }
@@ -62,7 +70,8 @@ export async function getDeviceById(id: string): Promise<Device> {
 }
 
 export async function getMobileCards(organizationId?: string | null): Promise<MobileDeviceCardData[]> {
-  const url = new URL(API_BASE + "/devices/mobile-cards");
+  const baseOrigin = typeof window !== "undefined" ? window.location.origin : "http://localhost:5173";
+  const url = new URL(API_BASE + "/devices/mobile-cards", baseOrigin);
   if (organizationId && organizationId !== "all") {
     url.searchParams.set("organization_id", organizationId);
   }
@@ -111,7 +120,8 @@ export async function searchDeviceServices(
   deviceId: string,
   query?: string
 ): Promise<{ services: any[] }> {
-  const url = new URL(API_BASE + "/devices/" + deviceId + "/services");
+  const baseOrigin = typeof window !== "undefined" ? window.location.origin : "http://localhost:5173";
+  const url = new URL(API_BASE + "/devices/" + deviceId + "/services", baseOrigin);
   if (query && query.trim()) {
     url.searchParams.set("q", query.trim());
   }
@@ -175,7 +185,9 @@ export async function getDeviceSystemLogs(
   source: string = "system",
   lines: number = 200
 ): Promise<{ device_id: string; logs: string; source: string; lines: number }> {
-  const res = await fetch(`${API_BASE}/devices/${deviceId}/system-logs?source=${encodeURIComponent(source)}&lines=${lines}`);
+  const res = await fetch(`${API_BASE}/devices/${deviceId}/system-logs?source=${encodeURIComponent(source)}&lines=${lines}`, {
+    headers: getAuthHeaders(),
+  });
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
     throw new Error(data.detail || "Error al consultar logs del sistema remoto");
@@ -201,11 +213,20 @@ export async function terminateDeviceProcess(
   return res.json();
 }
 
+export interface RemoteFileItem {
+  name: string;
+  path: string;
+  is_dir: boolean;
+  size: number;
+  modified_at: string;
+}
+
 export interface AlertSettings {
   email_alerts_enabled: boolean;
   notify_on_device_offline: boolean;
   notify_on_container_crash: boolean;
   alert_recipients: string[];
+  client_areas?: string[];
   delivery_channel: "google_oauth" | "smtp";
   smtp_host: string;
   smtp_port: number;
@@ -223,6 +244,7 @@ export interface AlertSettingsUpdatePayload {
   notify_on_device_offline: boolean;
   notify_on_container_crash: boolean;
   alert_recipients: string[];
+  client_areas?: string[];
   delivery_channel: "google_oauth" | "smtp";
   smtp_host?: string;
   smtp_port?: number;
@@ -276,7 +298,7 @@ export async function updateDeviceAlertRecipients(
 ): Promise<Device> {
   const res = await fetch(`${API_BASE}/devices/${deviceId}/alert-recipients`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify({ alert_recipients: alertRecipients }),
   });
   if (!res.ok) {
@@ -286,8 +308,126 @@ export async function updateDeviceAlertRecipients(
   return res.json();
 }
 
+export async function updateDeviceArea(
+  deviceId: string,
+  clientArea: string
+): Promise<Device> {
+  const res = await fetch(`${API_BASE}/devices/${deviceId}/area`, {
+    method: "PATCH",
+    headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify({ client_area: clientArea }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al actualizar el área o cliente del equipo");
+  }
+  return res.json();
+}
+
+export async function getClientAreas(): Promise<string[]> {
+  try {
+    const res = await fetch(`${API_BASE}/settings/areas`, {
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) {
+      // Fallback a alert settings si el endpoint dedicado no responde
+      const settings = await getAlertSettings();
+      return settings.client_areas || ["General"];
+    }
+    const data = await res.json();
+    return data.areas || ["General"];
+  } catch {
+    return ["General"];
+  }
+}
+
+export async function updateClientAreas(areas: string[]): Promise<string[]> {
+  const res = await fetch(`${API_BASE}/settings/areas`, {
+    method: "PUT",
+    headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify({ areas }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al guardar el catálogo de áreas/clientes");
+  }
+  const data = await res.json();
+  return data.areas || ["General"];
+}
+
+export async function listRemoteFiles(
+  deviceId: string,
+  path?: string
+): Promise<{ success: boolean; current_path: string; parent_path: string; items: RemoteFileItem[] }> {
+  const params = new URLSearchParams();
+  if (path) params.append("path", path);
+  const res = await fetch(`${API_BASE}/devices/${deviceId}/fs/list?${params.toString()}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al consultar archivos en el disco remoto");
+  }
+  return res.json();
+}
+
+export async function uploadRemoteFile(
+  deviceId: string,
+  targetPath: string,
+  filename: string,
+  contentBase64: string
+): Promise<{ success: boolean; message: string; path: string }> {
+  const res = await fetch(`${API_BASE}/devices/${deviceId}/fs/upload`, {
+    method: "POST",
+    headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify({
+      path: targetPath,
+      filename,
+      content_base64: contentBase64,
+    }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al transferir archivo hacia el equipo remoto");
+  }
+  return res.json();
+}
+
+export async function downloadRemoteFile(
+  deviceId: string,
+  path: string
+): Promise<{ success: boolean; filename: string; size: number; content_base64: string }> {
+  const params = new URLSearchParams({ path });
+  const res = await fetch(`${API_BASE}/devices/${deviceId}/fs/download?${params.toString()}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al descargar archivo desde el equipo remoto");
+  }
+  return res.json();
+}
+
+export async function deleteRemoteFile(
+  deviceId: string,
+  path: string
+): Promise<{ success: boolean; message: string }> {
+  const params = new URLSearchParams({ path });
+  const res = await fetch(`${API_BASE}/devices/${deviceId}/fs/delete?${params.toString()}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al eliminar elemento en el equipo remoto");
+  }
+  return res.json();
+}
+
 export async function getNetworkProbes(): Promise<{ probes: any[]; active_count: number }> {
-  const res = await fetch(`${API_BASE}/discovery/probes`);
+  const res = await fetch(`${API_BASE}/discovery/probes`, {
+    headers: getAuthHeaders(),
+  });
   if (!res.ok) throw new Error("Error al consultar sondas de red disponibles");
   return res.json();
 }
@@ -295,7 +435,7 @@ export async function getNetworkProbes(): Promise<{ probes: any[]; active_count:
 export async function scanNetwork(probeDeviceId?: string, subnet?: string): Promise<any> {
   const res = await fetch(`${API_BASE}/discovery/scan`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify({
       probe_device_id: probeDeviceId || undefined,
       subnet: subnet || undefined,
@@ -309,7 +449,9 @@ export async function scanNetwork(probeDeviceId?: string, subnet?: string): Prom
 }
 
 export async function getDiscoveredDevices(): Promise<any> {
-  const res = await fetch(`${API_BASE}/discovery/devices`);
+  const res = await fetch(`${API_BASE}/discovery/devices`, {
+    headers: getAuthHeaders(),
+  });
   if (!res.ok) throw new Error("Error al consultar dispositivos descubiertos");
   return res.json();
 }
@@ -355,6 +497,35 @@ export async function loginWithGoogle(credential: string): Promise<TokenResponse
     throw new Error(data.detail || "Error al autenticar con Google");
   }
   return res.json();
+}
+
+export async function register(payload: RegisterPayload): Promise<TokenResponseData> {
+  const res = await fetch(`${API_BASE}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al registrar la cuenta");
+  }
+  return res.json();
+}
+
+export async function getGoogleClientId(): Promise<string> {
+  try {
+    const res = await fetch(`${API_BASE}/auth/google-client-id`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.client_id) return data.client_id;
+    }
+  } catch {
+    // fallback seguro
+  }
+  return (
+    import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+    "600233776099-tlqifsqopk1tu5lsncuh54fhtprfq1vu.apps.googleusercontent.com"
+  );
 }
 
 export async function getMe(): Promise<{ user: UserProfile; organization: any }> {

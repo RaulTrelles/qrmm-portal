@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import type { UserProfile, OrganizationBasic } from "../types/auth";
+import type { UserProfile, OrganizationBasic, RegisterPayload } from "../types/auth";
 import type { OrganizationItem } from "../types/organization";
 import {
   getAuthToken,
   setAuthToken,
   login as apiLogin,
   loginWithGoogle as apiLoginWithGoogle,
+  register as apiRegister,
   getMe,
   getOrganizations,
 } from "../services/api";
@@ -20,6 +21,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, pass: string) => Promise<void>;
   loginWithGoogle: (credential: string) => Promise<void>;
+  register: (payload: RegisterPayload) => Promise<void>;
   loginWithCustomToken: (newToken: string, newUser?: any, newOrg?: any) => void;
   logout: () => void;
   refreshOrganizations: () => Promise<void>;
@@ -151,6 +153,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const register = async (payload: RegisterPayload) => {
+    const res = await apiRegister(payload);
+    setAuthToken(res.access_token);
+    setTokenState(res.access_token);
+    setUser(res.user);
+    setOrganization(res.organization || null);
+    if (res.organization) {
+      const clientOrgItem: OrganizationItem = {
+        id: res.organization.id,
+        name: res.organization.name,
+        slug: res.organization.slug,
+        plan: res.organization.plan,
+        enrollment_token: res.organization.enrollment_token,
+        created_at: new Date().toISOString(),
+      };
+      setActiveOrganizationState(clientOrgItem);
+      setOrganizationsList([clientOrgItem]);
+      localStorage.setItem("q_active_org", JSON.stringify(clientOrgItem));
+    }
+  };
+
   const loginWithCustomToken = (newToken: string, newUser?: any, newOrg?: any) => {
     setAuthToken(newToken);
     setTokenState(newToken);
@@ -198,6 +221,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         login,
         loginWithGoogle,
+        register,
         loginWithCustomToken,
         logout,
         refreshOrganizations,

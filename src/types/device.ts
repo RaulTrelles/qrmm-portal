@@ -83,6 +83,7 @@ export interface Device {
   mac_address?: string;
   enrollment_status: string;
   tags: string[];
+  client_area?: string;
   specs?: DeviceSpecs;
   alert_recipients?: string[];
   registered_at: string;
@@ -95,6 +96,7 @@ export interface MobileDeviceCardData {
   hostname: string;
   os_type: string;
   current_state: DeviceState;
+  client_area?: string;
   last_seen: string | null;
   ip: string;
   cpu_percent: number | null;

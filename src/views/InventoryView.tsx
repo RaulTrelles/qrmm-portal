@@ -18,7 +18,10 @@ import {
   ExternalLink,
   Plus,
   FileText,
+  Tag,
+  Edit2,
 } from "lucide-react";
+import { getClientAreas, updateDeviceArea } from "../services/api";
 import "./InventoryView.css";
 
 export interface InventoryViewProps {
@@ -31,6 +34,10 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
   const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>("");
   const [osFilter, setOsFilter] = useState<string>("all");
+  const [areaFilter, setAreaFilter] = useState<string>("all");
+  const [availableAreas, setAvailableAreas] = useState<string[]>(["General"]);
+  const [editingAreaDeviceId, setEditingAreaDeviceId] = useState<string | null>(null);
+  const [updatingAreaId, setUpdatingAreaId] = useState<string | null>(null);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [enrollModalOpen, setEnrollModalOpen] = useState<boolean>(false);
   const [reportModalOpen, setReportModalOpen] = useState<boolean>(false);
@@ -38,8 +45,14 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
   const fetchDevices = async () => {
     try {
       setLoading(true);
-      const data = await getDevices(activeOrganization?.id);
+      const [data, areasData] = await Promise.all([
+        getDevices(activeOrganization?.id),
+        getClientAreas().catch(() => ["General"]),
+      ]);
       setDevices(data);
+      if (areasData && areasData.length > 0) {
+        setAvailableAreas(areasData);
+      }
     } catch (err) {
       console.error("Error al cargar inventario:", err);
     } finally {
@@ -89,14 +102,34 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
         !q ||
         d.hostname.toLowerCase().includes(q) ||
         d.device_code.toLowerCase().includes(q) ||
+        (d.client_area && d.client_area.toLowerCase().includes(q)) ||
         (d.private_ip && d.private_ip.includes(q)) ||
         (d.specs?.cpu_model && d.specs.cpu_model.toLowerCase().includes(q)) ||
         (d.os_version && d.os_version.toLowerCase().includes(q));
 
       const matchesOs = osFilter === "all" || d.os_type.toLowerCase() === osFilter.toLowerCase();
-      return matchesSearch && matchesOs;
+      const matchesArea = areaFilter === "all" || (d.client_area || "General").toLowerCase() === areaFilter.toLowerCase();
+      return matchesSearch && matchesOs && matchesArea;
     });
-  }, [devices, search, osFilter]);
+  }, [devices, search, osFilter, areaFilter]);
+
+  const handleChangeArea = async (dev: Device, newArea: string) => {
+    if (dev.client_area === newArea) {
+      setEditingAreaDeviceId(null);
+      return;
+    }
+    try {
+      setUpdatingAreaId(dev.id);
+      dev.client_area = newArea;
+      setDevices([...devices]);
+      await updateDeviceArea(dev.id, newArea);
+    } catch (err) {
+      console.error("Error al actualizar área del equipo:", err);
+    } finally {
+      setUpdatingAreaId(null);
+      setEditingAreaDeviceId(null);
+    }
+  };
 
   // Totales de hardware para resumen ejecutivo
   const stats = useMemo(() => {
@@ -312,6 +345,29 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
             <option value="linux">Linux</option>
           </select>
         </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>Filtrar Área:</span>
+          <select
+            value={areaFilter}
+            onChange={(e) => setAreaFilter(e.target.value)}
+            style={{
+              background: "var(--color-surface-muted)",
+              color: "var(--color-text-primary)",
+              border: "1px solid var(--color-border-default)",
+              borderRadius: "var(--radius-sm)",
+              padding: "6px 12px",
+              fontSize: 13,
+            }}
+          >
+            <option value="all">Todas las Áreas</option>
+            {availableAreas.map((area) => (
+              <option key={area} value={area}>
+                {area}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Table */}
@@ -320,6 +376,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
           <thead>
             <tr>
               <th>Equipo / Código</th>
+              <th>Área / Cliente</th>
               <th>Estado</th>
               <th>Procesador (CPU)</th>
               <th>Memoria RAM</th>
@@ -333,13 +390,13 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={9} style={{ textAlign: "center", padding: 32, color: "var(--color-text-tertiary)" }}>
+                <td colSpan={10} style={{ textAlign: "center", padding: 32, color: "var(--color-text-tertiary)" }}>
                   Cargando inventario de activos...
                 </td>
               </tr>
             ) : filteredDevices.length === 0 ? (
               <tr>
-                <td colSpan={9} style={{ textAlign: "center", padding: 32, color: "var(--color-text-tertiary)" }}>
+                <td colSpan={10} style={{ textAlign: "center", padding: 32, color: "var(--color-text-tertiary)" }}>
                   No se encontraron activos que coincidan con la búsqueda.
                 </td>
               </tr>
@@ -351,6 +408,37 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
                     <td>
                       <div className="q-asset-hostname">{d.hostname}</div>
                       <div className="q-asset-meta">{d.device_code}</div>
+                    </td>
+                    <td>
+                      <div className="q-table-area-wrap" onClick={(e) => e.stopPropagation()}>
+                        {editingAreaDeviceId === d.id ? (
+                          <select
+                            className="q-table-area-select"
+                            value={d.client_area || "General"}
+                            onChange={(e) => handleChangeArea(d, e.target.value)}
+                            onBlur={() => setEditingAreaDeviceId(null)}
+                            autoFocus
+                            disabled={updatingAreaId === d.id}
+                          >
+                            {availableAreas.map((area) => (
+                              <option key={area} value={area}>
+                                {area}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <button
+                            type="button"
+                            className="q-table-area-badge"
+                            onClick={() => setEditingAreaDeviceId(d.id)}
+                            title="Haz clic para cambiar Área / Cliente"
+                          >
+                            <Tag size={12} style={{ opacity: 0.7 }} />
+                            <span>{d.client_area || "General"}</span>
+                            <Edit2 size={11} className="q-table-area-edit-icon" />
+                          </button>
+                        )}
+                      </div>
                     </td>
                     <td>
                       <Badge variant={isOnline ? "success" : "danger"} pulse={isOnline}>

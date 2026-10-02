@@ -10,25 +10,47 @@ import {
   X,
   KeyRound,
   CheckCircle2,
+  ShieldCheck,
+  User as UserIcon,
+  Building2,
+  UserPlus,
+  LogIn,
+  HelpCircle,
+  ExternalLink,
+  Copy,
 } from "lucide-react";
-import { forgotPassword, resetPassword } from "../services/api";
+import { forgotPassword, resetPassword, getGoogleClientId } from "../services/api";
 import "./LoginView.css";
 
 const GOOGLE_CLIENT_ID =
   import.meta.env.VITE_GOOGLE_CLIENT_ID ||
-  "1008955884041-n58nlc30n4fnqnl6c3btr3nmfh8sduj1.apps.googleusercontent.com";
+  "600233776099-tlqifsqopk1tu5lsncuh54fhtprfq1vu.apps.googleusercontent.com";
 
 export interface LoginViewProps {
   onGoToPortal?: () => void;
 }
 
 export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, register } = useAuth();
+  const [mode, setMode] = useState<"login" | "register">("login");
+
+  // Estados de Login
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Estados de Creación de Cuenta (Registro)
+  const [regFullName, setRegFullName] = useState<string>("");
+  const [regOrgName, setRegOrgName] = useState<string>("");
+  const [regEmail, setRegEmail] = useState<string>("");
+  const [regPassword, setRegPassword] = useState<string>("");
+  const [regConfirmPassword, setRegConfirmPassword] = useState<string>("");
+  const [showRegPassword, setShowRegPassword] = useState<boolean>(false);
+  const [regLoading, setRegLoading] = useState<boolean>(false);
+  const [regError, setRegError] = useState<string | null>(null);
+
   const googleBtnRef = useRef<HTMLDivElement>(null);
 
   // Estados para Recuperación de Contraseña
@@ -41,7 +63,19 @@ export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
   const [forgotLoading, setForgotLoading] = useState<boolean>(false);
   const [forgotError, setForgotError] = useState<string | null>(null);
   const [forgotMsg, setForgotMsg] = useState<string | null>(null);
-  const [generatedCodeNotice, setGeneratedCodeNotice] = useState<string | null>(null);
+
+  // Estado para Google Client ID dinámico y modal de ayuda
+  const [googleClientId, setGoogleClientId] = useState<string>(GOOGLE_CLIENT_ID);
+  const [isGoogleHelpOpen, setIsGoogleHelpOpen] = useState<boolean>(false);
+  const [copiedOrigin, setCopiedOrigin] = useState<boolean>(false);
+
+  useEffect(() => {
+    getGoogleClientId().then((cid) => {
+      if (cid && cid !== googleClientId) {
+        setGoogleClientId(cid);
+      }
+    });
+  }, []);
 
   // Inicializar Google Identity Services
   useEffect(() => {
@@ -49,7 +83,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
       if (typeof window !== "undefined" && (window as any).google?.accounts?.id) {
         try {
           (window as any).google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
+            client_id: googleClientId,
             callback: async (response: any) => {
               if (response?.credential) {
                 try {
@@ -57,7 +91,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
                   setError(null);
                   await loginWithGoogle(response.credential);
                 } catch (err: any) {
-                  setError(err.message || "Error al iniciar sesión con Google");
+                  setError(err.message || "Error al autenticar o crear cuenta con Google");
                 } finally {
                   setLoading(false);
                 }
@@ -71,7 +105,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
               theme: "outline",
               size: "large",
               width: 360,
-              text: "continue_with",
+              text: mode === "register" ? "signup_with" : "continue_with",
               shape: "rectangular",
               logo_alignment: "left",
             });
@@ -84,7 +118,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
 
     const timer = setTimeout(initGoogle, 400);
     return () => clearTimeout(timer);
-  }, [loginWithGoogle]);
+  }, [loginWithGoogle, mode, googleClientId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,6 +138,41 @@ export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
     }
   };
 
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!regFullName.trim()) {
+      setRegError("Por favor ingresa tu nombre completo.");
+      return;
+    }
+    if (!regEmail.trim() || !regEmail.includes("@") || !regEmail.includes(".")) {
+      setRegError("Por favor ingresa un correo electrónico corporativo válido.");
+      return;
+    }
+    if (regPassword.length < 6) {
+      setRegError("La contraseña debe tener al menos 6 caracteres.");
+      return;
+    }
+    if (regPassword !== regConfirmPassword) {
+      setRegError("Las contraseñas no coinciden.");
+      return;
+    }
+
+    try {
+      setRegLoading(true);
+      setRegError(null);
+      await register({
+        full_name: regFullName.trim(),
+        email: regEmail.trim(),
+        password: regPassword,
+        organization_name: regOrgName.trim() || undefined,
+      });
+    } catch (err: any) {
+      setRegError(err.message || "Error al crear la cuenta. Inténtalo de nuevo.");
+    } finally {
+      setRegLoading(false);
+    }
+  };
+
   const handleRequestCode = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!forgotEmail.trim()) {
@@ -116,13 +185,10 @@ export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
     try {
       const res = await forgotPassword(forgotEmail.trim());
       setForgotStep(2);
-      setForgotMsg(res.message);
-      if (res.code) {
-        setGeneratedCodeNotice(res.code);
-        setForgotCode(res.code);
-      }
+      setForgotMsg(res.message || `¡Código de seguridad enviado a ${forgotEmail.trim()}! Revisa tu bandeja de entrada o spam.`);
+      setForgotCode("");
     } catch (err: any) {
-      setForgotError(err.message || "Error al solicitar código");
+      setForgotError(err.message || "Error al solicitar código de verificación.");
     } finally {
       setForgotLoading(false);
     }
@@ -161,118 +227,301 @@ export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
 
   return (
     <div className="q-login-page">
-      <div className="q-login-card">
+      <div className="q-login-card" style={{ maxWidth: mode === "register" ? "480px" : "440px" }}>
         <div className="q-login-header">
           <div className="q-login-logo-badge">Q</div>
-          <h1 className="q-login-title">Qhapana RMM</h1>
+          <h1 className="q-login-title">
+            {mode === "login" ? "Qhapana RMM" : "Crear Cuenta en Qhapana"}
+          </h1>
           <p className="q-login-subtitle">
-            Consola SaaS de Gestión y Supervisión Remota
+            {mode === "login"
+              ? "Consola de Gestión y Supervisión Remota"
+              : "Gestiona y supervisa tu flota de servidores y puestos de trabajo"}
           </p>
         </div>
 
-        {error && (
+        {/* Selector de Modo (Tabs) */}
+        <div className="q-auth-mode-switch" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === "login"}
+            className={`q-auth-mode-tab ${mode === "login" ? "active" : ""}`}
+            onClick={() => {
+              setMode("login");
+              setError(null);
+              setRegError(null);
+            }}
+          >
+            <LogIn size={15} />
+            <span>Iniciar Sesión</span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === "register"}
+            className={`q-auth-mode-tab ${mode === "register" ? "active" : ""}`}
+            onClick={() => {
+              setMode("register");
+              setError(null);
+              setRegError(null);
+            }}
+          >
+            <UserPlus size={15} />
+            <span>Crear Cuenta</span>
+          </button>
+        </div>
+
+        {/* ALERTA DE ERROR */}
+        {(mode === "login" ? error : regError) && (
           <div className="q-login-error" role="alert">
             <AlertCircle size={16} />
-            <span>{error}</span>
+            <span>{mode === "login" ? error : regError}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="q-login-form">
-          <div className="q-form-group">
-            <label className="q-form-label" htmlFor="login-email">
-              Correo Electrónico
-            </label>
-            <div className="q-input-wrapper">
-              <Mail size={16} />
-              <input
-                id="login-email"
-                type="email"
-                className="q-input-field"
-                placeholder="ej. admin@qhapana.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
-                autoFocus
-              />
+        {/* FORMULARIO DE INICIO DE SESIÓN */}
+        {mode === "login" ? (
+          <form onSubmit={handleSubmit} className="q-login-form">
+            <div className="q-form-group">
+              <label className="q-form-label" htmlFor="login-email">
+                Correo Electrónico
+              </label>
+              <div className="q-input-wrapper">
+                <Mail size={16} />
+                <input
+                  id="login-email"
+                  type="email"
+                  className="q-input-field"
+                  placeholder="ej. admin@qhapana.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                  autoFocus
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="q-form-group">
-            <label className="q-form-label" htmlFor="login-password">
-              Contraseña
-            </label>
-            <div className="q-input-wrapper">
-              <Lock size={16} />
-              <input
-                id="login-password"
-                type={showPassword ? "text" : "password"}
-                className="q-input-field"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-              />
+            <div className="q-form-group">
+              <label className="q-form-label" htmlFor="login-password">
+                Contraseña
+              </label>
+              <div className="q-input-wrapper">
+                <Lock size={16} />
+                <input
+                  id="login-password"
+                  type={showPassword ? "text" : "password"}
+                  className="q-input-field"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  className="q-password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  tabIndex={-1}
+                  title={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={loading}
+              style={{ width: "100%", marginTop: 4, height: 42 }}
+            >
+              {loading ? "Verificando acceso..." : "Iniciar Sesión"}
+            </Button>
+
+            {/* Enlace Recuperar Contraseña */}
+            <div style={{ textAlign: "center", marginTop: "2px" }}>
               <button
                 type="button"
-                className="q-password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                tabIndex={-1}
-                title={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
+                onClick={() => {
+                  setForgotEmail(email.trim());
+                  setForgotStep(1);
+                  setForgotError(null);
+                  setForgotMsg(null);
+                  setForgotCode("");
+                  setForgotNewPassword("");
+                  setShowForgotNewPassword(false);
+                  setIsForgotOpen(true);
+                }}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "var(--color-brand-primary)",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  padding: "6px 8px",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
+                onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
               >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                ¿Olvidaste tu contraseña? Recuperar contraseña
               </button>
             </div>
-          </div>
+          </form>
+        ) : (
+          /* FORMULARIO DE CREACIÓN DE CUENTA (REGISTRO) */
+          <form onSubmit={handleRegisterSubmit} className="q-login-form">
+            <div className="q-form-group">
+              <label className="q-form-label" htmlFor="reg-fullname">
+                Nombre y Apellidos
+              </label>
+              <div className="q-input-wrapper">
+                <UserIcon size={16} />
+                <input
+                  id="reg-fullname"
+                  type="text"
+                  className="q-input-field"
+                  placeholder="ej. Carlos Mendoza"
+                  value={regFullName}
+                  onChange={(e) => setRegFullName(e.target.value)}
+                  disabled={regLoading}
+                  autoFocus
+                  required
+                />
+              </div>
+            </div>
 
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={loading}
-            style={{ width: "100%", marginTop: 4, height: 42 }}
-          >
-            {loading ? "Verificando acceso..." : "Iniciar Sesión"}
-          </Button>
+            <div className="q-form-group">
+              <label className="q-form-label" htmlFor="reg-orgname">
+                Empresa u Organización <span style={{ color: "var(--color-text-tertiary)", fontWeight: 400 }}>(opcional)</span>
+              </label>
+              <div className="q-input-wrapper">
+                <Building2 size={16} />
+                <input
+                  id="reg-orgname"
+                  type="text"
+                  className="q-input-field"
+                  placeholder="ej. Inversiones Globales S.A."
+                  value={regOrgName}
+                  onChange={(e) => setRegOrgName(e.target.value)}
+                  disabled={regLoading}
+                />
+              </div>
+            </div>
 
-          {/* Enlace Recuperar Contraseña */}
-          <div style={{ textAlign: "center", marginTop: "2px" }}>
-            <button
-              type="button"
-              onClick={() => {
-                setForgotEmail(email.trim());
-                setForgotStep(1);
-                setForgotError(null);
-                setForgotMsg(null);
-                setGeneratedCodeNotice(null);
-                setForgotCode("");
-                setForgotNewPassword("");
-                setShowForgotNewPassword(false);
-                setIsForgotOpen(true);
-              }}
-              style={{
-                background: "transparent",
-                border: "none",
-                color: "var(--color-brand-primary)",
-                fontSize: "13px",
-                fontWeight: 600,
-                cursor: "pointer",
-                padding: "6px 8px",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
-              onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
+            <div className="q-form-group">
+              <label className="q-form-label" htmlFor="reg-email">
+                Correo Electrónico Corporativo
+              </label>
+              <div className="q-input-wrapper">
+                <Mail size={16} />
+                <input
+                  id="reg-email"
+                  type="email"
+                  className="q-input-field"
+                  placeholder="ej. admin@miempresa.com"
+                  value={regEmail}
+                  onChange={(e) => setRegEmail(e.target.value)}
+                  disabled={regLoading}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="q-form-group">
+              <label className="q-form-label" htmlFor="reg-password">
+                Contraseña (mínimo 6 caracteres)
+              </label>
+              <div className="q-input-wrapper">
+                <Lock size={16} />
+                <input
+                  id="reg-password"
+                  type={showRegPassword ? "text" : "password"}
+                  className="q-input-field"
+                  placeholder="Crea una contraseña segura"
+                  value={regPassword}
+                  onChange={(e) => setRegPassword(e.target.value)}
+                  disabled={regLoading}
+                  required
+                />
+                <button
+                  type="button"
+                  className="q-password-toggle"
+                  onClick={() => setShowRegPassword(!showRegPassword)}
+                  tabIndex={-1}
+                  title={showRegPassword ? "Ocultar contraseña" : "Ver contraseña"}
+                >
+                  {showRegPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="q-form-group">
+              <label className="q-form-label" htmlFor="reg-confirm-password">
+                Confirmar Contraseña
+              </label>
+              <div className="q-input-wrapper">
+                <Lock size={16} />
+                <input
+                  id="reg-confirm-password"
+                  type={showRegPassword ? "text" : "password"}
+                  className="q-input-field"
+                  placeholder="Repite tu contraseña"
+                  value={regConfirmPassword}
+                  onChange={(e) => setRegConfirmPassword(e.target.value)}
+                  disabled={regLoading}
+                  required
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={regLoading}
+              style={{ width: "100%", marginTop: 4, height: 42 }}
             >
-              ¿Olvidaste tu contraseña? Recuperar contraseña
-            </button>
-          </div>
-        </form>
+              {regLoading ? "Creando tu cuenta y espacio..." : "Crear Cuenta y Empezar Gratis"}
+            </Button>
 
-        <div className="q-login-divider">O continúa con</div>
+            <p style={{ fontSize: "11px", color: "var(--color-text-tertiary)", textAlign: "center", margin: "2px 0 0" }}>
+              Al registrarte aceptas las Condiciones del Servicio y la Política de Privacidad de Qhapana.
+            </p>
+          </form>
+        )}
+
+        <div className="q-login-divider">
+          {mode === "login" ? "O continúa con" : "O regístrate con"}
+        </div>
 
         <div className="q-google-btn-container">
           <div ref={googleBtnRef} style={{ width: "100%", display: "flex", justifyContent: "center" }} />
+          <div style={{ textAlign: "center", marginTop: "6px" }}>
+            <button
+              type="button"
+              onClick={() => setIsGoogleHelpOpen(true)}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "var(--color-text-tertiary)",
+                fontSize: "12px",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+                padding: "2px 6px",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-brand-primary)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-tertiary)")}
+            >
+              <HelpCircle size={13} />
+              <span>¿Error 401 / no registered origin con Google? Ver solución</span>
+            </button>
+          </div>
         </div>
 
         {onGoToPortal && (
-          <div style={{ marginTop: "16px", textAlign: "center" }}>
+          <div style={{ marginTop: "12px", textAlign: "center" }}>
             <button
               type="button"
               onClick={onGoToPortal}
@@ -298,57 +547,83 @@ export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
             className="q-checkout-modal"
             style={{ maxWidth: "460px" }}
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="forgot-modal-title"
           >
             <button
               className="q-modal-close"
               onClick={() => setIsForgotOpen(false)}
-              title="Cerrar"
+              title="Cerrar ventana"
+              aria-label="Cerrar ventana"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+            {/* Encabezado del Modal */}
+            <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "16px" }}>
               <div
                 style={{
-                  width: "36px",
-                  height: "36px",
-                  borderRadius: "8px",
-                  background: "var(--color-brand-surface)",
+                  width: "44px",
+                  height: "44px",
+                  borderRadius: "12px",
+                  background: "linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(124, 58, 237, 0.2))",
+                  border: "1px solid rgba(99, 102, 241, 0.3)",
                   color: "var(--color-brand-primary)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  flexShrink: 0,
                 }}
               >
-                <KeyRound size={20} />
+                {forgotStep === 1 ? <KeyRound size={22} /> : <ShieldCheck size={22} />}
               </div>
-              <h2 style={{ fontSize: "18px", fontWeight: 800, margin: 0, color: "var(--color-text-primary)" }}>
-                Recuperar Contraseña
-              </h2>
+              <div>
+                <span
+                  style={{
+                    display: "inline-block",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                    color: "var(--color-brand-primary)",
+                    marginBottom: "4px",
+                  }}
+                >
+                  {forgotStep === 1 ? "Paso 1 de 2 • Identificación" : "Paso 2 de 2 • Verificación"}
+                </span>
+                <h2
+                  id="forgot-modal-title"
+                  style={{ fontSize: "19px", fontWeight: 800, margin: 0, color: "var(--color-text-primary)", letterSpacing: "-0.01em" }}
+                >
+                  {forgotStep === 1 ? "Recuperar Contraseña" : "Validar Código y Nueva Clave"}
+                </h2>
+              </div>
             </div>
 
-            <p style={{ fontSize: "13px", color: "var(--color-text-secondary)", marginBottom: "16px" }}>
+            <p style={{ fontSize: "13.5px", color: "var(--color-text-secondary)", lineHeight: 1.5, marginBottom: "18px" }}>
               {forgotStep === 1
-                ? "Ingresa el correo electrónico asociado a tu cuenta para generar un código de verificación."
-                : `Ingresa el código de 6 dígitos enviado y define tu nueva contraseña para ${forgotEmail}.`}
+                ? "Ingresa tu correo electrónico registrado. Te enviaremos un código de seguridad de 6 dígitos para restablecer tu acceso."
+                : `Hemos despachado un código de seguridad a ${forgotEmail}. Ingrésalo a continuación para activar tu nueva contraseña.`}
             </p>
 
             {forgotError && (
               <div
                 style={{
                   padding: "10px 14px",
-                  backgroundColor: "#fee2e2",
-                  color: "#b91c1c",
+                  backgroundColor: "rgba(239, 68, 68, 0.12)",
+                  border: "1px solid rgba(239, 68, 68, 0.3)",
+                  color: "#dc2626",
                   borderRadius: "8px",
-                  fontSize: "12px",
+                  fontSize: "12.5px",
                   fontWeight: 500,
-                  marginBottom: "14px",
+                  marginBottom: "16px",
                   display: "flex",
                   alignItems: "center",
                   gap: "8px",
                 }}
               >
-                <AlertCircle size={16} />
+                <AlertCircle size={16} style={{ flexShrink: 0 }} />
                 <span>{forgotError}</span>
               </div>
             )}
@@ -357,38 +632,56 @@ export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
               <div
                 style={{
                   padding: "10px 14px",
-                  backgroundColor: "#dcfce7",
-                  color: "#15803d",
+                  backgroundColor: "rgba(16, 185, 129, 0.12)",
+                  border: "1px solid rgba(16, 185, 129, 0.3)",
+                  color: "#059669",
                   borderRadius: "8px",
-                  fontSize: "12px",
+                  fontSize: "12.5px",
                   fontWeight: 500,
-                  marginBottom: "14px",
+                  marginBottom: "16px",
                   display: "flex",
                   alignItems: "center",
                   gap: "8px",
                 }}
               >
-                <CheckCircle2 size={16} />
+                <CheckCircle2 size={16} style={{ flexShrink: 0 }} />
                 <span>{forgotMsg}</span>
               </div>
             )}
 
             {forgotStep === 1 ? (
-              <form onSubmit={handleRequestCode} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <form onSubmit={handleRequestCode} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <div className="q-form-group">
-                  <label className="q-form-label">Correo Electrónico</label>
+                  <label className="q-form-label">Correo Electrónico de la Cuenta</label>
                   <div className="q-input-wrapper">
-                    <Mail size={16} />
+                    <Mail size={16} color="var(--color-text-secondary)" />
                     <input
                       type="email"
                       required
                       className="q-input-field"
-                      placeholder="ej. raul.trelles@gmail.com"
+                      placeholder="ejemplo@tuempresa.com"
                       value={forgotEmail}
                       onChange={(e) => setForgotEmail(e.target.value)}
                       autoFocus
                     />
                   </div>
+                </div>
+
+                <div
+                  style={{
+                    padding: "10px 12px",
+                    background: "var(--color-surface-page)",
+                    border: "1px solid var(--color-border-default)",
+                    borderRadius: "8px",
+                    fontSize: "12px",
+                    color: "var(--color-text-secondary)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <Lock size={14} color="var(--color-brand-primary)" style={{ flexShrink: 0 }} />
+                  <span>El código vence en 15 minutos y se envía de forma confidencial a tu bandeja.</span>
                 </div>
 
                 <Button
@@ -397,58 +690,23 @@ export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
                   loading={forgotLoading}
                   style={{ width: "100%", height: "42px", marginTop: "4px" }}
                 >
-                  Enviar Código de Verificación
+                  {forgotLoading ? "Enviando código por correo..." : "Enviar Código de Verificación"}
                 </Button>
               </form>
             ) : (
               <form onSubmit={handleResetPassword} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                {generatedCodeNotice && (
-                  <div
-                    style={{
-                      padding: "10px 12px",
-                      backgroundColor: "var(--color-brand-surface)",
-                      border: "1px dashed var(--color-brand-primary)",
-                      borderRadius: "8px",
-                      fontSize: "12px",
-                      color: "var(--color-brand-primary)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <span>
-                      Código generado: <strong>{generatedCodeNotice}</strong>
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setForgotCode(generatedCodeNotice)}
-                      style={{
-                        background: "var(--color-brand-primary)",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "4px",
-                        padding: "2px 8px",
-                        fontSize: "11px",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                      }}
-                    >
-                      Autocompletar
-                    </button>
-                  </div>
-                )}
-
                 <div className="q-form-group">
-                  <label className="q-form-label">Código de Verificación (6 dígitos)</label>
+                  <label className="q-form-label">Código de Verificación (6 dígitos recibido por correo)</label>
                   <input
                     type="text"
                     required
                     maxLength={6}
                     className="q-form-input"
-                    placeholder="Ej. 123456"
+                    placeholder="••••••"
                     value={forgotCode}
                     onChange={(e) => setForgotCode(e.target.value.replace(/\D/g, ""))}
-                    style={{ letterSpacing: "3px", fontSize: "16px", fontWeight: 700, textAlign: "center" }}
+                    style={{ letterSpacing: "6px", fontSize: "20px", fontWeight: 800, textAlign: "center" }}
+                    autoComplete="one-time-code"
                     autoFocus
                   />
                 </div>
@@ -493,7 +751,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
                   loading={forgotLoading}
                   style={{ width: "100%", height: "42px", marginTop: "4px" }}
                 >
-                  Restablecer Contraseña
+                  {forgotLoading ? "Actualizando contraseña..." : "Restablecer y Actualizar Contraseña"}
                 </Button>
 
                 <div style={{ textAlign: "center", marginTop: "4px" }}>
@@ -507,8 +765,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
                     style={{
                       background: "transparent",
                       border: "none",
-                      color: "var(--color-text-secondary)",
-                      fontSize: "12px",
+                      color: "var(--color-brand-primary)",
+                      fontSize: "12.5px",
+                      fontWeight: 600,
                       cursor: "pointer",
                       textDecoration: "underline",
                     }}
@@ -518,6 +777,168 @@ export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Ayuda: Configuración de Origen Google OAuth */}
+      {isGoogleHelpOpen && (
+        <div className="q-checkout-modal-overlay" onClick={() => setIsGoogleHelpOpen(false)}>
+          <div
+            className="q-checkout-modal"
+            style={{ maxWidth: "520px" }}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
+            <button
+              className="q-modal-close"
+              onClick={() => setIsGoogleHelpOpen(false)}
+              title="Cerrar ventana"
+            >
+              <X size={18} />
+            </button>
+
+            <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "16px" }}>
+              <div
+                style={{
+                  width: "44px",
+                  height: "44px",
+                  borderRadius: "12px",
+                  background: "linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(245, 158, 11, 0.2))",
+                  border: "1px solid rgba(239, 68, 68, 0.3)",
+                  color: "#ef4444",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <AlertCircle size={22} />
+              </div>
+              <div>
+                <span
+                  style={{
+                    display: "inline-block",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                    color: "var(--color-brand-primary)",
+                    marginBottom: "4px",
+                  }}
+                >
+                  Diagnóstico y Solución Google OAuth
+                </span>
+                <h2 style={{ fontSize: "18px", fontWeight: 800, margin: 0, color: "var(--color-text-primary)" }}>
+                  Resolver Error 401: no registered origin
+                </h2>
+              </div>
+            </div>
+
+            <p style={{ fontSize: "13px", color: "var(--color-text-secondary)", lineHeight: 1.5, margin: "0 0 16px" }}>
+              Google bloquea el popup si el dominio o puerto actual no está autorizado en la lista blanca de la consola de Google Cloud.
+            </p>
+
+            {/* Caja de Origen Detectado */}
+            <div style={{ background: "var(--color-surface-page)", border: "1px solid var(--color-border-default)", borderRadius: "10px", padding: "12px 14px", marginBottom: "16px" }}>
+              <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", color: "var(--color-text-tertiary)", marginBottom: "4px" }}>
+                Origen actual de tu navegador:
+              </div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
+                <code style={{ fontSize: "13px", fontWeight: 700, color: "var(--color-brand-primary)", wordBreak: "break-all" }}>
+                  {typeof window !== "undefined" ? window.location.origin : "http://localhost:5173"}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (typeof window !== "undefined") {
+                      navigator.clipboard.writeText(window.location.origin);
+                      setCopiedOrigin(true);
+                      setTimeout(() => setCopiedOrigin(false), 2000);
+                    }
+                  }}
+                  style={{
+                    background: "var(--color-surface-default)",
+                    border: "1px solid var(--color-border-default)",
+                    borderRadius: "6px",
+                    padding: "4px 8px",
+                    fontSize: "11px",
+                    fontWeight: 600,
+                    color: "var(--color-text-primary)",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    flexShrink: 0,
+                  }}
+                >
+                  <Copy size={12} />
+                  <span>{copiedOrigin ? "¡Copiado!" : "Copiar"}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Pasos de configuración */}
+            <div style={{ fontSize: "13px", color: "var(--color-text-secondary)", display: "flex", flexDirection: "column", gap: "10px", marginBottom: "18px" }}>
+              <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                <span style={{ width: "20px", height: "20px", borderRadius: "50%", background: "var(--color-brand-primary)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, flexShrink: 0 }}>1</span>
+                <span>
+                  Abre la <strong>Consola de Google Cloud</strong> en la sección de Credenciales de tu proyecto.
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                <span style={{ width: "20px", height: "20px", borderRadius: "50%", background: "var(--color-brand-primary)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, flexShrink: 0 }}>2</span>
+                <span>
+                  Haz clic en tu <strong>ID de cliente de OAuth 2.0</strong> (número de proyecto: <code>600233776099</code>).
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                <span style={{ width: "20px", height: "20px", borderRadius: "50%", background: "var(--color-brand-primary)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, flexShrink: 0 }}>3</span>
+                <span>
+                  Bajo <strong>Orígenes de JavaScript autorizados</strong>, añade:
+                  <ul style={{ margin: "4px 0 0", paddingLeft: "18px" }}>
+                    <li><code>http://localhost:5173</code> (para pruebas en tu PC)</li>
+                    <li><code>https://qrmm.qhapana.com</code> (para producción)</li>
+                  </ul>
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                <span style={{ width: "20px", height: "20px", borderRadius: "50%", background: "var(--color-brand-primary)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, flexShrink: 0 }}>4</span>
+                <span>
+                  Guarda los cambios. Google tarda entre 1 y 5 minutos en sincronizar los dominios.
+                </span>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+              <Button
+                variant="secondary"
+                onClick={() => setIsGoogleHelpOpen(false)}
+              >
+                Entendido
+              </Button>
+              <a
+                href="https://console.cloud.google.com/apis/credentials?project=600233776099"
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  background: "var(--color-brand-primary)",
+                  color: "#ffffff",
+                  textDecoration: "none",
+                  fontWeight: 600,
+                  fontSize: "13px",
+                  padding: "8px 16px",
+                  borderRadius: "var(--radius-md)",
+                }}
+              >
+                <span>Ir a Google Cloud Console</span>
+                <ExternalLink size={14} />
+              </a>
+            </div>
           </div>
         </div>
       )}

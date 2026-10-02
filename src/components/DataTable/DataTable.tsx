@@ -1,21 +1,65 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import type { Device } from "../../types/device";
 import { Badge } from "../Badge/Badge";
 import { Button } from "../Button/Button";
-import { Monitor, Server, ExternalLink, Activity, Trash2 } from "lucide-react";
+import { Monitor, Server, ExternalLink, Activity, Trash2, Tag, Edit2 } from "lucide-react";
+import { getClientAreas, updateDeviceArea } from "../../services/api";
 import "./DataTable.css";
 
 export interface DataTableProps {
   devices: Device[];
   onSelectDevice: (device: Device) => void;
   onDeleteDevice?: (device: Device) => void;
+  onUpdateDeviceArea?: (device: Device, newArea: string) => void;
+  areas?: string[];
 }
 
-type DeviceSortField = "hostname" | "status" | "os" | "ip" | "availability" | "last_seen";
+type DeviceSortField = "hostname" | "area" | "status" | "os" | "ip" | "availability" | "last_seen";
 
-export const DataTable: React.FC<DataTableProps> = ({ devices, onSelectDevice, onDeleteDevice }) => {
+export const DataTable: React.FC<DataTableProps> = ({
+  devices,
+  onSelectDevice,
+  onDeleteDevice,
+  onUpdateDeviceArea,
+  areas,
+}) => {
   const [sortField, setSortField] = useState<DeviceSortField>("hostname");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [availableAreas, setAvailableAreas] = useState<string[]>(areas || ["General"]);
+  const [editingAreaDeviceId, setEditingAreaDeviceId] = useState<string | null>(null);
+  const [updatingAreaId, setUpdatingAreaId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (areas && areas.length > 0) {
+      setAvailableAreas(areas);
+    } else {
+      getClientAreas()
+        .then((fetched) => {
+          if (fetched && fetched.length > 0) setAvailableAreas(fetched);
+        })
+        .catch(() => {});
+    }
+  }, [areas]);
+
+  const handleChangeArea = async (dev: Device, newArea: string) => {
+    if (dev.client_area === newArea) {
+      setEditingAreaDeviceId(null);
+      return;
+    }
+    try {
+      setUpdatingAreaId(dev.id);
+      dev.client_area = newArea;
+      await updateDeviceArea(dev.id, newArea);
+      if (onUpdateDeviceArea) {
+        onUpdateDeviceArea(dev, newArea);
+      }
+    } catch (err) {
+      console.error("Error al actualizar área del equipo:", err);
+    } finally {
+      setUpdatingAreaId(null);
+      setEditingAreaDeviceId(null);
+    }
+  };
 
   const handleSort = (field: DeviceSortField) => {
     if (sortField === field) {
@@ -47,6 +91,10 @@ export const DataTable: React.FC<DataTableProps> = ({ devices, onSelectDevice, o
         case "hostname":
           valA = a.hostname.toLowerCase();
           valB = b.hostname.toLowerCase();
+          break;
+        case "area":
+          valA = (a.client_area || "General").toLowerCase();
+          valB = (b.client_area || "General").toLowerCase();
           break;
         case "status":
           valA = a.status.current_state;
@@ -101,6 +149,12 @@ export const DataTable: React.FC<DataTableProps> = ({ devices, onSelectDevice, o
                 {renderSortIndicator("hostname")}
               </div>
             </th>
+            <th className="q-sortable-th" onClick={() => handleSort("area")} title="Ordenar por Área o Cliente">
+              <div className="q-th-inner">
+                <span>Área / Cliente</span>
+                {renderSortIndicator("area")}
+              </div>
+            </th>
             <th className="q-sortable-th" onClick={() => handleSort("status")} title="Ordenar por Estado">
               <div className="q-th-inner">
                 <span>Estado</span>
@@ -149,6 +203,37 @@ export const DataTable: React.FC<DataTableProps> = ({ devices, onSelectDevice, o
                       <div>{dev.hostname}</div>
                       <div className="q-table-subtext">{dev.device_code}</div>
                     </div>
+                  </div>
+                </td>
+                <td>
+                  <div className="q-table-area-wrap" onClick={(e) => e.stopPropagation()}>
+                    {editingAreaDeviceId === dev.id ? (
+                      <select
+                        className="q-table-area-select"
+                        value={dev.client_area || "General"}
+                        onChange={(e) => handleChangeArea(dev, e.target.value)}
+                        onBlur={() => setEditingAreaDeviceId(null)}
+                        autoFocus
+                        disabled={updatingAreaId === dev.id}
+                      >
+                        {availableAreas.map((area) => (
+                          <option key={area} value={area}>
+                            {area}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <button
+                        type="button"
+                        className="q-table-area-badge"
+                        onClick={() => setEditingAreaDeviceId(dev.id)}
+                        title="Haz clic para cambiar el Área o Cliente"
+                      >
+                        <Tag size={12} style={{ opacity: 0.7 }} />
+                        <span>{dev.client_area || "General"}</span>
+                        <Edit2 size={11} className="q-table-area-edit-icon" />
+                      </button>
+                    )}
                   </div>
                 </td>
                 <td>

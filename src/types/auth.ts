@@ -24,3 +24,11 @@ export interface TokenResponseData {
   user: UserProfile;
   organization?: OrganizationBasic | null;
 }
+
+export interface RegisterPayload {
+  full_name: string;
+  email: string;
+  password: string;
+  organization_name?: string;
+}
+

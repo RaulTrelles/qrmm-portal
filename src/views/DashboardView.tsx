@@ -85,7 +85,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
   }, [devices]);
   const filteredDevices = useMemo(() => {
     return devices.filter((dev) => {
-      const matchSearch = dev.hostname.toLowerCase().includes(search.toLowerCase()) || dev.device_code.toLowerCase().includes(search.toLowerCase()) || dev.private_ip.includes(search);
+      const matchSearch =
+        dev.hostname.toLowerCase().includes(search.toLowerCase()) ||
+        dev.device_code.toLowerCase().includes(search.toLowerCase()) ||
+        (dev.client_area && dev.client_area.toLowerCase().includes(search.toLowerCase())) ||
+        Boolean(dev.private_ip && dev.private_ip.includes(search));
       const matchOs = osFilter === "all" || dev.os_type.toLowerCase().includes(osFilter.toLowerCase());
       const matchState = stateFilter === "all" || dev.status.current_state === stateFilter;
       return matchSearch && matchOs && matchState;
@@ -145,7 +149,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
         <div style={{ textAlign: "center", padding: 48, color: "var(--color-text-secondary)" }}>Cargando flota de dispositivos...</div>
       ) : (
         <>
-          <DataTable devices={filteredDevices} onSelectDevice={(d) => setSelectedDevice(d)} onDeleteDevice={handleDeleteDevice} />
+          <DataTable
+            devices={filteredDevices}
+            onSelectDevice={(d) => setSelectedDevice(d)}
+            onDeleteDevice={handleDeleteDevice}
+            onUpdateDeviceArea={(dev, newArea) => {
+              dev.client_area = newArea;
+              setDevices([...devices]);
+            }}
+          />
           <div className="q-cards-grid">
             {filteredDevices.map((d) => (<DeviceCard key={d.id} device={d} onSelect={(dev) => setSelectedDevice(dev)} />))}
           </div>
