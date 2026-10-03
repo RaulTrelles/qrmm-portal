@@ -331,9 +331,13 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
     if (!device) return;
     try {
       setDiagnosingAi(true);
-      await triggerDeviceAIDiagnosis(device.id, true, "es");
-      const updated = await getDeviceAIHealth(device.id);
-      setAiHealthData(updated);
+      const res = await triggerDeviceAIDiagnosis(device.id, true, "es");
+      if (res && res.health) {
+        setAiHealthData(res);
+      } else {
+        const updated = await getDeviceAIHealth(device.id);
+        setAiHealthData(updated);
+      }
     } catch (_err: any) {
       // Fallback determinístico con la telemetría actual sin lanzar alert bloqueante
       const fallbackData = computeLocalDeviceAIHealth(device);
