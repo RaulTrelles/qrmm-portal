@@ -7,7 +7,15 @@ export interface DeviceStatus {
   disconnect_reason: string | null;
   availability_percentage_24h: number;
 }
-export interface DiskSpec { mount: string; total_gb: number; free_gb: number; }
+export interface DiskSpec {
+  mount: string;
+  total_gb: number;
+  free_gb: number;
+  used_gb?: number;
+  used_percent?: number;
+  device?: string;
+  fstype?: string;
+}
 export interface PeripheralSpecs {
   chassis_type?: "Desktop" | "Laptop" | "Server" | "All in One" | string;
   monitors?: string[];

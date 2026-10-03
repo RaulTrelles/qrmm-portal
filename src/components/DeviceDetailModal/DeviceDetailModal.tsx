@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import type { Device, ProcessItem, ServiceItem, DockerContainer } from "../../types/device";
+import type { Device, ProcessItem, ServiceItem, DockerContainer, DiskSpec } from "../../types/device";
 import { Badge } from "../Badge/Badge";
 import { Button } from "../Button/Button";
 import {
@@ -148,6 +148,56 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
     setProcessActionFeedback(null);
     setProcessToTerminate(null);
   }, [device?.id]);
+
+  // Lista consolidada de todas las unidades de almacenamiento (telemetría en vivo o especificaciones)
+  const allDisks = useMemo<DiskSpec[]>(() => {
+    if (!device) return [];
+
+    // 1. Telemetría en vivo del último heartbeat recibido
+    const liveTelemetryDisks = (device.latest_telemetry as any)?.telemetry?.disks as DiskSpec[] | undefined;
+    if (Array.isArray(liveTelemetryDisks) && liveTelemetryDisks.length > 0) {
+      return liveTelemetryDisks;
+    }
+
+    // 2. Discos en specs de hardware registrados
+    const specsDisks = device.specs?.disks;
+    if (Array.isArray(specsDisks) && specsDisks.length > 0) {
+      return specsDisks;
+    }
+
+    // 3. Fallback sintetizado de unidad principal
+    const totalGB = Number(device.specs?.disk_total_gb || 0);
+    const freeGB = Number(device.specs?.disk_free_gb || 0);
+    const usedGB = totalGB > 0 ? Math.max(0, Math.round((totalGB - freeGB) * 10) / 10) : 0;
+    const pct = device.latest_telemetry?.disk_percent != null
+      ? Number(device.latest_telemetry.disk_percent)
+      : totalGB > 0 ? Math.round((usedGB / totalGB) * 100) : 0;
+
+    const mainMount = device.os_type === "windows" ? "C:" : "/";
+    return [
+      {
+        mount: mainMount,
+        total_gb: totalGB,
+        free_gb: freeGB,
+        used_gb: usedGB,
+        used_percent: pct,
+      },
+    ];
+  }, [device]);
+
+  const totalStorageGB = useMemo(() => {
+    if (allDisks.length > 0) {
+      return allDisks.reduce((acc, d) => acc + (Number(d.total_gb) || 0), 0);
+    }
+    return Number(device?.specs?.disk_total_gb || 0);
+  }, [allDisks, device]);
+
+  const freeStorageGB = useMemo(() => {
+    if (allDisks.length > 0) {
+      return allDisks.reduce((acc, d) => acc + (Number(d.free_gb) || 0), 0);
+    }
+    return Number(device?.specs?.disk_free_gb || 0);
+  }, [allDisks, device]);
 
   // Estados para Área / Cliente
   const [deviceArea, setDeviceArea] = useState<string>(device?.client_area || "General");
@@ -866,12 +916,140 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                   </div>
                   <div style={{ background: "var(--color-surface-muted)", padding: 12, borderRadius: 8 }}>
                     <HardDrive size={18} color="var(--color-brand-primary)" style={{ marginBottom: 4 }} />
-                    <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>ALMACENAMIENTO</div>
-                    <div style={{ fontWeight: 600, fontSize: 13 }}>{device.specs?.disk_total_gb ? `${device.specs.disk_total_gb} GB` : "Disco Principal"}</div>
+                    <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>
+                      {isEs ? "ALMACENAMIENTO TOTAL" : "TOTAL STORAGE"}
+                    </div>
+                    <div style={{ fontWeight: 600, fontSize: 13 }}>
+                      {totalStorageGB >= 1000
+                        ? `${(totalStorageGB / 1024).toFixed(1)} TB (${allDisks.length} ${allDisks.length === 1 ? (isEs ? "unidad" : "drive") : (isEs ? "unidades" : "drives")})`
+                        : `${Math.round(totalStorageGB)} GB (${allDisks.length} ${allDisks.length === 1 ? (isEs ? "unidad" : "drive") : (isEs ? "unidades" : "drives")})`}
+                    </div>
                     <div style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>
-                      {device.specs?.disk_free_gb ? `${device.specs.disk_free_gb} GB libres` : "NVMe / SSD"}
+                      {freeStorageGB >= 1000
+                        ? `${(freeStorageGB / 1024).toFixed(1)} TB ${isEs ? "libres" : "free"}`
+                        : `${Math.round(freeStorageGB * 10) / 10} GB ${isEs ? "libres" : "free"}`}
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* UNIDADES DE ALMACENAMIENTO & ESTADO DE DISCOS */}
+              <div className="q-modal-section">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <span className="q-modal-section-title" style={{ margin: 0 }}>
+                    <HardDrive size={14} style={{ verticalAlign: "middle", marginRight: 6 }} />
+                    {isEs ? "Unidades de Disco & Almacenamiento" : "Disk Drives & Storage Partitions"}
+                  </span>
+                  <Badge variant="info">
+                    {allDisks.length} {allDisks.length === 1 ? (isEs ? "Unidad Detectada" : "Drive Detected") : (isEs ? "Unidades Detectadas" : "Drives Detected")}
+                  </Badge>
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: allDisks.length > 1 ? "repeat(auto-fit, minmax(280px, 1fr))" : "1fr",
+                    gap: 12,
+                  }}
+                >
+                  {allDisks.map((d, idx) => {
+                    const total = Number(d.total_gb || 0);
+                    const free = Number(d.free_gb || 0);
+                    const used = d.used_gb != null ? Number(d.used_gb) : Math.max(0, Math.round((total - free) * 10) / 10);
+                    const pct = d.used_percent != null
+                      ? Number(d.used_percent)
+                      : total > 0 ? Math.round((used / total) * 100) : 0;
+
+                    const isHigh = pct >= 90;
+                    const isWarning = pct >= 75 && pct < 90;
+                    const barColor = isHigh
+                      ? "var(--color-status-danger, #ef4444)"
+                      : isWarning
+                      ? "var(--color-status-warning, #f59e0b)"
+                      : "var(--color-status-success, #10b981)";
+
+                    return (
+                      <div
+                        key={idx}
+                        style={{
+                          background: "var(--color-surface-muted)",
+                          border: "1px solid var(--color-border-default)",
+                          borderRadius: 8,
+                          padding: "14px 16px",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 10,
+                        }}
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                            <div
+                              style={{
+                                width: 34,
+                                height: 34,
+                                borderRadius: 8,
+                                background: "var(--color-surface-default)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                border: "1px solid var(--color-border-default)",
+                              }}
+                            >
+                              <HardDrive size={18} color="var(--color-brand-primary)" />
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: 700, fontSize: 14, color: "var(--color-text-primary)" }}>
+                                {isEs ? "Unidad" : "Drive"} {d.mount}
+                                {d.fstype ? ` (${d.fstype})` : ""}
+                              </div>
+                              <div style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>
+                                {d.device && d.device !== d.mount
+                                  ? d.device
+                                  : d.mount === "C:" || d.mount === "/"
+                                  ? (isEs ? "Disco Local (Sistema)" : "Local Disk (System)")
+                                  : (isEs ? "Disco Local (Datos / Secundario)" : "Local Disk (Data / Secondary)")}
+                              </div>
+                            </div>
+                          </div>
+                          <Badge variant={isHigh ? "danger" : isWarning ? "warning" : "success"}>
+                            {pct}% {isEs ? "ocupado" : "used"}
+                          </Badge>
+                        </div>
+
+                        {/* Barra de progreso de uso de disco */}
+                        <div>
+                          <div
+                            style={{
+                              width: "100%",
+                              height: 8,
+                              background: "var(--color-border-default)",
+                              borderRadius: 4,
+                              overflow: "hidden",
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: `${Math.min(100, Math.max(0, pct))}%`,
+                                height: "100%",
+                                background: barColor,
+                                borderRadius: 4,
+                                transition: "width 0.3s ease",
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--color-text-secondary)" }}>
+                          <span>
+                            <b>{free} GB</b> {isEs ? "libres" : "free"}
+                          </span>
+                          <span>
+                            {used} GB {isEs ? "usados de" : "used of"} <b>{total} GB</b>
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
