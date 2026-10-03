@@ -1090,29 +1090,29 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
 
                     {/* Desglose de componentes */}
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
-                      <div style={{ background: "#ffffff", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
-                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>CPU HEALTH</div>
-                        <div style={{ fontWeight: 700, fontSize: 16 }}>{aiHealthData.health.cpu_score}%</div>
+                      <div style={{ background: "rgba(255, 255, 255, 0.05)", padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", fontWeight: 600, letterSpacing: "0.03em" }}>CPU HEALTH</div>
+                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.cpu_score}%</div>
                       </div>
-                      <div style={{ background: "#ffffff", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
-                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>RAM HEALTH</div>
-                        <div style={{ fontWeight: 700, fontSize: 16 }}>{aiHealthData.health.memory_score}%</div>
+                      <div style={{ background: "rgba(255, 255, 255, 0.05)", padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", fontWeight: 600, letterSpacing: "0.03em" }}>RAM HEALTH</div>
+                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.memory_score}%</div>
                       </div>
-                      <div style={{ background: "#ffffff", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
-                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>DISK HEALTH</div>
-                        <div style={{ fontWeight: 700, fontSize: 16 }}>{aiHealthData.health.disk_score}%</div>
+                      <div style={{ background: "rgba(255, 255, 255, 0.05)", padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", fontWeight: 600, letterSpacing: "0.03em" }}>DISK HEALTH</div>
+                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.disk_score}%</div>
                       </div>
-                      <div style={{ background: "#ffffff", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
-                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>NETWORK</div>
-                        <div style={{ fontWeight: 700, fontSize: 16 }}>{aiHealthData.health.network_score}%</div>
+                      <div style={{ background: "rgba(255, 255, 255, 0.05)", padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", fontWeight: 600, letterSpacing: "0.03em" }}>NETWORK</div>
+                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.network_score}%</div>
                       </div>
-                      <div style={{ background: "#ffffff", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
-                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>OS & LOGS</div>
-                        <div style={{ fontWeight: 700, fontSize: 16 }}>{aiHealthData.health.events_score}%</div>
+                      <div style={{ background: "rgba(255, 255, 255, 0.05)", padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", fontWeight: 600, letterSpacing: "0.03em" }}>OS & LOGS</div>
+                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.events_score}%</div>
                       </div>
-                      <div style={{ background: "#ffffff", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
-                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>AVAILABILITY</div>
-                        <div style={{ fontWeight: 700, fontSize: 16 }}>{aiHealthData.health.availability_score}%</div>
+                      <div style={{ background: "rgba(255, 255, 255, 0.05)", padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", fontWeight: 600, letterSpacing: "0.03em" }}>AVAILABILITY</div>
+                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.availability_score}%</div>
                       </div>
                     </div>
                   </div>
@@ -1188,8 +1188,8 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                           </div>
                           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                             {aiHealthData.diagnostic.recommendations.map((rec, i) => (
-                              <div key={i} style={{ fontSize: 13, padding: "8px 12px", background: "#ffffff", borderRadius: 6, border: "1px solid var(--color-border-default)" }}>
-                                <b>{i + 1}. {rec.action}</b> — <span style={{ color: "var(--color-text-secondary)" }}>{rec.reason}</span>
+                              <div key={i} style={{ fontSize: 13, padding: "10px 14px", background: "rgba(255, 255, 255, 0.05)", borderRadius: 6, border: "1px solid rgba(255, 255, 255, 0.1)", color: "var(--color-text-primary)" }}>
+                                <b style={{ color: "var(--color-text-primary)" }}>{i + 1}. {rec.action}</b> — <span style={{ color: "var(--color-text-secondary)" }}>{rec.reason}</span>
                               </div>
                             ))}
                           </div>
