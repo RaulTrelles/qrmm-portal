@@ -60,6 +60,13 @@ import { RemoteDesktopModal } from "../RemoteDesktopModal/RemoteDesktopModal";
 import { copyToClipboard } from "../../utils/clipboard";
 import type { DeviceAIHealthResponse } from "../../types/ai";
 import { computeLocalDeviceAIHealth } from "../../utils/aiFallback";
+import {
+  formatAnomalyType,
+  formatTrend,
+  formatAnomalyDescription,
+  formatReason,
+  getAppLanguage,
+} from "../../utils/aiFormatters";
 import "./DeviceDetailModal.css";
 
 export interface DeviceDetailModalProps {
@@ -74,6 +81,7 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
   const [activeTab, setActiveTab] = useState<ModalTab>("overview");
   const [aiHealthData, setAiHealthData] = useState<DeviceAIHealthResponse | null>(null);
   const [loadingAiHealth, setLoadingAiHealth] = useState<boolean>(false);
+  const isEs = getAppLanguage() === "es";
   const [diagnosingAi, setDiagnosingAi] = useState<boolean>(false);
   const [processSearch, setProcessSearch] = useState<string>("");
   const [serviceSearch, setServiceSearch] = useState<string>("");
@@ -331,7 +339,8 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
     if (!device) return;
     try {
       setDiagnosingAi(true);
-      const res = await triggerDeviceAIDiagnosis(device.id, true, "es");
+      const lang = getAppLanguage();
+      const res = await triggerDeviceAIDiagnosis(device.id, true, lang);
       if (res && res.health) {
         setAiHealthData(res);
       } else {
@@ -1020,10 +1029,12 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                 <div>
                   <h3 style={{ margin: "0 0 4px 0", fontSize: 17, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}>
                     <Sparkles size={20} color="var(--color-brand-primary)" />
-                    Diagnóstico Predictivo & Salud del Endpoint
+                    {isEs ? "Diagnóstico Predictivo & Salud del Endpoint" : "Predictive Diagnostics & Endpoint Health"}
                   </h3>
                   <span style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>
-                    Evaluación determinística multi-variable asistida por motor de inferencia DeepSeek.
+                    {isEs
+                      ? "Evaluación determinística multi-variable asistida por motor de inferencia DeepSeek."
+                      : "Multi-variable deterministic assessment assisted by DeepSeek inference engine."}
                   </span>
                 </div>
                 <Button
@@ -1033,14 +1044,16 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                   disabled={diagnosingAi}
                 >
                   <RefreshCw size={14} style={{ marginRight: 6 }} className={diagnosingAi ? "animate-spin" : ""} />
-                  {diagnosingAi ? "Diagnosticando..." : "Ejecutar Diagnóstico IA en Vivo"}
+                  {diagnosingAi
+                    ? isEs ? "Diagnosticando..." : "Diagnosing..."
+                    : isEs ? "Ejecutar Diagnóstico IA en Vivo" : "Run Live AI Diagnostic"}
                 </Button>
               </div>
 
               {loadingAiHealth ? (
                 <div style={{ textAlign: "center", padding: "40px 0", color: "var(--color-text-secondary)" }}>
                   <RefreshCw className="animate-spin" size={28} style={{ margin: "0 auto 12px auto", color: "var(--color-brand-primary)" }} />
-                  <div>Cargando métricas y análisis de salud...</div>
+                  <div>{isEs ? "Cargando métricas y análisis de salud..." : "Loading health metrics and analysis..."}</div>
                 </div>
               ) : aiHealthData ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -1059,7 +1072,7 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                   >
                     <div style={{ textAlign: "center", borderRight: "1px solid var(--color-border-default)", paddingRight: 16 }}>
                       <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase" }}>
-                        Health Score
+                        {isEs ? "Puntaje de Salud" : "Health Score"}
                       </div>
                       <div
                         style={{
@@ -1088,34 +1101,34 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                         }
                         style={{ marginTop: 6 }}
                       >
-                        Tendencia: {aiHealthData.health.trend}
+                        {isEs ? "Tendencia:" : "Trend:"} {formatTrend(aiHealthData.health.trend, isEs ? "es" : "en")}
                       </Badge>
                     </div>
 
                     {/* Desglose de componentes */}
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
                       <div style={{ background: "var(--color-surface-default)", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
-                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>CPU HEALTH</div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>{isEs ? "SALUD DE CPU" : "CPU HEALTH"}</div>
                         <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.cpu_score}%</div>
                       </div>
                       <div style={{ background: "var(--color-surface-default)", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
-                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>RAM HEALTH</div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>{isEs ? "MEMORIA RAM" : "RAM HEALTH"}</div>
                         <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.memory_score}%</div>
                       </div>
                       <div style={{ background: "var(--color-surface-default)", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
-                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>DISK HEALTH</div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>{isEs ? "ALMACENAMIENTO" : "DISK HEALTH"}</div>
                         <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.disk_score}%</div>
                       </div>
                       <div style={{ background: "var(--color-surface-default)", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
-                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>NETWORK</div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>{isEs ? "RED Y ENLACE" : "NETWORK"}</div>
                         <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.network_score}%</div>
                       </div>
                       <div style={{ background: "var(--color-surface-default)", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
-                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>OS & LOGS</div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>{isEs ? "SISTEMA Y EVENTOS" : "OS & LOGS"}</div>
                         <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.events_score}%</div>
                       </div>
                       <div style={{ background: "var(--color-surface-default)", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
-                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>AVAILABILITY</div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>{isEs ? "DISPONIBILIDAD" : "AVAILABILITY"}</div>
                         <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.availability_score}%</div>
                       </div>
                     </div>
@@ -1124,10 +1137,10 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                   {/* Explicabilidad determinística (Reasons) */}
                   {aiHealthData.health.reasons && aiHealthData.health.reasons.length > 0 && (
                     <div style={{ background: "var(--color-surface-muted)", padding: 14, borderRadius: 8 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>Evidencia y factores del cálculo:</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>{isEs ? "Evidencia y factores del cálculo:" : "Evidence & calculation factors:"}</div>
                       <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: "var(--color-text-secondary)" }}>
                         {aiHealthData.health.reasons.map((r, idx) => (
-                          <li key={idx} style={{ marginBottom: 3 }}>{r}</li>
+                          <li key={idx} style={{ marginBottom: 3 }}>{formatReason(r, isEs ? "es" : "en")}</li>
                         ))}
                       </ul>
                     </div>
@@ -1137,7 +1150,7 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                   {aiHealthData.anomalies && aiHealthData.anomalies.length > 0 && (
                     <div>
                       <h4 style={{ margin: "12px 0 8px 0", fontSize: 14, fontWeight: 700 }}>
-                        Anomalías y Proyecciones Predictivas
+                        {isEs ? "Anomalías y Proyecciones Predictivas" : "Anomalies & Predictive Projections"}
                       </h4>
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                         {aiHealthData.anomalies.map((anom, idx) => (
@@ -1152,12 +1165,14 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                             }}
                           >
                             <div style={{ fontWeight: 700 }}>
-                              {((anom.type || (anom as any).anomaly_type || "ANOMALÍA DETECTADA") as string).replace(/_/g, " ")}
+                              {formatAnomalyType(anom.type || (anom as any).anomaly_type, isEs ? "es" : "en")}
                             </div>
-                            <div style={{ color: "var(--color-text-secondary)", marginTop: 2 }}>{anom.description}</div>
+                            <div style={{ color: "var(--color-text-secondary)", marginTop: 2 }}>
+                              {formatAnomalyDescription(anom.description, isEs ? "es" : "en")}
+                            </div>
                             {anom.projection_days && (
                               <div style={{ marginTop: 4, fontWeight: 600, color: "#b45309", fontSize: 12 }}>
-                                ⏱ Estimado de saturación: ~{anom.projection_days} días
+                                ⏱ {isEs ? "Estimado de saturación:" : "Estimated saturation:"} ~{anom.projection_days} {isEs ? "días" : "days"}
                               </div>
                             )}
                           </div>
@@ -1172,10 +1187,10 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                         <div style={{ fontWeight: 800, fontSize: 15, color: "var(--color-brand-primary)", display: "flex", alignItems: "center", gap: 6 }}>
                           <Sparkles size={16} />
-                          Diagnóstico DeepSeek ({aiHealthData.diagnostic.model})
+                          {isEs ? "Diagnóstico DeepSeek" : "DeepSeek Diagnostic"} ({aiHealthData.diagnostic.model})
                         </div>
                         <Badge variant="neutral">
-                          Confianza: {Math.round(aiHealthData.diagnostic.confidence * 100)}%
+                          {isEs ? "Confianza:" : "Confidence:"} {Math.round(aiHealthData.diagnostic.confidence * 100)}%
                         </Badge>
                       </div>
 
@@ -1190,7 +1205,7 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                       {aiHealthData.diagnostic.recommendations && aiHealthData.diagnostic.recommendations.length > 0 && (
                         <div>
                           <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text-primary)", marginBottom: 6 }}>
-                            Acciones Recomendadas por IA:
+                            {isEs ? "Acciones Recomendadas por IA:" : "AI Recommended Actions:"}
                           </div>
                           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                             {aiHealthData.diagnostic.recommendations.map((rec, i) => (
@@ -1204,7 +1219,7 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
 
                       {/* Mensaje al Cliente */}
                       <div style={{ marginTop: 12, padding: "10px 14px", background: "var(--color-surface-muted)", borderRadius: 8, fontSize: 12.5 }}>
-                        <b>Comunicado sugerido para el cliente:</b>
+                        <b>{isEs ? "Comunicado sugerido para el cliente:" : "Suggested message for client:"}</b>
                         <div style={{ fontStyle: "italic", marginTop: 4, color: "var(--color-text-secondary)" }}>
                           "{aiHealthData.diagnostic.client_message}"
                         </div>
@@ -1213,14 +1228,16 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                   ) : (
                     <div style={{ textAlign: "center", padding: "20px 0", color: "var(--color-text-secondary)" }}>
                       <p style={{ margin: 0, fontSize: 13.5 }}>
-                        Presione "Ejecutar Diagnóstico IA en Vivo" para obtener recomendaciones profundas y análisis de causas probables.
+                        {isEs
+                          ? 'Presione "Ejecutar Diagnóstico IA en Vivo" para obtener recomendaciones profundas y análisis de causas probables.'
+                          : 'Click "Run Live AI Diagnostic" to obtain in-depth recommendations and root cause analysis.'}
                       </p>
                     </div>
                   )}
                 </div>
               ) : (
                 <div style={{ textAlign: "center", padding: "30px 0", color: "var(--color-text-secondary)" }}>
-                  No se pudo cargar la información de salud del equipo.
+                  {isEs ? "No se pudo cargar la información de salud del equipo." : "Could not load device health information."}
                 </div>
               )}
             </div>
