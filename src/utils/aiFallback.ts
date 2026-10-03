@@ -20,9 +20,9 @@ export function computeLocalDeviceAIHealth(device: Device): DeviceAIHealthRespon
 
   // RAM Score
   let ramScore = 100;
-  if (ram > 92) ramScore = 25;
-  else if (ram > 85) ramScore = 60;
-  else if (ram > 70) ramScore = 80;
+  if (ram > 95) ramScore = 25;
+  else if (ram > 88) ramScore = 60;
+  else if (ram > 75) ramScore = 85;
 
   // Disk Score
   let diskScore = 100;

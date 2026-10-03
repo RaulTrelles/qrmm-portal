@@ -3,6 +3,14 @@ import type { TokenResponseData, UserProfile, RegisterPayload } from "../types/a
 import type { OrganizationItem, CreateOrganizationPayload, UpdateOrganizationPayload } from "../types/organization";
 
 const getApiBase = (): string => {
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    // Detección prioritaria para producción en qhapana.com
+    if (host === "qrmm.qhapana.com" || host.endsWith(".qhapana.com")) {
+      return "https://qrmm-backend.qhapana.com/api/v1";
+    }
+  }
+
   if (import.meta.env.VITE_API_BASE) {
     const base = import.meta.env.VITE_API_BASE.replace(/\/$/, "");
     if (base.startsWith("http://") || base.startsWith("https://")) {
@@ -13,13 +21,9 @@ const getApiBase = (): string => {
     }
     return `http://localhost:5173${base}`;
   }
+
   if (typeof window !== "undefined") {
     const host = window.location.hostname;
-    // Detección automática para producción en qhapana.com
-    if (host === "qrmm.qhapana.com" || host.endsWith(".qhapana.com")) {
-      return "https://qrmm-backend.qhapana.com/api/v1";
-    }
-    // Entorno local o IP de red local
     const port = window.location.port === "5173" ? ":8000" : (window.location.port ? `:${window.location.port}` : "");
     const proto = window.location.protocol;
     return `${proto}//${host}${port}/api/v1`;

@@ -191,7 +191,9 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
     setError(null);
 
     let wsUrl = "";
-    if (import.meta.env.VITE_WS_BASE) {
+    if (typeof window !== "undefined" && (window.location.hostname === "qrmm.qhapana.com" || window.location.hostname.endsWith(".qhapana.com"))) {
+      wsUrl = `wss://qrmm-backend.qhapana.com/ws/v1/desktop/${device.id}`;
+    } else if (import.meta.env.VITE_WS_BASE) {
       const base = import.meta.env.VITE_WS_BASE.replace(/\/dashboard\/?$/, "").replace(/\/$/, "");
       wsUrl = `${base}/desktop/${device.id}`;
     } else {

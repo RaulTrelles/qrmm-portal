@@ -1283,31 +1283,78 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                       </Badge>
                     </div>
 
-                    {/* Desglose de componentes */}
+                    {/* Desglose de componentes con métricas reales en vivo */}
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+                      {/* CPU */}
                       <div style={{ background: "var(--color-surface-default)", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
                         <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>{isEs ? "SALUD DE CPU" : "CPU HEALTH"}</div>
-                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.cpu_score}%</div>
+                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2, display: "flex", alignItems: "baseline", gap: 4 }}>
+                          {aiHealthData.health.cpu_score}
+                          <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 500 }}>/100</span>
+                        </div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 3 }}>
+                          <span style={{ fontWeight: 600 }}>{isEs ? "Consumo:" : "Usage:"}</span> {cpu}%
+                        </div>
                       </div>
+
+                      {/* Memoria RAM */}
                       <div style={{ background: "var(--color-surface-default)", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
-                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>{isEs ? "MEMORIA RAM" : "RAM HEALTH"}</div>
-                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.memory_score}%</div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>{isEs ? "SALUD DE MEMORIA" : "RAM HEALTH"}</div>
+                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2, display: "flex", alignItems: "baseline", gap: 4 }}>
+                          {aiHealthData.health.memory_score}
+                          <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 500 }}>/100</span>
+                        </div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 3 }}>
+                          <span style={{ fontWeight: 600 }}>{isEs ? "Uso:" : "Usage:"}</span> {ram}% {device.specs?.ram_usable_gb ? `(${((ram * Number(device.specs.ram_usable_gb)) / 100).toFixed(1)}/${device.specs.ram_usable_gb} GB)` : ""}
+                        </div>
                       </div>
+
+                      {/* Almacenamiento */}
                       <div style={{ background: "var(--color-surface-default)", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
-                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>{isEs ? "ALMACENAMIENTO" : "DISK HEALTH"}</div>
-                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.disk_score}%</div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>{isEs ? "SALUD DE ALMACENAMIENTO" : "STORAGE HEALTH"}</div>
+                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2, display: "flex", alignItems: "baseline", gap: 4 }}>
+                          {aiHealthData.health.disk_score}
+                          <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 500 }}>/100</span>
+                        </div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 3 }}>
+                          <span style={{ fontWeight: 600 }}>{isEs ? "Ocupación C:" : "Drive C:"}</span> {disk}% {device.specs?.disk_free_gb ? `(${device.specs.disk_free_gb} GB lib.)` : ""}
+                        </div>
                       </div>
+
+                      {/* Red y Enlace */}
                       <div style={{ background: "var(--color-surface-default)", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
                         <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>{isEs ? "RED Y ENLACE" : "NETWORK"}</div>
-                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.network_score}%</div>
+                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2, display: "flex", alignItems: "baseline", gap: 4 }}>
+                          {aiHealthData.health.network_score}
+                          <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 500 }}>/100</span>
+                        </div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 3 }}>
+                          {isEs ? "Enlace y latencia estables" : "Stable connection"}
+                        </div>
                       </div>
+
+                      {/* Sistema y Eventos */}
                       <div style={{ background: "var(--color-surface-default)", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
                         <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>{isEs ? "SISTEMA Y EVENTOS" : "OS & LOGS"}</div>
-                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.events_score}%</div>
+                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2, display: "flex", alignItems: "baseline", gap: 4 }}>
+                          {aiHealthData.health.events_score}
+                          <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 500 }}>/100</span>
+                        </div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 3 }}>
+                          {aiHealthData.health.events_score < 70 ? (isEs ? "Incidentes en log" : "Log events logged") : (isEs ? "Sin fallos críticos" : "Clean system logs")}
+                        </div>
                       </div>
+
+                      {/* Disponibilidad */}
                       <div style={{ background: "var(--color-surface-default)", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
                         <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: 600, letterSpacing: "0.03em" }}>{isEs ? "DISPONIBILIDAD" : "AVAILABILITY"}</div>
-                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2 }}>{aiHealthData.health.availability_score}%</div>
+                        <div style={{ fontWeight: 700, fontSize: 18, color: "var(--color-text-primary)", marginTop: 2, display: "flex", alignItems: "baseline", gap: 4 }}>
+                          {aiHealthData.health.availability_score}
+                          <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 500 }}>/100</span>
+                        </div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 3 }}>
+                          Uptime 24h: {Number(device.status?.availability_percentage_24h ?? 100).toFixed(0)}%
+                        </div>
                       </div>
                     </div>
                   </div>
