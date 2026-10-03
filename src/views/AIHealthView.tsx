@@ -389,7 +389,7 @@ export const AIHealthView: React.FC<AIHealthViewProps> = ({ onSelectDevice }) =>
                     }`}
                   >
                     <div className="q-ai-anomaly-title">
-                      {anom.type.replace(/_/g, " ")}
+                      {((anom.type || (anom as any).anomaly_type || "ANOMALÍA DETECTADA") as string).replace(/_/g, " ")}
                     </div>
                     <p className="q-ai-anomaly-desc">{anom.description}</p>
                     {anom.projection_days && (

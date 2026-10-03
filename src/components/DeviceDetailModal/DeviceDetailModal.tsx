@@ -1151,7 +1151,9 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                               fontSize: 13,
                             }}
                           >
-                            <div style={{ fontWeight: 700 }}>{anom.type.replace(/_/g, " ")}</div>
+                            <div style={{ fontWeight: 700 }}>
+                              {((anom.type || (anom as any).anomaly_type || "ANOMALÍA DETECTADA") as string).replace(/_/g, " ")}
+                            </div>
                             <div style={{ color: "var(--color-text-secondary)", marginTop: 2 }}>{anom.description}</div>
                             {anom.projection_days && (
                               <div style={{ marginTop: 4, fontWeight: 600, color: "#b45309", fontSize: 12 }}>
