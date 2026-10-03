@@ -1211,8 +1211,8 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                   </h3>
                   <span style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>
                     {isEs
-                      ? "Evaluación determinística multi-variable asistida por motor de inferencia DeepSeek."
-                      : "Multi-variable deterministic assessment assisted by DeepSeek inference engine."}
+                      ? "Evaluación determinística multi-variable asistida por motor de inferencia de IA."
+                      : "Multi-variable deterministic assessment assisted by AI inference engine."}
                   </span>
                 </div>
                 <Button
@@ -1412,7 +1412,7 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                         <div style={{ fontWeight: 800, fontSize: 15, color: "var(--color-brand-primary)", display: "flex", alignItems: "center", gap: 6 }}>
                           <Sparkles size={16} />
-                          {isEs ? "Diagnóstico DeepSeek" : "DeepSeek Diagnostic"} ({aiHealthData.diagnostic.model})
+                          {isEs ? "Diagnóstico de IA" : "AI Diagnostic"}
                         </div>
                         <Badge variant="neutral">
                           {isEs ? "Confianza:" : "Confidence:"} {Math.round(aiHealthData.diagnostic.confidence * 100)}%
