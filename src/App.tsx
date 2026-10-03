@@ -8,11 +8,13 @@ import { NetworkDiscoveryView } from "./views/NetworkDiscoveryView";
 import { ClientsView } from "./views/ClientsView";
 import { UsersView } from "./views/UsersView";
 import { PaymentsView } from "./views/PaymentsView";
+import { AIHealthView } from "./views/AIHealthView";
 import { PortalView } from "./views/PortalView";
 import { LoginView } from "./views/LoginView";
 import { DeviceDetailModal } from "./components/DeviceDetailModal/DeviceDetailModal";
 import { dashboardSocket } from "./services/socket";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { getDeviceById } from "./services/api";
 import type { Device } from "./types/device";
 
 function AppContent() {
@@ -22,10 +24,20 @@ function AppContent() {
   });
   const [activeView, setActiveView] = useState<ViewType>("dashboard");
   const [visitorView, setVisitorView] = useState<"portal" | "login">("portal");
+  const [visitorMode, setVisitorMode] = useState<"login" | "register">("login");
   const [showPortalPreview, setShowPortalPreview] = useState<boolean>(false);
   const [isLiveConnected, setIsLiveConnected] = useState<boolean>(false);
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
+
+  const handleOpenDeviceById = async (deviceId: string) => {
+    try {
+      const dev = await getDeviceById(deviceId);
+      if (dev) setSelectedDevice(dev);
+    } catch (err) {
+      console.error("Error loading device detail:", err);
+    }
+  };
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -78,9 +90,21 @@ function AppContent() {
   // Vista para visitantes no autenticados (Portal de Productos & Ofertas por defecto, o Login)
   if (!token) {
     if (visitorView === "portal") {
-      return <PortalView onGoToLogin={() => setVisitorView("login")} />;
+      return (
+        <PortalView
+          onGoToLogin={(m = "login") => {
+            setVisitorMode(m);
+            setVisitorView("login");
+          }}
+        />
+      );
     }
-    return <LoginView onGoToPortal={() => setVisitorView("portal")} />;
+    return (
+      <LoginView
+        initialMode={visitorMode}
+        onGoToPortal={() => setVisitorView("portal")}
+      />
+    );
   }
 
   // Vista previa de portal para usuario autenticado
@@ -136,6 +160,8 @@ function AppContent() {
           <DashboardView refreshTrigger={refreshKey} />
         ) : activeView === "inventory" ? (
           <InventoryView refreshTrigger={refreshKey} />
+        ) : activeView === "ai-health" ? (
+          <AIHealthView onSelectDevice={handleOpenDeviceById} />
         ) : activeView === "discovery" ? (
           <NetworkDiscoveryView
             onOpenDeviceDetail={(dev) => setSelectedDevice(dev)}

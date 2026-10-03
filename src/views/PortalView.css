@@ -1,8 +1,11 @@
 /* ==============================================================================
-   QHAPANA RMM - PORTAL PUBLICO & LANDING PAGE (ANYDESK STYLE + QHAPANA DESIGN SYSTEM)
+   QHAPANA RMM - PORTAL COMERCIAL PÚBLICO & LANDING PAGE
+   Diseño B2B Enterprise alineado al Design System de Qhapana
    ============================================================================== */
 
-/* Reset & Scope Root */
+/* --------------------------------------------------------------------------
+   TEMAS: QHAPANA LIGHT & QHAPANA DARK TOKENS
+-------------------------------------------------------------------------- */
 .q-portal {
   min-height: 100vh;
   display: flex;
@@ -13,60 +16,54 @@
   overflow-x: hidden;
 }
 
-/* --------------------------------------------------------------------------
-   TEMAS: QHAPANA LIGHT & QHAPANA DARK TOKENS
--------------------------------------------------------------------------- */
-
-/* Qhapana Light (Warm bone white matching qhapana.com #faf9f6) */
+/* Qhapana Light */
 .q-portal[data-portal-theme="light"] {
   --portal-bg: #faf9f6;
-  --portal-bg-gradient: radial-gradient(circle at 50% -10%, rgba(99, 102, 241, 0.08) 0%, rgba(44, 168, 128, 0.04) 35%, #faf9f6 75%);
+  --portal-bg-gradient: radial-gradient(circle at 50% -10%, rgba(103, 61, 230, 0.08) 0%, rgba(44, 168, 128, 0.04) 35%, #faf9f6 75%);
   --portal-surface: #ffffff;
   --portal-surface-muted: #f4f3ef;
   --portal-surface-hover: #edece8;
-  --portal-card-border: rgba(15, 23, 42, 0.08);
+  --portal-card-border: rgba(17, 24, 39, 0.09);
   --portal-card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
-  --portal-text-primary: #0f172a;
-  --portal-text-secondary: #475569;
-  --portal-text-muted: #64748b;
-  --portal-brand: #6366f1;
-  --portal-brand-hover: #4f46e5;
-  --portal-brand-subtle: rgba(99, 102, 241, 0.1);
-  --portal-accent-teal: #2ca880;
-  --portal-accent-teal-subtle: rgba(44, 168, 128, 0.12);
+  --portal-text-primary: #111827;
+  --portal-text-secondary: #4b5563;
+  --portal-text-muted: #6b7280;
+  --portal-brand: #673de6;
+  --portal-brand-hover: #5025d1;
+  --portal-brand-subtle: rgba(103, 61, 230, 0.1);
+  --portal-accent-teal: #16a34a;
+  --portal-accent-teal-subtle: rgba(22, 163, 74, 0.12);
   --portal-accent-purple: #7c3aed;
-  --portal-header-bg: rgba(250, 249, 246, 0.88);
-  --portal-header-border: rgba(15, 23, 42, 0.08);
+  --portal-header-bg: rgba(250, 249, 246, 0.92);
+  --portal-header-border: rgba(17, 24, 39, 0.08);
   --portal-mockup-bg: #0f172a;
-  --portal-mockup-border: rgba(15, 23, 42, 0.15);
-  --portal-code-bg: #1e293b;
-  --portal-hero-title-gradient: linear-gradient(135deg, #0f172a 30%, #4338ca 70%, #2ca880 100%);
+  --portal-mockup-border: rgba(17, 24, 39, 0.15);
+  --portal-hero-title-gradient: linear-gradient(135deg, #111827 30%, #5025d1 70%, #16a34a 100%);
 }
 
-/* Qhapana Dark (Deep cosmic void matching qhapana.com #030014) */
+/* Qhapana Dark */
 .q-portal[data-portal-theme="dark"] {
   --portal-bg: #030014;
-  --portal-bg-gradient: radial-gradient(circle at 50% -10%, rgba(99, 102, 241, 0.18) 0%, rgba(124, 58, 237, 0.12) 40%, rgba(44, 168, 128, 0.06) 70%, #030014 90%);
-  --portal-surface: #08071a;
-  --portal-surface-muted: #0d0b24;
-  --portal-surface-hover: #151238;
-  --portal-card-border: rgba(255, 255, 255, 0.08);
-  --portal-card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 25px rgba(99, 102, 241, 0.07);
+  --portal-bg-gradient: radial-gradient(circle at 50% -10%, rgba(103, 61, 230, 0.22) 0%, rgba(124, 58, 237, 0.14) 40%, rgba(44, 168, 128, 0.06) 70%, #030014 90%);
+  --portal-surface: #0a081e;
+  --portal-surface-muted: #110e2e;
+  --portal-surface-hover: #1b1744;
+  --portal-card-border: rgba(255, 255, 255, 0.09);
+  --portal-card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.7), 0 0 25px rgba(103, 61, 230, 0.08);
   --portal-text-primary: #f8fafc;
   --portal-text-secondary: #cbd5e1;
   --portal-text-muted: #94a3b8;
-  --portal-brand: #6366f1;
-  --portal-brand-hover: #818cf8;
-  --portal-brand-subtle: rgba(99, 102, 241, 0.18);
+  --portal-brand: #7b57e8;
+  --portal-brand-hover: #9877f5;
+  --portal-brand-subtle: rgba(123, 87, 232, 0.2);
   --portal-accent-teal: #2ca880;
   --portal-accent-teal-subtle: rgba(44, 168, 128, 0.18);
   --portal-accent-purple: #a78bfa;
-  --portal-header-bg: rgba(3, 0, 20, 0.88);
+  --portal-header-bg: rgba(3, 0, 20, 0.92);
   --portal-header-border: rgba(255, 255, 255, 0.08);
   --portal-mockup-bg: #070614;
   --portal-mockup-border: rgba(255, 255, 255, 0.12);
-  --portal-code-bg: #0b0922;
-  --portal-hero-title-gradient: linear-gradient(135deg, #ffffff 40%, #a5b4fc 70%, #34d399 100%);
+  --portal-hero-title-gradient: linear-gradient(135deg, #ffffff 40%, #bbaaff 70%, #34d399 100%);
 }
 
 .q-portal {
@@ -77,7 +74,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   BARRA SUPERIOR (HEADER) STICKY CON BLUR
+   1. NAVBAR / HEADER
 -------------------------------------------------------------------------- */
 .q-portal-header {
   position: sticky;
@@ -98,58 +95,63 @@
 .q-portal-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   cursor: pointer;
   text-decoration: none;
 }
 
-.q-portal-logo-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #6366f1, #7c3aed);
-  color: #fff;
+.q-portal-brand-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--portal-brand), #5025d1);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: 19px;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 12px rgba(103, 61, 230, 0.35);
 }
 
-.q-portal-brand-title {
+.q-portal-brand-glyph {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 19px;
+  line-height: 1;
+}
+
+.q-portal-brand-text {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.q-portal-brand-name {
   font-size: 18px;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--portal-text-primary);
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
-.q-portal-brand-badge {
-  font-size: 10px;
-  font-weight: 700;
+.q-portal-brand-tag {
+  font-size: 11px;
+  font-weight: 800;
+  background: var(--portal-brand-subtle);
+  color: var(--portal-brand);
   padding: 2px 6px;
   border-radius: 4px;
-  background: var(--portal-accent-teal-subtle);
-  color: var(--portal-accent-teal);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .q-portal-nav {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 24px;
 }
 
 .q-portal-nav-link {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13.5px;
+  font-weight: 600;
   color: var(--portal-text-secondary);
   text-decoration: none;
-  cursor: pointer;
   transition: color 0.15s ease;
 }
 
@@ -157,48 +159,52 @@
   color: var(--portal-brand);
 }
 
-.q-portal-actions {
+.q-portal-header-actions {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-/* Controles de Idioma y Tema */
-.q-portal-ctrl-group {
+.q-portal-lang-switch {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   background: var(--portal-surface-muted);
   border: 1px solid var(--portal-card-border);
-  padding: 3px 6px;
+  padding: 2px 6px;
   border-radius: 20px;
 }
 
-.q-portal-pill-btn {
+.q-portal-lang-btn {
   background: transparent;
   border: none;
   color: var(--portal-text-secondary);
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 14px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
-.q-portal-pill-btn--active {
+.q-portal-lang-btn--active {
   background: var(--portal-surface);
   color: var(--portal-brand);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.q-portal-icon-toggle {
+.q-portal-lang-divider {
+  font-size: 10px;
+  color: var(--portal-text-muted);
+}
+
+.q-portal-theme-btn {
   background: transparent;
-  border: none;
+  border: 1px solid var(--portal-card-border);
   color: var(--portal-text-secondary);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -206,763 +212,780 @@
   transition: all 0.15s ease;
 }
 
-.q-portal-icon-toggle:hover {
+.q-portal-theme-btn:hover {
+  background: var(--portal-surface-hover);
   color: var(--portal-text-primary);
+}
+
+/* Botones universales de la landing */
+.q-portal-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--portal-brand);
+  color: #ffffff !important;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 10px rgba(103, 61, 230, 0.3);
+}
+
+.q-portal-btn-primary:hover {
+  background: var(--portal-brand-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(103, 61, 230, 0.4);
+}
+
+.q-portal-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   background: var(--portal-surface);
+  color: var(--portal-text-primary);
+  border: 1px solid var(--portal-card-border);
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.q-portal-btn-secondary:hover {
+  background: var(--portal-surface-hover);
+  border-color: var(--portal-brand);
+  color: var(--portal-brand);
+}
+
+.q-portal-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: var(--portal-text-primary);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.q-portal-btn-ghost:hover {
+  background: var(--portal-surface-hover);
+}
+
+.q-portal-btn-lg {
+  height: 48px;
+  padding: 0 24px;
+  font-size: 15px;
 }
 
 /* --------------------------------------------------------------------------
-   HERO SECTION (ESTILO ANYDESK: IMPACTANTE, CLARO, RÁPIDO)
+   2. HERO SECTION
 -------------------------------------------------------------------------- */
 .q-portal-hero {
-  padding: 72px 24px 80px;
+  padding: 60px 24px 70px;
   max-width: 1240px;
   margin: 0 auto;
   text-align: center;
 }
 
-.q-portal-hero-tag {
+.q-portal-badge-pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   background: var(--portal-brand-subtle);
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  border: 1px solid rgba(103, 61, 230, 0.25);
   color: var(--portal-brand);
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
   padding: 6px 16px;
-  border-radius: 30px;
-  margin-bottom: 24px;
-  animation: q-pulse-slow 3s infinite;
+  border-radius: 999px;
+  margin-bottom: 22px;
 }
 
-@keyframes q-pulse-slow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+.q-portal-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--portal-accent-teal);
+  box-shadow: 0 0 8px var(--portal-accent-teal);
 }
 
 .q-portal-hero-title {
-  font-size: clamp(38px, 5.5vw, 68px);
+  font-size: clamp(34px, 5vw, 62px);
   font-weight: 900;
-  line-height: 1.08;
+  line-height: 1.12;
   letter-spacing: -0.035em;
-  margin-bottom: 22px;
+  margin: 0 auto 20px;
+  max-width: 980px;
   background: var(--portal-hero-title-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.q-portal-hero-desc {
-  font-size: clamp(16px, 1.8vw, 20px);
+.q-portal-hero-subtitle {
+  font-size: clamp(16px, 2vw, 20px);
   color: var(--portal-text-secondary);
   max-width: 820px;
-  margin: 0 auto 36px;
-  line-height: 1.6;
+  margin: 0 auto 28px;
+  line-height: 1.5;
 }
 
-.q-portal-hero-cta-row {
-  display: flex;
+/* Strategic Value Message Callout */
+.q-portal-hero-strategic-box {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 28px;
-}
-
-.q-portal-btn-primary {
-  background: linear-gradient(135deg, #6366f1, #7c3aed);
-  color: #fff;
-  border: none;
-  font-size: 15px;
-  font-weight: 700;
-  padding: 14px 28px;
-  border-radius: 12px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
-  transition: all 0.2s ease;
-  text-decoration: none;
-}
-
-.q-portal-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(99, 102, 241, 0.45);
-}
-
-.q-portal-btn-secondary {
   background: var(--portal-surface);
-  color: var(--portal-text-primary);
   border: 1px solid var(--portal-card-border);
-  font-size: 15px;
-  font-weight: 600;
-  padding: 14px 26px;
-  border-radius: 12px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
   box-shadow: var(--portal-card-shadow);
-  transition: all 0.2s ease;
-  text-decoration: none;
-}
-
-.q-portal-btn-secondary:hover {
-  background: var(--portal-surface-hover);
-  transform: translateY(-2px);
-}
-
-/* Pills de compatibilidad */
-.q-portal-platforms {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
+  padding: 14px 24px;
+  border-radius: 12px;
+  margin: 0 auto 32px;
   flex-wrap: wrap;
-  font-size: 12.5px;
+}
+
+.q-portal-strategic-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.q-portal-strategic-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
   color: var(--portal-text-muted);
 }
 
-.q-portal-platform-chip {
-  display: inline-flex;
+.q-portal-strategic-desc {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--portal-text-primary);
+}
+
+.q-portal-strategic-sep {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--portal-text-muted);
+}
+
+.q-portal-strategic-col--highlight .q-portal-strategic-label {
+  color: var(--portal-brand);
+}
+
+.q-portal-strategic-col--highlight .q-portal-strategic-desc {
+  color: var(--portal-brand);
+}
+
+.q-portal-hero-actions {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  background: var(--portal-surface-muted);
-  border: 1px solid var(--portal-card-border);
-  padding: 4px 12px;
-  border-radius: 20px;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.q-portal-hero-microcopy {
+  font-size: 13px;
+  color: var(--portal-text-muted);
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* --------------------------------------------------------------------------
-   INTERACTIVE PRODUCT MOCKUP (SIMULADOR DE ESCRITORIO REMOTO Y RMM)
+   3. PRODUCT DASHBOARD PREVIEW (MOCKUP INTERACTIVO)
 -------------------------------------------------------------------------- */
 .q-portal-mockup-wrapper {
-  margin: 48px auto 0;
-  max-width: 1100px;
-  border-radius: 18px;
+  margin-top: 36px;
+  perspective: 1000px;
+}
+
+.q-portal-mockup-window {
   background: var(--portal-mockup-bg);
   border: 1px solid var(--portal-mockup-border);
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(99, 102, 241, 0.15);
+  border-radius: 14px;
   overflow: hidden;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), 0 0 35px rgba(103, 61, 230, 0.1);
   text-align: left;
 }
 
 .q-portal-mockup-titlebar {
-  background: #111827;
-  padding: 12px 18px;
+  background: rgba(15, 23, 42, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-.q-portal-mockup-dots {
+.q-portal-window-dots {
   display: flex;
-  gap: 7px;
+  gap: 6px;
 }
 
-.q-portal-mockup-dot {
-  width: 11px;
-  height: 11px;
+.q-portal-dot {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
 }
 
-.q-portal-mockup-dot--red { background: #ef4444; }
-.q-portal-mockup-dot--yellow { background: #f59e0b; }
-.q-portal-mockup-dot--green { background: #10b981; }
+.q-portal-dot--red { background: #ef4444; }
+.q-portal-dot--yellow { background: #f59e0b; }
+.q-portal-dot--green { background: #10b981; }
 
-.q-portal-mockup-title {
-  color: #94a3b8;
-  font-size: 12.5px;
-  font-weight: 600;
+.q-portal-mockup-tab-list {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.q-portal-mockup-tabs {
-  background: #090e1a;
-  display: flex;
-  gap: 4px;
-  padding: 8px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 6px;
   overflow-x: auto;
 }
 
-.q-portal-mockup-tab {
+.q-portal-mockup-tab-btn {
   background: transparent;
   border: none;
   color: #94a3b8;
   font-size: 12.5px;
   font-weight: 600;
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: 6px;
-  cursor: pointer;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
+  cursor: pointer;
   transition: all 0.15s ease;
   white-space: nowrap;
 }
 
-.q-portal-mockup-tab:hover {
-  color: #fff;
+.q-portal-mockup-tab-btn:hover {
+  color: #ffffff;
   background: rgba(255, 255, 255, 0.05);
 }
 
-.q-portal-mockup-tab--active {
-  background: rgba(99, 102, 241, 0.2);
-  color: #818cf8;
-  border: 1px solid rgba(99, 102, 241, 0.35);
+.q-portal-mockup-tab-btn--active {
+  color: #ffffff;
+  background: var(--portal-brand);
+}
+
+.q-portal-mockup-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #34d399;
+  letter-spacing: 0.04em;
+}
+
+.q-portal-live-beacon {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399;
+  animation: q-pulse 1.8s infinite;
+}
+
+@keyframes q-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
 }
 
 .q-portal-mockup-body {
-  padding: 24px;
-  min-height: 400px;
-  background: #080c16;
-  color: #f1f5f9;
+  padding: 20px;
+  min-height: 380px;
+  color: #e2e8f0;
 }
 
-/* Indicadores de telemetría de sesión */
-.q-portal-metrics-pillbar {
+/* Dashboard Mockup View */
+.q-mockup-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.q-mockup-kpi-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.q-mockup-kpi-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.q-mockup-kpi-val {
+  font-size: 24px;
+  font-weight: 800;
+  color: #f8fafc;
+  line-height: 1.2;
+}
+
+.q-mockup-kpi-sub {
+  font-size: 11.5px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+.q-mockup-table-preview {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.q-mockup-table-header {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.2fr 0.8fr 0.8fr 1fr;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.q-mockup-table-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.2fr 0.8fr 0.8fr 1fr;
+  padding: 10px 16px;
+  font-size: 12.5px;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.q-mockup-row-host {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 10px;
 }
 
-.q-portal-metric-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 11.5px;
-  font-family: var(--font-mono, monospace);
+.q-mockup-row-host small {
+  display: block;
+  font-size: 11px;
   color: #94a3b8;
 }
 
-.q-portal-metric-tag--active {
-  color: #34d399;
-  border-color: rgba(52, 211, 153, 0.3);
-  background: rgba(52, 211, 153, 0.1);
-}
-
-/* Simulación interactiva de contenido */
-.q-portal-sim-desktop {
-  background: #0a1120;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 24px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
-}
-
-.q-portal-sim-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-}
-
-.q-portal-sim-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  padding: 16px;
-}
-
-/* --------------------------------------------------------------------------
-   DASHBOARD SAAS MOCKUP (PANEL DE SUPERVISIÓN GLOBAL)
--------------------------------------------------------------------------- */
-.q-portal-dash-container {
-  display: flex;
-  background: #0b1120;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
-}
-
-.q-portal-dash-sidebar {
-  width: 210px;
-  background: #060a14;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 16px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+.q-mockup-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
   flex-shrink: 0;
 }
 
-@media (max-width: 960px) {
-  .q-portal-dash-sidebar {
-    display: none;
-  }
+.q-mockup-status-dot--online { background: #10b981; box-shadow: 0 0 6px #10b981; }
+.q-mockup-status-dot--warning { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
+
+.q-mockup-btn-connect {
+  background: var(--portal-brand);
+  color: #fff;
+  border: none;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: background 0.15s ease;
 }
 
-.q-portal-dash-brand {
+.q-mockup-btn-connect:hover {
+  background: var(--portal-brand-hover);
+}
+
+/* Remote Desktop Mockup View */
+.q-mockup-remote-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1e293b;
+  padding: 8px 14px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+
+.q-mockup-remote-info {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.q-portal-dash-nav-section-title {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #475569;
-  letter-spacing: 0.05em;
-  margin-bottom: 6px;
-  padding-left: 8px;
-}
-
-.q-portal-dash-nav-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 7px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  color: #94a3b8;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.q-portal-dash-nav-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-  color: #fff;
-}
-
-.q-portal-dash-nav-item--active {
-  background: rgba(99, 102, 241, 0.18);
-  color: #a5b4fc;
   font-weight: 600;
-  border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
-.q-portal-dash-main {
-  flex: 1;
-  min-width: 0;
-  padding: 20px;
-  background: #090e1a;
-}
-
-.q-portal-dash-topbar {
+.q-mockup-remote-controls {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 8px;
 }
 
-.q-portal-dash-kpis {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-@media (max-width: 768px) {
-  .q-portal-dash-kpis {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.q-portal-dash-kpi {
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 8px;
-  padding: 12px 14px;
-}
-
-.q-portal-dash-filter-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 14px;
-  flex-wrap: wrap;
-}
-
-.q-portal-dash-table-wrap {
-  overflow-x: auto;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.q-portal-dash-table {
-  width: 100%;
-  border-collapse: collapse;
+.q-mockup-ctrl-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
   font-size: 11.5px;
-  text-align: left;
-}
-
-.q-portal-dash-table th {
-  background: rgba(255, 255, 255, 0.03);
-  color: #64748b;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  white-space: nowrap;
-}
-
-.q-portal-dash-table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  white-space: nowrap;
-}
-
-.q-portal-dash-table tr:hover {
-  background: rgba(255, 255, 255, 0.03);
-}
-
-/* --------------------------------------------------------------------------
-   ESCRITORIO REMOTO LIMPIO (WINDOWS 11 CLEAN DESKTOP)
--------------------------------------------------------------------------- */
-.q-portal-win-wrapper {
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
-  background: #020617;
-}
-
-.q-portal-win-topbar {
-  background: #060a14;
-  padding: 8px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.q-portal-win-desktop {
-  min-height: 440px;
-  position: relative;
-  background: radial-gradient(ellipse at 50% 40%, #1e3a8a 0%, #0f172a 55%, #020617 100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 20px 20px 12px;
-}
-
-.q-portal-win-desktop-icons {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  width: fit-content;
-}
-
-.q-portal-win-desktop-icon {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  width: 74px;
-  padding: 6px 4px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  text-align: center;
-}
-
-.q-portal-win-desktop-icon:hover {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-}
-
-.q-portal-win-desktop-icon span {
-  font-size: 11px;
-  color: #fff;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
-  line-height: 1.2;
-  font-weight: 500;
-}
-
-.q-portal-win-taskbar {
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 10px;
-  height: 42px;
-  padding: 0 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 760px;
-  margin: 0 auto;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-}
-
-/* --------------------------------------------------------------------------
-   VISTA EN ABANICO MULTISESIÓN (FAN DECK SHOWCASE)
--------------------------------------------------------------------------- */
-.q-portal-fan-container {
-  position: relative;
-  min-height: 480px;
-  padding: 24px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  perspective: 1200px;
-}
-
-@media (max-width: 900px) {
-  .q-portal-fan-container {
-    flex-direction: column;
-    perspective: none;
-    min-height: auto;
-    gap: 20px;
-  }
-}
-
-.q-portal-fan-card {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-}
-
-.q-portal-fan-card:hover {
-  z-index: 10 !important;
-  transform: translateY(-8px) scale(1.02) !important;
-}
-
-/* --------------------------------------------------------------------------
-   MODAL DE DETALLE / TELEMETRÍA Y LOGS DEL SISTEMA (SRV-SAP-HANA-PROD)
--------------------------------------------------------------------------- */
-.q-portal-detail-view {
-  background: #0b1120;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
-}
-
-.q-portal-detail-header {
-  background: #060a14;
-  padding: 14px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.q-portal-detail-nav {
-  background: #080d1a;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 18px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  overflow-x: auto;
-}
-
-.q-portal-detail-tab-btn {
-  background: transparent;
-  border: none;
-  color: #94a3b8;
-  font-size: 12px;
   font-weight: 600;
-  padding: 8px 14px;
+  padding: 4px 10px;
+  border-radius: 4px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  border-bottom: 2px solid transparent;
   transition: all 0.15s ease;
-  white-space: nowrap;
 }
 
-.q-portal-detail-tab-btn:hover {
-  color: #fff;
+.q-mockup-ctrl-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
 }
 
-.q-portal-detail-tab-btn--active {
-  color: #818cf8;
-  border-bottom-color: #6366f1;
+.q-mockup-desktop-screen {
+  background: #0284c7;
+  border-radius: 8px;
+  height: 280px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.q-portal-detail-body {
-  padding: 18px 20px;
-  background: #090e1a;
+.q-mockup-simulated-app {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  width: 80%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
 }
 
-.q-portal-log-card {
-  background: #0b1120;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+.q-sim-app-bar {
+  background: #0f172a;
+  padding: 6px 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.q-sim-app-body {
+  padding: 14px;
+  font-size: 12px;
+  font-family: monospace;
+  line-height: 1.6;
+}
+
+/* Terminal Mockup View */
+.q-mockup-term-header {
+  background: #1e293b;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px 6px 0 0;
+}
+
+.q-mockup-term-body {
+  background: #0b0f19;
+  border: 1px solid #1e293b;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
   padding: 16px;
+  font-family: monospace;
+  font-size: 12.5px;
+  color: #38bdf8;
+  line-height: 1.5;
+  margin: 0;
+  overflow-x: auto;
 }
 
-.q-portal-log-topbar {
-  display: flex;
+/* Files Mockup View */
+.q-mockup-view-files {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  flex-wrap: wrap;
-  gap: 10px;
 }
 
-.q-portal-log-filterbar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
-  flex-wrap: wrap;
-}
-
-.q-portal-log-console {
-  background: #050811;
+.q-mockup-files-pane {
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   padding: 14px;
-  font-family: monospace;
-  font-size: 11.5px;
-  line-height: 1.6;
-  color: #cbd5e1;
-  max-height: 280px;
-  overflow-y: auto;
+  font-size: 12px;
 }
 
-.q-portal-log-line {
+.q-mockup-pane-title {
   display: flex;
-  gap: 12px;
-  padding: 2px 0;
+  align-items: center;
+  font-weight: 700;
+  color: #94a3b8;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.q-portal-log-num {
-  color: #475569;
-  width: 22px;
-  text-align: right;
-  user-select: none;
-  flex-shrink: 0;
+.q-mockup-file-item {
+  padding: 6px 8px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  background: rgba(255, 255, 255, 0.02);
 }
 
-/* --------------------------------------------------------------------------
-   BARRA DE ESTADÍSTICAS Y CREDIBILIDAD
--------------------------------------------------------------------------- */
-.q-portal-stats-bar {
-  border-top: 1px solid var(--portal-card-border);
-  border-bottom: 1px solid var(--portal-card-border);
-  background: var(--portal-surface);
-  padding: 48px 24px;
+.q-mockup-files-divider {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.q-portal-stats-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  text-align: center;
-}
-
-.q-portal-stat-number {
-  font-size: clamp(32px, 3.5vw, 44px);
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  background: linear-gradient(135deg, var(--portal-brand), var(--portal-accent-teal));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 6px;
-}
-
-.q-portal-stat-label {
-  font-size: 13.5px;
-  color: var(--portal-text-muted);
-  font-weight: 500;
+/* Discovery Mockup View */
+.q-mockup-discovery-banner {
+  display: flex;
+  align-items: center;
+  background: rgba(44, 168, 128, 0.12);
+  border: 1px solid rgba(44, 168, 128, 0.25);
+  color: #6ee7b7;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-bottom: 16px;
 }
 
 /* --------------------------------------------------------------------------
-   SECCIÓN DE CARACTERÍSTICAS / WHY QHAPANA RMM
+   SECCIONES GENERALES & HEADERS
 -------------------------------------------------------------------------- */
-.q-portal-features {
-  padding: 96px 24px;
+.q-portal-section {
+  padding: 80px 24px;
   max-width: 1240px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .q-portal-section-header {
   text-align: center;
-  max-width: 760px;
-  margin: 0 auto 56px;
+  max-width: 800px;
+  margin: 0 auto 48px;
 }
 
 .q-portal-section-badge {
   display: inline-block;
   font-size: 11px;
   font-weight: 800;
-  text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--portal-accent-teal);
-  background: var(--portal-accent-teal-subtle);
+  color: var(--portal-brand);
+  background: var(--portal-brand-subtle);
   padding: 4px 12px;
-  border-radius: 20px;
-  margin-bottom: 14px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
 }
 
 .q-portal-section-title {
-  font-size: clamp(28px, 3.5vw, 42px);
+  font-size: clamp(26px, 3.5vw, 38px);
   font-weight: 800;
   letter-spacing: -0.025em;
-  margin-bottom: 16px;
+  line-height: 1.2;
+  margin-bottom: 14px;
   color: var(--portal-text-primary);
 }
 
 .q-portal-section-subtitle {
   font-size: 16px;
   color: var(--portal-text-secondary);
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
-.q-portal-features-grid {
+/* --------------------------------------------------------------------------
+   4. SECCIÓN EDUCATIVA: "REMOTE DESKTOP VS RMM" (SECCIÓN 15)
+-------------------------------------------------------------------------- */
+.q-portal-vs-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 24px;
 }
 
-.q-portal-feature-card {
+.q-portal-vs-card {
   background: var(--portal-surface);
   border: 1px solid var(--portal-card-border);
-  border-radius: 16px;
-  padding: 32px 28px;
   box-shadow: var(--portal-card-shadow);
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 14px;
+  padding: 28px;
   display: flex;
   flex-direction: column;
 }
 
-.q-portal-feature-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(99, 102, 241, 0.4);
-  box-shadow: 0 16px 36px -8px rgba(99, 102, 241, 0.15);
+.q-portal-vs-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
 }
 
-.q-portal-feature-icon {
+.q-portal-vs-card-header h3 {
+  font-size: 17px;
+  font-weight: 800;
+  margin: 0 0 4px;
+}
+
+.q-portal-vs-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.q-portal-vs-icon--rd {
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+}
+
+.q-portal-vs-icon--rmm {
+  background: rgba(217, 119, 6, 0.12);
+  color: #d97706;
+}
+
+.q-portal-vs-icon--unified {
+  background: var(--portal-brand-subtle);
+  color: var(--portal-brand);
+}
+
+.q-portal-vs-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.q-portal-vs-pill--reactive { background: rgba(37, 99, 235, 0.1); color: #2563eb; }
+.q-portal-vs-pill--proactive { background: rgba(217, 119, 6, 0.1); color: #d97706; }
+.q-portal-vs-pill--unified { background: var(--portal-brand-subtle); color: var(--portal-brand); }
+
+.q-portal-vs-summary {
+  font-size: 14px;
+  color: var(--portal-text-secondary);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.q-portal-vs-flow {
+  background: var(--portal-surface-muted);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.q-portal-vs-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.q-portal-step-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--portal-surface);
+  border: 1px solid var(--portal-card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.q-portal-vs-arrow {
+  text-align: center;
+  font-size: 12px;
+  color: var(--portal-text-muted);
+}
+
+.q-portal-vs-card--unified {
+  border-color: var(--portal-brand);
+  background: linear-gradient(180deg, var(--portal-surface), var(--portal-surface-muted));
+}
+
+.q-portal-vs-unified-box {
+  background: var(--portal-surface);
+  border: 1px solid var(--portal-card-border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.q-portal-vs-unified-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13.5px;
+}
+
+.q-portal-vs-footer {
+  border-top: 1px solid var(--portal-card-border);
+  padding-top: 14px;
+  font-size: 12.5px;
+  color: var(--portal-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   5. 4 PILARES
+-------------------------------------------------------------------------- */
+.q-portal-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.q-portal-pillar-card {
+  background: var(--portal-surface);
+  border: 1px solid var(--portal-card-border);
+  box-shadow: var(--portal-card-shadow);
+  border-radius: 14px;
+  padding: 28px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.q-portal-pillar-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--portal-brand);
+}
+
+.q-portal-pillar-icon {
   width: 52px;
   height: 52px;
   border-radius: 12px;
@@ -974,91 +997,348 @@
   margin-bottom: 20px;
 }
 
-.q-portal-feature-card h3 {
+.q-portal-pillar-card h3 {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 10px;
+}
+
+.q-portal-pillar-desc {
+  font-size: 13.5px;
+  color: var(--portal-text-secondary);
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.q-portal-pillar-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.q-portal-pillar-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
   color: var(--portal-text-primary);
 }
 
-.q-portal-feature-card p {
-  font-size: 14px;
+/* --------------------------------------------------------------------------
+   6. SECCIÓN DIFERENCIAL & ANTES VS AHORA
+-------------------------------------------------------------------------- */
+.q-portal-diff-section {
+  background: var(--portal-surface-muted);
+  border-radius: 20px;
+  border: 1px solid var(--portal-card-border);
+  padding: 60px 40px;
+}
+
+.q-portal-diff-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.q-portal-diff-quote {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--portal-brand);
+  margin-bottom: 14px;
+}
+
+.q-portal-diff-desc {
+  font-size: 15px;
   color: var(--portal-text-secondary);
   line-height: 1.6;
-  flex: 1;
 }
 
-/* --------------------------------------------------------------------------
-   SECCIÓN DE DESCARGA RÁPIDA (QUICK DOWNLOAD)
--------------------------------------------------------------------------- */
-.q-portal-download-box {
-  background: var(--portal-surface);
-  border: 1px solid var(--portal-card-border);
-  border-radius: 20px;
-  padding: 48px;
-  margin: 64px auto;
-  max-width: 1040px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 40px;
-  box-shadow: var(--portal-card-shadow);
-  position: relative;
-  overflow: hidden;
-}
-
-.q-portal-download-box::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 300px;
-  height: 100%;
-  background: radial-gradient(circle at 100% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.q-portal-download-content {
-  flex: 1;
-  max-width: 560px;
-}
-
-.q-portal-download-btns {
+.q-portal-diff-visual {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  min-width: 280px;
+  gap: 16px;
 }
 
-.q-portal-code-snippet {
-  margin-top: 16px;
-  background: var(--portal-code-bg);
-  color: #38bdf8;
-  font-family: var(--font-mono, monospace);
-  font-size: 12px;
-  padding: 10px 14px;
-  border-radius: 8px;
+.q-portal-diff-card {
+  background: var(--portal-surface);
+  border: 1px solid var(--portal-card-border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.q-portal-diff-badge-status {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #ef4444;
+  margin-bottom: 12px;
+}
+
+.q-portal-diff-badge-status--after {
+  color: var(--portal-accent-teal);
+}
+
+.q-portal-diff-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
 }
 
 /* --------------------------------------------------------------------------
-   SECCIÓN DE PLANES Y PRECIOS
+   7. CÓMO FUNCIONA
+-------------------------------------------------------------------------- */
+.q-portal-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.q-portal-step-card {
+  background: var(--portal-surface);
+  border: 1px solid var(--portal-card-border);
+  border-radius: 14px;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.q-portal-step-bubble {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--portal-brand-subtle);
+  color: var(--portal-brand);
+  font-size: 18px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.q-portal-step-card h3 {
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.q-portal-step-card p {
+  font-size: 13.5px;
+  color: var(--portal-text-secondary);
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   8. ¿PARA QUIÉN ES QRMM?
+-------------------------------------------------------------------------- */
+.q-portal-audience-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.q-portal-audience-card {
+  background: var(--portal-surface);
+  border: 1px solid var(--portal-card-border);
+  box-shadow: var(--portal-card-shadow);
+  border-radius: 14px;
+  padding: 30px;
+}
+
+.q-portal-audience-card--highlight {
+  border-color: var(--portal-brand);
+  position: relative;
+}
+
+.q-portal-audience-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  background: var(--portal-brand-subtle);
+  color: var(--portal-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.q-portal-audience-card h3 {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.q-portal-audience-quote {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--portal-brand);
+  margin-bottom: 12px;
+}
+
+.q-portal-audience-desc {
+  font-size: 13.5px;
+  color: var(--portal-text-secondary);
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   9. CAPACIDADES Y CARACTERÍSTICAS INTEGRALES DE QRMM
+-------------------------------------------------------------------------- */
+.q-portal-capabilities-section {
+  padding-top: 60px;
+}
+
+.q-portal-cap-groups-container {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.q-portal-cap-group-card {
+  background: var(--portal-surface);
+  border: 1px solid var(--portal-card-border);
+  box-shadow: var(--portal-card-shadow);
+  border-radius: 16px;
+  padding: 32px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.q-portal-cap-group-card:hover {
+  border-color: rgba(103, 61, 230, 0.4);
+  box-shadow: 0 10px 30px -5px rgba(103, 61, 230, 0.1);
+}
+
+.q-portal-cap-group-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.q-portal-cap-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: var(--portal-brand-subtle);
+  color: var(--portal-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.q-portal-cap-category-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--portal-brand);
+  margin-bottom: 4px;
+}
+
+.q-portal-cap-group-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0;
+  color: var(--portal-text-primary);
+}
+
+.q-portal-cap-group-desc {
+  font-size: 14.5px;
+  color: var(--portal-text-secondary);
+  line-height: 1.5;
+  margin: 0 0 24px 0;
+  max-width: 900px;
+}
+
+.q-portal-cap-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.q-portal-cap-item {
+  background: var(--portal-surface-muted);
+  border: 1px solid var(--portal-card-border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.q-portal-cap-item:hover {
+  transform: translateY(-2px);
+  background: var(--portal-surface-hover);
+}
+
+.q-portal-cap-item-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.q-portal-cap-check-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--portal-accent-teal-subtle);
+  color: var(--portal-accent-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.q-portal-cap-item-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--portal-text-primary);
+  flex: 1;
+}
+
+.q-portal-cap-item-badge {
+  font-size: 10.5px;
+  font-weight: 800;
+  background: var(--portal-brand-subtle);
+  color: var(--portal-brand);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.q-portal-cap-item-desc {
+  font-size: 13px;
+  color: var(--portal-text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   12. SECCIÓN DE PLANES Y PRECIOS
 -------------------------------------------------------------------------- */
 .q-portal-pricing {
-  padding: 80px 24px 100px;
+  padding: 80px 24px;
   max-width: 1240px;
   margin: 0 auto;
 }
 
 .q-portal-pricing-toggle-row {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 20px;
-  margin-bottom: 48px;
+  margin-bottom: 40px;
 }
 
 .q-portal-toggle-pill {
@@ -1066,33 +1346,82 @@
   align-items: center;
   background: var(--portal-surface-muted);
   border: 1px solid var(--portal-card-border);
-  border-radius: 30px;
   padding: 4px;
+  border-radius: 999px;
+  gap: 4px;
+}
+
+.q-portal-pill-btn {
+  background: transparent;
+  border: none;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--portal-text-secondary);
+  padding: 8px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+
+.q-portal-pill-btn--active {
+  background: var(--portal-brand);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(103, 61, 230, 0.3);
+}
+
+.q-portal-pill-saving-badge {
+  background: rgba(22, 163, 74, 0.2);
+  color: #16a34a;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.q-portal-pill-btn--active .q-portal-pill-saving-badge {
+  background: #ffffff;
+  color: var(--portal-brand);
 }
 
 .q-portal-pricing-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
   align-items: stretch;
+  width: 100%;
+}
+
+@media (max-width: 960px) {
+  .q-portal-pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 440px;
+    margin: 0 auto;
+  }
 }
 
 .q-portal-plan-card {
   background: var(--portal-surface);
   border: 1px solid var(--portal-card-border);
-  border-radius: 18px;
-  padding: 36px 30px;
   box-shadow: var(--portal-card-shadow);
+  border-radius: 16px;
+  padding: 32px 28px;
   display: flex;
   flex-direction: column;
   position: relative;
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
+.q-portal-plan-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--portal-brand);
+}
+
 .q-portal-plan-card--featured {
   border-color: var(--portal-brand);
-  box-shadow: 0 16px 40px -10px rgba(99, 102, 241, 0.25);
-  transform: scale(1.03);
+  box-shadow: 0 12px 35px -5px rgba(103, 61, 230, 0.22);
 }
 
 .q-portal-plan-badge-top {
@@ -1100,36 +1429,45 @@
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, #6366f1, #7c3aed);
-  color: #fff;
+  background: var(--portal-brand);
+  color: #ffffff;
   font-size: 11px;
   font-weight: 800;
-  text-transform: uppercase;
-  padding: 3px 12px;
-  border-radius: 20px;
-  letter-spacing: 0.05em;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  letter-spacing: 0.06em;
+  padding: 3px 14px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(103, 61, 230, 0.4);
+}
+
+.q-portal-plan-header {
+  margin-bottom: 20px;
 }
 
 .q-portal-plan-name {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
-  margin-bottom: 8px;
+  margin: 0 0 6px;
   color: var(--portal-text-primary);
 }
 
-.q-portal-plan-desc {
+.q-portal-plan-tagline {
   font-size: 13.5px;
-  color: var(--portal-text-muted);
-  min-height: 40px;
-  margin-bottom: 20px;
+  color: var(--portal-text-secondary);
+  line-height: 1.4;
+  min-height: 38px;
+}
+
+.q-portal-plan-price-box {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--portal-card-border);
 }
 
 .q-portal-plan-price-row {
   display: flex;
   align-items: baseline;
-  gap: 4px;
-  margin-bottom: 24px;
+  gap: 8px;
+  margin-bottom: 6px;
 }
 
 .q-portal-plan-price {
@@ -1137,17 +1475,54 @@
   font-weight: 900;
   letter-spacing: -0.03em;
   color: var(--portal-text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 
 .q-portal-plan-period {
   font-size: 14px;
   color: var(--portal-text-muted);
+  font-weight: 600;
+}
+
+.q-portal-annual-calc-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 12.5px;
+}
+
+.q-portal-monthly-equivalent {
+  color: var(--portal-text-secondary);
+  font-weight: 600;
+}
+
+.q-portal-savings-tag {
+  color: var(--portal-accent-teal);
+  font-weight: 700;
+}
+
+.q-portal-plan-limit-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--portal-surface-muted);
+  color: var(--portal-text-primary);
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+.q-portal-plan-limit-badge--highlight {
+  background: var(--portal-brand-subtle);
+  color: var(--portal-brand);
 }
 
 .q-portal-plan-features {
   list-style: none;
   padding: 0;
-  margin: 0 0 32px;
+  margin: 0 0 28px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1156,17 +1531,30 @@
 
 .q-portal-plan-features li {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   font-size: 13.5px;
-  color: var(--portal-text-secondary);
+  color: var(--portal-text-primary);
+  line-height: 1.4;
+}
+
+.q-portal-plan-cta-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.q-portal-cta-microcopy {
+  font-size: 11.5px;
+  color: var(--portal-text-muted);
 }
 
 /* --------------------------------------------------------------------------
-   PREGUNTAS FRECUENTES (FAQ)
+   13. FAQ ACORDEÓN
 -------------------------------------------------------------------------- */
 .q-portal-faq {
-  padding: 60px 24px 100px;
+  padding: 80px 24px;
   max-width: 900px;
   margin: 0 auto;
 }
@@ -1182,71 +1570,117 @@
   border: 1px solid var(--portal-card-border);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: var(--portal-card-shadow);
+  transition: border-color 0.15s ease;
+}
+
+.q-portal-faq-item:hover {
+  border-color: var(--portal-brand);
 }
 
 .q-portal-faq-question {
   width: 100%;
-  padding: 18px 24px;
+  padding: 18px 22px;
+  background: transparent;
+  border: none;
+  text-align: left;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: transparent;
-  border: none;
-  font-size: 15.5px;
-  font-weight: 600;
+  gap: 16px;
+  font-size: 15px;
+  font-weight: 700;
   color: var(--portal-text-primary);
   cursor: pointer;
-  text-align: left;
+  min-height: 44px;
 }
 
 .q-portal-faq-answer {
-  padding: 0 24px 20px;
+  padding: 0 22px 20px;
   font-size: 14px;
   color: var(--portal-text-secondary);
   line-height: 1.6;
 }
 
+.q-portal-faq-answer p {
+  margin: 0;
+}
+
 /* --------------------------------------------------------------------------
-   FOOTER (QHAPANA TECHNOLOGIES BRANDING)
+   14. FINAL CTA
+-------------------------------------------------------------------------- */
+.q-portal-final-cta-section {
+  padding: 60px 24px 100px;
+}
+
+.q-portal-final-cta-box {
+  background: linear-gradient(135deg, var(--portal-surface), var(--portal-surface-muted));
+  border: 1px solid var(--portal-card-border);
+  box-shadow: var(--portal-card-shadow);
+  border-radius: 20px;
+  padding: 60px 32px;
+  text-align: center;
+  max-width: 940px;
+  margin: 0 auto;
+}
+
+.q-portal-final-cta-title {
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 900;
+  line-height: 1.2;
+  margin: 16px auto 18px;
+  color: var(--portal-text-primary);
+}
+
+.q-portal-final-cta-subtitle {
+  font-size: 16px;
+  color: var(--portal-text-secondary);
+  max-width: 600px;
+  margin: 0 auto 32px;
+}
+
+.q-portal-final-cta-actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.q-portal-final-cta-subtext {
+  font-size: 13px;
+  color: var(--portal-text-muted);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   15. FOOTER
 -------------------------------------------------------------------------- */
 .q-portal-footer {
   background: var(--portal-surface);
   border-top: 1px solid var(--portal-card-border);
-  padding: 64px 32px 32px;
+  padding: 60px 32px 30px;
   margin-top: auto;
 }
 
 .q-portal-footer-container {
   max-width: 1240px;
-  margin: 0 auto;
+  margin: 0 auto 40px;
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 48px;
-  margin-bottom: 48px;
-}
-
-.q-portal-footer-brand h4 {
-  font-size: 18px;
-  font-weight: 800;
-  margin-bottom: 12px;
-  color: var(--portal-text-primary);
+  gap: 40px;
 }
 
 .q-portal-footer-brand p {
   font-size: 13.5px;
-  color: var(--portal-text-muted);
-  line-height: 1.6;
-  max-width: 320px;
+  color: var(--portal-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 340px;
 }
 
 .q-portal-footer-col h5 {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
+  margin: 0 0 16px;
   color: var(--portal-text-primary);
-  margin-bottom: 16px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .q-portal-footer-col ul {
@@ -1259,8 +1693,8 @@
 }
 
 .q-portal-footer-col a {
-  font-size: 13.5px;
-  color: var(--portal-text-muted);
+  font-size: 13px;
+  color: var(--portal-text-secondary);
   text-decoration: none;
   transition: color 0.15s ease;
 }
@@ -1275,62 +1709,313 @@
   padding-top: 24px;
   border-top: 1px solid var(--portal-card-border);
   display: flex;
-  align-items: center;
   justify-content: space-between;
   font-size: 12.5px;
   color: var(--portal-text-muted);
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
 }
 
 /* --------------------------------------------------------------------------
-   RESPONSIVE DESIGN (MOBILE, TABLET, DESKTOP)
+   16. MODAL DE CHECKOUT
 -------------------------------------------------------------------------- */
-@media (max-width: 1024px) {
-  .q-portal-features-grid,
-  .q-portal-pricing-grid {
-    grid-template-columns: 1fr;
-    max-width: 500px;
-    margin: 0 auto;
-  }
-
-  .q-portal-plan-card--featured {
-    transform: none;
-  }
-
-  .q-portal-stats-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .q-portal-footer-container {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .q-portal-download-box {
-    flex-direction: column;
-    text-align: center;
-  }
+.q-portal-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: q-fade-in 0.2s ease;
 }
 
-@media (max-width: 768px) {
-  .q-portal-header {
-    padding: 0 16px;
-  }
+@keyframes q-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
+.q-portal-checkout-modal {
+  background: var(--portal-surface);
+  border: 1px solid var(--portal-card-border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 540px;
+  padding: 32px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.q-portal-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: transparent;
+  border: none;
+  color: var(--portal-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.q-portal-modal-close:hover {
+  background: var(--portal-surface-hover);
+  color: var(--portal-text-primary);
+}
+
+.q-checkout-header {
+  margin-bottom: 20px;
+}
+
+.q-checkout-plan-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  background: var(--portal-brand-subtle);
+  color: var(--portal-brand);
+  padding: 3px 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.q-checkout-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 12px;
+  color: var(--portal-text-primary);
+}
+
+.q-checkout-price-banner {
+  background: var(--portal-surface-muted);
+  border: 1px solid var(--portal-card-border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.q-checkout-price-banner--free {
+  border-color: rgba(22, 163, 74, 0.3);
+  background: rgba(22, 163, 74, 0.08);
+}
+
+.q-checkout-main-price {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--portal-text-primary);
+  display: block;
+}
+
+.q-checkout-cycle-label {
+  font-size: 12px;
+  color: var(--portal-text-secondary);
+}
+
+.q-checkout-badge-nocard {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--portal-accent-teal);
+  background: var(--portal-accent-teal-subtle);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.q-checkout-savings-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.q-checkout-savings-badge {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--portal-accent-teal);
+}
+
+.q-checkout-savings-box small {
+  font-size: 11px;
+  color: var(--portal-text-muted);
+}
+
+.q-checkout-alert-error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.q-checkout-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.q-checkout-cycle-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.q-checkout-cycle-btn {
+  background: var(--portal-surface-muted);
+  border: 1px solid var(--portal-card-border);
+  color: var(--portal-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.q-checkout-cycle-btn--active {
+  background: var(--portal-brand);
+  color: #ffffff;
+  border-color: var(--portal-brand);
+}
+
+.q-checkout-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.q-checkout-label {
+  font-size: 12px;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 5px;
+  color: var(--portal-text-secondary);
+}
+
+.q-checkout-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--portal-surface-muted);
+  border: 1px solid var(--portal-card-border);
+  border-radius: 8px;
+  color: var(--portal-text-primary);
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.q-checkout-input:focus {
+  border-color: var(--portal-brand);
+}
+
+.q-checkout-coupon-row {
+  display: flex;
+  gap: 8px;
+}
+
+.q-checkout-promo-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--portal-accent-teal);
+  display: inline-flex;
+  align-items: center;
+}
+
+.q-checkout-summary-box {
+  background: var(--portal-surface-muted);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 12px;
+}
+
+.q-checkout-summary-title {
+  font-weight: 700;
+  display: block;
+  margin-bottom: 6px;
+  color: var(--portal-text-secondary);
+}
+
+.q-checkout-summary-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--portal-text-primary);
+}
+
+.q-checkout-success-view {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.q-checkout-success-view h3 {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0 0 10px;
+}
+
+.q-checkout-success-view p {
+  font-size: 14px;
+  color: var(--portal-text-secondary);
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE DESIGN (BREAKPOINTS SECTORIZADOS)
+-------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
   .q-portal-nav {
     display: none;
   }
-
-  .q-portal-hero {
-    padding: 48px 16px 60px;
-  }
-
-  .q-portal-stats-container {
+  .q-portal-diff-container {
     grid-template-columns: 1fr;
-    gap: 32px;
   }
-
   .q-portal-footer-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .q-portal-header {
+    padding: 0 16px;
+  }
+  .q-portal-hero {
+    padding: 40px 16px 50px;
+  }
+  .q-portal-section {
+    padding: 50px 16px;
+  }
+  .q-portal-checkout-modal {
+    padding: 24px 16px;
+  }
+  .q-checkout-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .q-portal-footer-container {
+    grid-template-columns: 1fr;
+  }
+  .q-mockup-table-header, .q-mockup-table-row {
+    grid-template-columns: 1.5fr 1fr 1fr;
+  }
+  .q-mockup-table-header span:nth-child(n+4),
+  .q-mockup-table-row div:nth-child(n+4) {
+    display: none;
+  }
+  .q-mockup-view-files {
     grid-template-columns: 1fr;
   }
 }

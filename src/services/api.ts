@@ -638,6 +638,26 @@ export async function processCheckout(payload: CheckoutPayload): Promise<Checkou
   return res.json();
 }
 
+export async function getLemonSqueezyCheckoutUrl(payload: {
+  plan_tier: string;
+  billing_cycle: string;
+  customer_email?: string;
+  customer_name?: string;
+  organization_name?: string;
+}): Promise<{ checkout_url: string; variant_id?: string }> {
+  const res = await fetch(`${API_BASE}/payments/lemonsqueezy-checkout`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al generar enlace de Lemon Squeezy");
+  }
+  return res.json();
+}
+
+
 export async function verifyPromoCode(code: string, plan_tier?: string): Promise<{ valid: boolean; code: string; discount_percent: number; fixed_discount: number; label: string }> {
   const res = await fetch(`${API_BASE}/payments/verify-promo`, {
     method: "POST",
@@ -728,4 +748,147 @@ export async function updateAdminUser(
   }
   return res.json();
 }
+
+// -----------------------------------------------------------------------------
+// QRMM AI HEALTH & PREDICTIVE DIAGNOSTICS API CLIENT
+// -----------------------------------------------------------------------------
+import type {
+  AIHealthOverview,
+  DeviceAIHealthResponse,
+  AIIncidentItem,
+  AIReportItem,
+} from "../types/ai";
+
+export async function getAIOverview(): Promise<AIHealthOverview> {
+  const res = await fetch(`${API_BASE}/ai/overview`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al cargar resumen de salud IA");
+  }
+  return res.json();
+}
+
+export async function getDeviceAIHealth(deviceId: string): Promise<DeviceAIHealthResponse> {
+  const res = await fetch(`${API_BASE}/ai/devices/${deviceId}/health`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al consultar salud IA del dispositivo");
+  }
+  return res.json();
+}
+
+export async function triggerDeviceAIDiagnosis(
+  deviceId: string,
+  forceAi: boolean = true,
+  language: string = "es"
+): Promise<any> {
+  const res = await fetch(`${API_BASE}/ai/devices/${deviceId}/diagnose`, {
+    method: "POST",
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({ force_ai: forceAi, language }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al ejecutar diagnóstico IA");
+  }
+  return res.json();
+}
+
+export async function getAIIncidents(filters?: {
+  status?: string;
+  severity?: string;
+  deviceId?: string;
+}): Promise<AIIncidentItem[]> {
+  const url = new URL(`${API_BASE}/ai/incidents`, window.location.origin);
+  if (filters?.status) url.searchParams.set("status", filters.status);
+  if (filters?.severity) url.searchParams.set("severity", filters.severity);
+  if (filters?.deviceId) url.searchParams.set("device_id", filters.deviceId);
+
+  const res = await fetch(url.toString(), {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al listar incidentes IA");
+  }
+  return res.json();
+}
+
+export async function acknowledgeIncident(incidentId: string, note?: string): Promise<any> {
+  const res = await fetch(`${API_BASE}/ai/incidents/${incidentId}/acknowledge`, {
+    method: "POST",
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({ note }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al reconocer incidente");
+  }
+  return res.json();
+}
+
+export async function resolveIncident(incidentId: string, note?: string): Promise<any> {
+  const res = await fetch(`${API_BASE}/ai/incidents/${incidentId}/resolve`, {
+    method: "POST",
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({ note }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al resolver incidente");
+  }
+  return res.json();
+}
+
+export async function getAIReports(reportType?: string): Promise<AIReportItem[]> {
+  const url = new URL(`${API_BASE}/ai/reports`, window.location.origin);
+  if (reportType) url.searchParams.set("report_type", reportType);
+
+  const res = await fetch(url.toString(), {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al listar informes de salud");
+  }
+  return res.json();
+}
+
+export async function generateAIReport(payload: {
+  report_type?: string;
+  language?: string;
+  send_email?: boolean;
+}): Promise<AIReportItem> {
+  const res = await fetch(`${API_BASE}/ai/reports/generate`, {
+    method: "POST",
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({
+      report_type: payload.report_type || "DAILY",
+      language: payload.language || "es",
+      send_email: payload.send_email ?? false,
+    }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al generar informe de IA");
+  }
+  return res.json();
+}
+
+export async function sendReportEmail(reportId: string): Promise<any> {
+  const res = await fetch(`${API_BASE}/ai/reports/${reportId}/send-email`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al despachar informe por correo");
+  }
+  return res.json();
+}
+
 

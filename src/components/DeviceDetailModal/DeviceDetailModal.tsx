@@ -16,6 +16,8 @@ import {
   terminateDeviceProcess,
   updateDeviceArea,
   getClientAreas,
+  getDeviceAIHealth,
+  triggerDeviceAIDiagnosis,
 } from "../../services/api";
 import {
   X,
@@ -52,9 +54,12 @@ import {
   FileText,
   XCircle,
   ShieldAlert,
+  Sparkles,
 } from "lucide-react";
 import { RemoteDesktopModal } from "../RemoteDesktopModal/RemoteDesktopModal";
 import { copyToClipboard } from "../../utils/clipboard";
+import type { DeviceAIHealthResponse } from "../../types/ai";
+import { computeLocalDeviceAIHealth } from "../../utils/aiFallback";
 import "./DeviceDetailModal.css";
 
 export interface DeviceDetailModalProps {
@@ -63,10 +68,13 @@ export interface DeviceDetailModalProps {
   onDelete?: (device: Device) => void;
 }
 
-type ModalTab = "overview" | "processes" | "services" | "containers" | "actions" | "logs" | "alerts";
+type ModalTab = "overview" | "ai-health" | "processes" | "services" | "containers" | "actions" | "logs" | "alerts";
 
 export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, onClose, onDelete }) => {
   const [activeTab, setActiveTab] = useState<ModalTab>("overview");
+  const [aiHealthData, setAiHealthData] = useState<DeviceAIHealthResponse | null>(null);
+  const [loadingAiHealth, setLoadingAiHealth] = useState<boolean>(false);
+  const [diagnosingAi, setDiagnosingAi] = useState<boolean>(false);
   const [processSearch, setProcessSearch] = useState<string>("");
   const [serviceSearch, setServiceSearch] = useState<string>("");
   const [containerSearch, setContainerSearch] = useState<string>("");
@@ -304,6 +312,36 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
     }, 350);
     return () => clearTimeout(timer);
   }, [serviceSearch, device]);
+
+  useEffect(() => {
+    if (activeTab === "ai-health" && device) {
+      setLoadingAiHealth(true);
+      getDeviceAIHealth(device.id)
+        .then((data) => setAiHealthData(data))
+        .catch(() => {
+          // Si el endpoint de backend en el VPS está en despliegue, calcular con telemetría local del equipo
+          const fallbackData = computeLocalDeviceAIHealth(device);
+          setAiHealthData(fallbackData);
+        })
+        .finally(() => setLoadingAiHealth(false));
+    }
+  }, [activeTab, device]);
+
+  const handleRunAiDiagnosis = async () => {
+    if (!device) return;
+    try {
+      setDiagnosingAi(true);
+      await triggerDeviceAIDiagnosis(device.id, true, "es");
+      const updated = await getDeviceAIHealth(device.id);
+      setAiHealthData(updated);
+    } catch (_err: any) {
+      // Fallback determinístico con la telemetría actual sin lanzar alert bloqueante
+      const fallbackData = computeLocalDeviceAIHealth(device);
+      setAiHealthData(fallbackData);
+    } finally {
+      setDiagnosingAi(false);
+    }
+  };
 
   const handleServiceControl = async (serviceName: string, operation: "start" | "stop" | "restart") => {
     if (!device) return;
@@ -748,6 +786,12 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
             <Activity size={16} /> Resumen & Hardware
           </button>
           <button
+            className={`q-modal-tab ${activeTab === "ai-health" ? "q-modal-tab--active" : ""}`}
+            onClick={() => setActiveTab("ai-health")}
+          >
+            <Sparkles size={16} color="var(--color-brand-primary)" /> AI Health & Diagnóstico
+          </button>
+          <button
             className={`q-modal-tab ${activeTab === "processes" ? "q-modal-tab--active" : ""}`}
             onClick={() => setActiveTab("processes")}
           >
@@ -963,6 +1007,217 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                 </div>
               </div>
             </>
+          )}
+
+          {/* TAB: AI HEALTH & PREDICTIVE DIAGNOSTICS */}
+          {activeTab === "ai-health" && (
+            <div className="q-modal-section">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <div>
+                  <h3 style={{ margin: "0 0 4px 0", fontSize: 17, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}>
+                    <Sparkles size={20} color="var(--color-brand-primary)" />
+                    Diagnóstico Predictivo & Salud del Endpoint
+                  </h3>
+                  <span style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>
+                    Evaluación determinística multi-variable asistida por motor de inferencia DeepSeek.
+                  </span>
+                </div>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleRunAiDiagnosis}
+                  disabled={diagnosingAi}
+                >
+                  <RefreshCw size={14} style={{ marginRight: 6 }} className={diagnosingAi ? "animate-spin" : ""} />
+                  {diagnosingAi ? "Diagnosticando..." : "Ejecutar Diagnóstico IA en Vivo"}
+                </Button>
+              </div>
+
+              {loadingAiHealth ? (
+                <div style={{ textAlign: "center", padding: "40px 0", color: "var(--color-text-secondary)" }}>
+                  <RefreshCw className="animate-spin" size={28} style={{ margin: "0 auto 12px auto", color: "var(--color-brand-primary)" }} />
+                  <div>Cargando métricas y análisis de salud...</div>
+                </div>
+              ) : aiHealthData ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  {/* Score strip */}
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "180px 1fr",
+                      gap: 16,
+                      background: "var(--color-surface-muted)",
+                      padding: 18,
+                      borderRadius: 12,
+                      border: "1px solid var(--color-border-default)",
+                      alignItems: "center",
+                    }}
+                  >
+                    <div style={{ textAlign: "center", borderRight: "1px solid var(--color-border-default)", paddingRight: 16 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase" }}>
+                        Health Score
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 42,
+                          fontWeight: 900,
+                          lineHeight: 1.1,
+                          marginTop: 4,
+                          color:
+                            aiHealthData.health.overall_score >= 80
+                              ? "var(--color-status-success)"
+                              : aiHealthData.health.overall_score >= 60
+                              ? "var(--color-status-warning)"
+                              : "var(--color-status-danger)",
+                        }}
+                      >
+                        {aiHealthData.health.overall_score}
+                        <span style={{ fontSize: 16, color: "var(--color-text-tertiary)", fontWeight: 600 }}>/100</span>
+                      </div>
+                      <Badge
+                        variant={
+                          aiHealthData.health.trend === "IMPROVING"
+                            ? "success"
+                            : aiHealthData.health.trend === "DEGRADING"
+                            ? "danger"
+                            : "info"
+                        }
+                        style={{ marginTop: 6 }}
+                      >
+                        Tendencia: {aiHealthData.health.trend}
+                      </Badge>
+                    </div>
+
+                    {/* Desglose de componentes */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+                      <div style={{ background: "#ffffff", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
+                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>CPU HEALTH</div>
+                        <div style={{ fontWeight: 700, fontSize: 16 }}>{aiHealthData.health.cpu_score}%</div>
+                      </div>
+                      <div style={{ background: "#ffffff", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
+                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>RAM HEALTH</div>
+                        <div style={{ fontWeight: 700, fontSize: 16 }}>{aiHealthData.health.memory_score}%</div>
+                      </div>
+                      <div style={{ background: "#ffffff", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
+                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>DISK HEALTH</div>
+                        <div style={{ fontWeight: 700, fontSize: 16 }}>{aiHealthData.health.disk_score}%</div>
+                      </div>
+                      <div style={{ background: "#ffffff", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
+                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>NETWORK</div>
+                        <div style={{ fontWeight: 700, fontSize: 16 }}>{aiHealthData.health.network_score}%</div>
+                      </div>
+                      <div style={{ background: "#ffffff", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
+                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>OS & LOGS</div>
+                        <div style={{ fontWeight: 700, fontSize: 16 }}>{aiHealthData.health.events_score}%</div>
+                      </div>
+                      <div style={{ background: "#ffffff", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border-default)" }}>
+                        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>AVAILABILITY</div>
+                        <div style={{ fontWeight: 700, fontSize: 16 }}>{aiHealthData.health.availability_score}%</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Explicabilidad determinística (Reasons) */}
+                  {aiHealthData.health.reasons && aiHealthData.health.reasons.length > 0 && (
+                    <div style={{ background: "var(--color-surface-muted)", padding: 14, borderRadius: 8 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>Evidencia y factores del cálculo:</div>
+                      <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: "var(--color-text-secondary)" }}>
+                        {aiHealthData.health.reasons.map((r, idx) => (
+                          <li key={idx} style={{ marginBottom: 3 }}>{r}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Anomalías Detectadas */}
+                  {aiHealthData.anomalies && aiHealthData.anomalies.length > 0 && (
+                    <div>
+                      <h4 style={{ margin: "12px 0 8px 0", fontSize: 14, fontWeight: 700 }}>
+                        Anomalías y Proyecciones Predictivas
+                      </h4>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        {aiHealthData.anomalies.map((anom, idx) => (
+                          <div
+                            key={idx}
+                            style={{
+                              padding: "10px 14px",
+                              borderLeft: `4px solid ${anom.severity === "CRITICAL" ? "var(--color-status-danger)" : "var(--color-status-warning)"}`,
+                              background: "var(--color-surface-muted)",
+                              borderRadius: "0 6px 6px 0",
+                              fontSize: 13,
+                            }}
+                          >
+                            <div style={{ fontWeight: 700 }}>{anom.type.replace(/_/g, " ")}</div>
+                            <div style={{ color: "var(--color-text-secondary)", marginTop: 2 }}>{anom.description}</div>
+                            {anom.projection_days && (
+                              <div style={{ marginTop: 4, fontWeight: 600, color: "#b45309", fontSize: 12 }}>
+                                ⏱ Estimado de saturación: ~{anom.projection_days} días
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Diagnóstico Profundo IA */}
+                  {aiHealthData.diagnostic ? (
+                    <div style={{ border: "1px solid var(--color-brand-primary)", borderRadius: 10, padding: 18, background: "rgba(103, 61, 230, 0.03)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                        <div style={{ fontWeight: 800, fontSize: 15, color: "var(--color-brand-primary)", display: "flex", alignItems: "center", gap: 6 }}>
+                          <Sparkles size={16} />
+                          Diagnóstico DeepSeek ({aiHealthData.diagnostic.model})
+                        </div>
+                        <Badge variant="neutral">
+                          Confianza: {Math.round(aiHealthData.diagnostic.confidence * 100)}%
+                        </Badge>
+                      </div>
+
+                      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>
+                        {aiHealthData.diagnostic.summary}
+                      </div>
+                      <div style={{ fontSize: 13.5, color: "var(--color-text-secondary)", lineHeight: 1.5, marginBottom: 12 }}>
+                        {aiHealthData.diagnostic.diagnosis}
+                      </div>
+
+                      {/* Recomendaciones */}
+                      {aiHealthData.diagnostic.recommendations && aiHealthData.diagnostic.recommendations.length > 0 && (
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text-primary)", marginBottom: 6 }}>
+                            Acciones Recomendadas por IA:
+                          </div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                            {aiHealthData.diagnostic.recommendations.map((rec, i) => (
+                              <div key={i} style={{ fontSize: 13, padding: "8px 12px", background: "#ffffff", borderRadius: 6, border: "1px solid var(--color-border-default)" }}>
+                                <b>{i + 1}. {rec.action}</b> — <span style={{ color: "var(--color-text-secondary)" }}>{rec.reason}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Mensaje al Cliente */}
+                      <div style={{ marginTop: 12, padding: "10px 14px", background: "var(--color-surface-muted)", borderRadius: 8, fontSize: 12.5 }}>
+                        <b>Comunicado sugerido para el cliente:</b>
+                        <div style={{ fontStyle: "italic", marginTop: 4, color: "var(--color-text-secondary)" }}>
+                          "{aiHealthData.diagnostic.client_message}"
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: "center", padding: "20px 0", color: "var(--color-text-secondary)" }}>
+                      <p style={{ margin: 0, fontSize: 13.5 }}>
+                        Presione "Ejecutar Diagnóstico IA en Vivo" para obtener recomendaciones profundas y análisis de causas probables.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div style={{ textAlign: "center", padding: "30px 0", color: "var(--color-text-secondary)" }}>
+                  No se pudo cargar la información de salud del equipo.
+                </div>
+              )}
+            </div>
           )}
 
           {/* TAB 2: PROCESSES */}

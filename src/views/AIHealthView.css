@@ -1,0 +1,352 @@
+/* ==============================================================================
+   QHAPANA RMM — AI HEALTH & PREDICTIVE DIAGNOSTICS VIEW STYLES
+   Design System Compliance: Enterprise Purple, Hostinger-inspired, WCAG 2.2 AA
+============================================================================== */
+
+.q-ai-health-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 24px);
+  padding: var(--space-6, 24px);
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Header & Actions */
+.q-ai-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.q-ai-title-box h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-text-primary, #111827);
+  margin: 0 0 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.q-ai-subtitle {
+  font-size: 14px;
+  color: var(--color-text-secondary, #4b5563);
+  margin: 0;
+}
+
+.q-ai-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* KPI Banner Strip */
+.q-ai-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1080px) {
+  .q-ai-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .q-ai-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.q-ai-kpi-card {
+  background: var(--color-surface-default, #ffffff);
+  border: 1px solid var(--color-border-default, #e5e7eb);
+  border-radius: var(--radius-lg, 12px);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.q-ai-kpi-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-tertiary, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.q-ai-kpi-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.q-ai-kpi-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--color-text-primary, #111827);
+  line-height: 1;
+}
+
+.q-ai-kpi-subtext {
+  font-size: 13px;
+  color: var(--color-text-secondary, #4b5563);
+}
+
+/* Tabs */
+.q-ai-tabs-bar {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border-default, #e5e7eb);
+  gap: 24px;
+}
+
+.q-ai-tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 12px 4px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--color-text-secondary, #4b5563);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+
+.q-ai-tab-btn:hover {
+  color: var(--color-brand-primary, #673de6);
+}
+
+.q-ai-tab-btn--active {
+  color: var(--color-brand-primary, #673de6);
+  border-bottom-color: var(--color-brand-primary, #673de6);
+}
+
+/* Main Content Split Grid */
+.q-ai-content-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .q-ai-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Section Cards */
+.q-ai-panel {
+  background: var(--color-surface-default, #ffffff);
+  border: 1px solid var(--color-border-default, #e5e7eb);
+  border-radius: var(--radius-lg, 12px);
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.q-ai-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.q-ai-panel-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text-primary, #111827);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+/* Incidents List */
+.q-ai-incidents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.q-ai-incident-item {
+  border: 1px solid var(--color-border-default, #e5e7eb);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--color-surface-page, #f8f9fa);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.15s ease;
+}
+
+.q-ai-incident-item:hover {
+  border-color: var(--color-brand-primary, #673de6);
+}
+
+.q-ai-incident-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.q-ai-incident-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-primary, #111827);
+  margin: 0 0 4px 0;
+}
+
+.q-ai-incident-summary {
+  font-size: 13.5px;
+  color: var(--color-text-secondary, #4b5563);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.q-ai-incident-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--color-border-default, #e5e7eb);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+.q-ai-incident-meta {
+  font-size: 12px;
+  color: var(--color-text-tertiary, #6b7280);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Anomaly Items */
+.q-ai-anomaly-item {
+  border-left: 4px solid var(--color-status-warning, #d97706);
+  background: var(--color-surface-muted, #f1f3f5);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.q-ai-anomaly-item--critical {
+  border-left-color: var(--color-status-danger, #dc2626);
+}
+
+.q-ai-anomaly-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary, #111827);
+  margin: 0 0 4px 0;
+}
+
+.q-ai-anomaly-desc {
+  font-size: 13px;
+  color: var(--color-text-secondary, #4b5563);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.q-ai-projection-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-top: 6px;
+}
+
+/* Reports Tab */
+.q-ai-reports-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.q-ai-report-card {
+  background: var(--color-surface-default, #ffffff);
+  border: 1px solid var(--color-border-default, #e5e7eb);
+  border-radius: var(--radius-lg, 12px);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.q-ai-report-view-toggle {
+  display: flex;
+  background: var(--color-surface-muted, #f1f3f5);
+  padding: 3px;
+  border-radius: 8px;
+  gap: 4px;
+  align-self: flex-start;
+}
+
+.q-ai-report-view-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary, #4b5563);
+  cursor: pointer;
+}
+
+.q-ai-report-view-btn--active {
+  background: #ffffff;
+  color: var(--color-brand-primary, #673de6);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.q-ai-report-textbox {
+  background: var(--color-surface-page, #f8f9fa);
+  border: 1px solid var(--color-border-default, #e5e7eb);
+  border-radius: 8px;
+  padding: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-primary, #111827);
+  white-space: pre-line;
+}
+
+/* Empty & Loading States */
+.q-ai-empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-text-secondary, #4b5563);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.q-ai-empty-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(22, 163, 74, 0.12);
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

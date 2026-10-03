@@ -15,10 +15,11 @@ import {
   Users,
   CreditCard,
   Globe,
+  Sparkles,
 } from "lucide-react";
 import "./AppShell.css";
 
-export type ViewType = "dashboard" | "inventory" | "discovery" | "clients" | "users" | "payments" | "settings";
+export type ViewType = "dashboard" | "inventory" | "ai-health" | "discovery" | "clients" | "users" | "payments" | "settings";
 
 export interface AppShellProps {
   children: React.ReactNode;
@@ -53,6 +54,10 @@ export const AppShell: React.FC<AppShellProps> = ({
         return activeOrganization
           ? `Inventario — ${activeOrganization.name}`
           : "Inventario de Activos y Equipos";
+      case "ai-health":
+        return activeOrganization
+          ? `AI Health & Diagnóstico Predictivo — ${activeOrganization.name}`
+          : "AI Health & Diagnóstico Predictivo (AIOps)";
       case "clients":
         return "Gestión de Clientes SaaS";
       case "users":
@@ -95,6 +100,14 @@ export const AppShell: React.FC<AppShellProps> = ({
           >
             <Server size={18} />
             <span>Inventario de Equipos</span>
+          </div>
+          <div
+            className={`q-nav-item ${activeView === "ai-health" ? "q-nav-item--active" : ""}`}
+            onClick={() => onViewChange("ai-health")}
+            style={{ cursor: "pointer" }}
+          >
+            <Sparkles size={18} color="var(--color-brand-primary)" />
+            <span>AI Health & Predictivo</span>
           </div>
           <div
             className={`q-nav-item ${activeView === "discovery" ? "q-nav-item--active" : ""}`}

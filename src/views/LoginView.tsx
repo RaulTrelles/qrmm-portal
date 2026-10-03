@@ -28,11 +28,12 @@ const GOOGLE_CLIENT_ID =
 
 export interface LoginViewProps {
   onGoToPortal?: () => void;
+  initialMode?: "login" | "register";
 }
 
-export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal }) => {
+export const LoginView: React.FC<LoginViewProps> = ({ onGoToPortal, initialMode = "login" }) => {
   const { login, loginWithGoogle, register } = useAuth();
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register">(initialMode);
 
   // Estados de Login
   const [email, setEmail] = useState<string>("");
