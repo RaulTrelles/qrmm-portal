@@ -1193,7 +1193,7 @@ PS C:\\Windows\\system32> # Incidencia resuelta en 15 segundos sin cerrar la ses
           </p>
         </div>
 
-        {/* Selector Mensual / Anual Interactivo */}
+        {/* Selector Mensual / Anual Interactivo con Ahorra 2 Meses */}
         <div className="q-portal-pricing-toggle-row">
           <div className="q-portal-toggle-pill">
             <button
@@ -1206,12 +1206,15 @@ PS C:\\Windows\\system32> # Incidencia resuelta en 15 segundos sin cerrar la ses
               className={`q-portal-pill-btn ${billingCycle === "yearly" ? "q-portal-pill-btn--active" : ""}`}
               onClick={() => setBillingCycle("yearly")}
             >
-              {lang === "es" ? "Anual" : "Yearly"}
+              <span>{lang === "es" ? "Anual" : "Yearly"}</span>
+              <span className="q-portal-pill-saving-badge">
+                {lang === "es" ? "Ahorra 2 meses" : "Save 2 months"}
+              </span>
             </button>
           </div>
         </div>
 
-        {/* Grid de 3 Planes Centralizados en una sola línea */}
+        {/* Grid de 4 Planes Centralizados */}
         <div className="q-portal-pricing-grid">
           {/* 1. PLAN STARTER */}
           <div className="q-portal-plan-card">
@@ -1226,9 +1229,23 @@ PS C:\\Windows\\system32> # Incidencia resuelta en 15 segundos sin cerrar la ses
 
             <div className="q-portal-plan-price-box">
               <div className="q-portal-plan-price-row">
-                <span className="q-portal-plan-price">$0</span>
-                <span className="q-portal-plan-period">USD / {lang === "es" ? "para siempre" : "forever"}</span>
+                <span className="q-portal-plan-price">
+                  {formatPrice(PRICING_CONFIG.plans.STARTER.pricing[billingCycle].price)}
+                </span>
+                <span className="q-portal-plan-period">
+                  USD / {billingCycle === "yearly" ? (lang === "es" ? "año" : "year") : (lang === "es" ? "mes" : "month")}
+                </span>
               </div>
+              {billingCycle === "yearly" && (
+                <div className="q-portal-annual-calc-box">
+                  <span className="q-portal-monthly-equivalent">
+                    ≈ $4.17 USD/{lang === "es" ? "mes" : "mo"}
+                  </span>
+                  <span className="q-portal-savings-tag">
+                    {lang === "es" ? "Ahorras $10 al año" : "Save $10/year"}
+                  </span>
+                </div>
+              )}
               <div className="q-portal-plan-limit-badge">
                 {lang === "es"
                   ? PRICING_CONFIG.plans.STARTER.limits.deviceLabelEs
@@ -1259,12 +1276,14 @@ PS C:\\Windows\\system32> # Incidencia resuelta en 15 segundos sin cerrar la ses
                   : PRICING_CONFIG.plans.STARTER.ctaTextEn}
               </button>
               <small className="q-portal-cta-microcopy">
-                {lang === "es" ? "Sin tarjeta de crédito" : "No credit card needed"}
+                {lang === "es"
+                  ? PRICING_CONFIG.plans.STARTER.trialTextEs
+                  : PRICING_CONFIG.plans.STARTER.trialTextEn}
               </small>
             </div>
           </div>
 
-          {/* 2. PLAN PROFESIONAL (DESTACADO) */}
+          {/* 2. PLAN PROFESIONAL (DESTACADO - MÁS POPULAR) */}
           <div className="q-portal-plan-card q-portal-plan-card--featured">
             <span className="q-portal-plan-badge-top">
               {PRICING_CONFIG.plans.PRO.badge}
@@ -1288,7 +1307,16 @@ PS C:\\Windows\\system32> # Incidencia resuelta en 15 segundos sin cerrar la ses
                   USD / {billingCycle === "yearly" ? (lang === "es" ? "año" : "year") : (lang === "es" ? "mes" : "month")}
                 </span>
               </div>
-
+              {billingCycle === "yearly" && (
+                <div className="q-portal-annual-calc-box">
+                  <span className="q-portal-monthly-equivalent">
+                    ≈ $32.50 USD/{lang === "es" ? "mes" : "mo"}
+                  </span>
+                  <span className="q-portal-savings-tag">
+                    {lang === "es" ? "Ahorras $78 al año" : "Save $78/year"}
+                  </span>
+                </div>
+              )}
               <div className="q-portal-plan-limit-badge q-portal-plan-limit-badge--highlight">
                 {lang === "es"
                   ? PRICING_CONFIG.plans.PRO.limits.deviceLabelEs
@@ -1320,13 +1348,80 @@ PS C:\\Windows\\system32> # Incidencia resuelta en 15 segundos sin cerrar la ses
               </button>
               <small className="q-portal-cta-microcopy">
                 {billingCycle === "yearly"
-                  ? (lang === "es" ? "$190 USD facturados anualmente" : "$190 USD billed annually")
-                  : (lang === "es" ? "$19 USD al mes • Cancela cuando quieras" : "$19 USD/month • Cancel anytime")}
+                  ? (lang === "es" ? "$390 USD facturados anualmente" : "$390 USD billed annually")
+                  : (lang === "es" ? "$39 USD al mes • Cancela cuando quieras" : "$39 USD/month • Cancel anytime")}
               </small>
             </div>
           </div>
 
-          {/* 3. PLAN CORPORATIVO */}
+          {/* 3. PLAN BUSINESS / MSP */}
+          <div className="q-portal-plan-card">
+            <div className="q-portal-plan-header">
+              <h3 className="q-portal-plan-name">{PRICING_CONFIG.plans.BUSINESS.name}</h3>
+              <p className="q-portal-plan-tagline">
+                {lang === "es"
+                  ? PRICING_CONFIG.plans.BUSINESS.taglineEs
+                  : PRICING_CONFIG.plans.BUSINESS.taglineEn}
+              </p>
+            </div>
+
+            <div className="q-portal-plan-price-box">
+              <div className="q-portal-plan-price-row">
+                <span className="q-portal-plan-price">
+                  {formatPrice(PRICING_CONFIG.plans.BUSINESS.pricing[billingCycle].price)}
+                </span>
+                <span className="q-portal-plan-period">
+                  USD / {billingCycle === "yearly" ? (lang === "es" ? "año" : "year") : (lang === "es" ? "mes" : "month")}
+                </span>
+              </div>
+              {billingCycle === "yearly" && (
+                <div className="q-portal-annual-calc-box">
+                  <span className="q-portal-monthly-equivalent">
+                    ≈ $65.83 USD/{lang === "es" ? "mes" : "mo"}
+                  </span>
+                  <span className="q-portal-savings-tag">
+                    {lang === "es" ? "Ahorras $158 al año" : "Save $158/year"}
+                  </span>
+                </div>
+              )}
+              <div className="q-portal-plan-limit-badge">
+                {lang === "es"
+                  ? PRICING_CONFIG.plans.BUSINESS.limits.deviceLabelEs
+                  : PRICING_CONFIG.plans.BUSINESS.limits.deviceLabelEn}
+              </div>
+            </div>
+
+            <ul className="q-portal-plan-features">
+              {(lang === "es"
+                ? PRICING_CONFIG.plans.BUSINESS.featuresEs
+                : PRICING_CONFIG.plans.BUSINESS.featuresEn
+              ).map((f, idx) => (
+                <li key={idx}>
+                  <Check size={16} color="var(--portal-accent-teal)" style={{ flexShrink: 0 }} />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="q-portal-plan-cta-box">
+              <button
+                onClick={() => handleSelectPlan("BUSINESS")}
+                className="q-portal-btn-secondary"
+                style={{ width: "100%", justifyContent: "center", height: "44px", fontWeight: 700 }}
+              >
+                {lang === "es"
+                  ? PRICING_CONFIG.plans.BUSINESS.ctaTextEs
+                  : PRICING_CONFIG.plans.BUSINESS.ctaTextEn}
+              </button>
+              <small className="q-portal-cta-microcopy">
+                {billingCycle === "yearly"
+                  ? (lang === "es" ? "$790 USD facturados anualmente" : "$790 USD billed annually")
+                  : (lang === "es" ? "$79 USD al mes • Cancela cuando quieras" : "$79 USD/month • Cancel anytime")}
+              </small>
+            </div>
+          </div>
+
+          {/* 4. PLAN ENTERPRISE */}
           <div className="q-portal-plan-card">
             <div className="q-portal-plan-header">
               <h3 className="q-portal-plan-name">{PRICING_CONFIG.plans.ENTERPRISE.name}</h3>
@@ -1339,14 +1434,24 @@ PS C:\\Windows\\system32> # Incidencia resuelta en 15 segundos sin cerrar la ses
 
             <div className="q-portal-plan-price-box">
               <div className="q-portal-plan-price-row">
-                <span className="q-portal-plan-price">
+                <span className="q-portal-plan-price" style={{ fontSize: "36px" }}>
+                  {lang === "es" ? "Desde " : "From "}
                   {formatPrice(PRICING_CONFIG.plans.ENTERPRISE.pricing[billingCycle].price)}
                 </span>
                 <span className="q-portal-plan-period">
                   USD / {billingCycle === "yearly" ? (lang === "es" ? "año" : "year") : (lang === "es" ? "mes" : "month")}
                 </span>
               </div>
-
+              {billingCycle === "yearly" && (
+                <div className="q-portal-annual-calc-box">
+                  <span className="q-portal-monthly-equivalent">
+                    ≈ {lang === "es" ? "Desde" : "From"} $124.17 USD/{lang === "es" ? "mes" : "mo"}
+                  </span>
+                  <span className="q-portal-savings-tag">
+                    {lang === "es" ? "Ahorras $298 al año" : "Save $298/year"}
+                  </span>
+                </div>
+              )}
               <div className="q-portal-plan-limit-badge">
                 {lang === "es"
                   ? PRICING_CONFIG.plans.ENTERPRISE.limits.deviceLabelEs
@@ -1377,7 +1482,7 @@ PS C:\\Windows\\system32> # Incidencia resuelta en 15 segundos sin cerrar la ses
                   : PRICING_CONFIG.plans.ENTERPRISE.ctaTextEn}
               </button>
               <small className="q-portal-cta-microcopy">
-                {lang === "es" ? "Equipos ilimitados • Soporte prioritario" : "Unlimited endpoints • Priority support"}
+                {lang === "es" ? "Volumen y condiciones personalizadas" : "Custom volume & terms"}
               </small>
             </div>
           </div>
@@ -1672,7 +1777,9 @@ PS C:\\Windows\\system32> # Incidencia resuelta en 15 segundos sin cerrar la ses
                           className={`q-checkout-cycle-btn ${billingCycle === "monthly" ? "q-checkout-cycle-btn--active" : ""}`}
                           onClick={() => setBillingCycle("monthly")}
                         >
-                          {lang === "es" ? "Mensual ($19/mes)" : "Monthly ($19/mo)"}
+                          {lang === "es"
+                            ? `Mensual ($${PRICING_CONFIG.plans[selectedPlan].pricing.monthly.price}/mes)`
+                            : `Monthly ($${PRICING_CONFIG.plans[selectedPlan].pricing.monthly.price}/mo)`}
                         </button>
                         <button
                           type="button"

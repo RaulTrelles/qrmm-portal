@@ -1,4 +1,4 @@
-export type PlanTier = "STARTER" | "PRO" | "ENTERPRISE";
+export type PlanTier = "STARTER" | "PRO" | "BUSINESS" | "ENTERPRISE";
 export type CurrencyCode = "PEN" | "USD" | "EUR" | "MXN";
 export type PaymentGateway = "CARD" | "STRIPE" | "YAPE" | "PLIN" | "BIZUM" | "MERCADOPAGO";
 

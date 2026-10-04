@@ -10,16 +10,19 @@ export interface PlanBilling {
 
 export interface PlanDefinition {
   id: PlanTier;
-  key: "starter" | "professional" | "corporate";
+  key: "starter" | "professional" | "business" | "corporate";
   name: string;
   nameEn: string;
   badge?: string;
   badgeEn?: string;
   taglineEs: string;
   taglineEn: string;
+  trialTextEs?: string;
+  trialTextEn?: string;
   ctaTextEs: string;
   ctaTextEn: string;
   featured?: boolean;
+  isStartingPrice?: boolean;
   requiresPaymentMethod: boolean;
   limits: {
     maxDevices: number | "unlimited";
@@ -28,7 +31,7 @@ export interface PlanDefinition {
     retentionDays: number;
     multiClient: boolean;
     networkDiscovery: "basic" | "full" | "enterprise";
-    support: "community" | "standard" | "priority";
+    support: "community" | "standard" | "priority" | "dedicated";
   };
   pricing: {
     monthly: PlanBilling;
@@ -36,7 +39,7 @@ export interface PlanDefinition {
   };
   savings: {
     amountUsd: number;
-    percentEffective: number; // ~16.7%
+    percentEffective: number; // ~16.7% (Ahorra 2 meses)
     labelEs: string;
     labelEn: string;
   };
@@ -70,112 +73,114 @@ export interface FeatureMatrixRow {
 }
 
 // -----------------------------------------------------------------------------
-// FUENTE ÚNICA DE VERDAD: PLANES Y CONFIGURACIÓN COMERCIAL
+// FUENTE ÚNICA DE VERDAD: PLANES Y CONFIGURACIÓN COMERCIAL (2026)
 // -----------------------------------------------------------------------------
 export const PRICING_CONFIG = {
   currencySymbol: "$",
   currencyCode: "USD" as CurrencyCode,
-  starterMaxDevices: 5, // Configurable sin rediseñar la interfaz
+  starterMaxDevices: 5,
   billingOptions: [
     { id: "monthly" as const, labelEs: "Mensual", labelEn: "Monthly" },
-    { id: "yearly" as const, labelEs: "Anual", labelEn: "Yearly" },
+    { id: "yearly" as const, labelEs: "Anual", labelEn: "Yearly", discountBadgeEs: "Ahorra 2 meses", discountBadgeEn: "Save 2 months" },
   ],
   plans: {
     STARTER: {
       id: "STARTER" as PlanTier,
-      key: "starter",
+      key: "starter" as const,
       name: "Starter",
       nameEn: "Starter",
-      taglineEs: "Prueba QRMM con tus primeros equipos. Gratis para siempre.",
-      taglineEn: "Try QRMM with your first endpoints. Free forever.",
-      ctaTextEs: "Empezar gratis",
-      ctaTextEn: "Start for Free",
+      taglineEs: "Para técnicos freelance, laboratorios y micro-redes.",
+      taglineEn: "For freelance technicians, home labs, and micro-networks.",
+      trialTextEs: "14 días de prueba · Sin tarjeta",
+      trialTextEn: "14-day free trial · No card required",
+      ctaTextEs: "Probar 14 días gratis",
+      ctaTextEn: "Start 14-Day Free Trial",
       requiresPaymentMethod: false,
       featured: false,
       limits: {
         maxDevices: 5,
         deviceLabelEs: "Hasta 5 equipos",
         deviceLabelEn: "Up to 5 endpoints",
-        retentionDays: 7,
+        retentionDays: 1,
         multiClient: false,
-        networkDiscovery: "basic",
-        support: "community",
+        networkDiscovery: "basic" as const,
+        support: "community" as const,
       },
       pricing: {
         monthly: {
-          price: 0,
+          price: 5,
           periodLabelEs: "mes",
           periodLabelEn: "month",
-          billingTextEs: "Gratis para siempre",
-          billingTextEn: "Free forever",
+          billingTextEs: "Facturado mensualmente",
+          billingTextEn: "Billed monthly",
         },
         yearly: {
-          price: 0,
+          price: 50,
           periodLabelEs: "año",
           periodLabelEn: "year",
-          billingTextEs: "Gratis para siempre",
-          billingTextEn: "Free forever",
+          billingTextEs: "Facturado anualmente",
+          billingTextEn: "Billed annually",
         },
       },
       savings: {
-        amountUsd: 0,
-        percentEffective: 0,
-        labelEs: "",
-        labelEn: "",
+        amountUsd: 10,
+        percentEffective: 16.7,
+        labelEs: "Ahorras $10 al año",
+        labelEn: "Save $10 per year",
       },
       featuresEs: [
         "Hasta 5 equipos enrolados",
-        "Control remoto desde el navegador",
-        "Acceso desatendido 24/7",
-        "Telemetría básica (CPU, RAM, Disco)",
+        "Control remoto web desde navegador (sin visor)",
+        "Acceso desatendido 24/7 con credenciales",
+        "Telemetría básica en vivo (CPU, RAM, Disco)",
         "Estado en línea y desconexión en vivo",
         "Transferencia bidireccional de archivos",
-        "Alertas básicas de conexión por correo",
+        "Alertas automáticas de desconexión (Watchdog)",
         "Consola web centralizada",
       ],
       featuresEn: [
         "Up to 5 enrolled endpoints",
-        "Browser-based remote desktop",
-        "24/7 unattended access",
-        "Basic telemetry (CPU, RAM, Disk)",
-        "Live online/offline status",
+        "In-browser remote desktop (no local viewer)",
+        "24/7 unattended access with credentials",
+        "Live basic telemetry (CPU, RAM, Disk)",
+        "Live online and disconnection status",
         "Bidirectional file transfer",
-        "Basic connection email alerts",
+        "Automatic disconnection alerts (Watchdog)",
         "Centralized web console",
       ],
     },
     PRO: {
       id: "PRO" as PlanTier,
-      key: "professional",
+      key: "professional" as const,
       name: "Profesional",
       nameEn: "Professional",
       badge: "MÁS POPULAR",
       badgeEn: "MOST POPULAR",
-      taglineEs: "Para técnicos, consultores TI, MSP y pequeñas empresas.",
-      taglineEn: "For IT consultants, MSPs, and growing IT teams.",
+      taglineEs: "Para talleres de soporte, consultores TI y pequeñas empresas.",
+      taglineEn: "For repair shops, IT consultants, and small businesses.",
       ctaTextEs: "Comenzar Profesional",
       ctaTextEn: "Start Professional",
       requiresPaymentMethod: true,
       featured: true,
       limits: {
-        maxDevices: "unlimited",
-        deviceLabelEs: "Equipos ilimitados",
-        deviceLabelEn: "Unlimited endpoints",
-        retentionDays: 90,
-        multiClient: true,
-        networkDiscovery: "full",
-        support: "standard",
+        maxDevices: 50,
+        deviceLabelEs: "Hasta 50 equipos",
+        deviceLabelEn: "Up to 50 endpoints",
+        retentionDays: 7,
+        multiClient: false,
+        networkDiscovery: "basic" as const,
+        support: "standard" as const,
       },
       pricing: {
         monthly: {
-          price: 19,
+          price: 39,
           periodLabelEs: "mes",
           periodLabelEn: "month",
           billingTextEs: "Facturado mensualmente",
           billingTextEn: "Billed monthly",
         },
         yearly: {
-          price: 190,
+          price: 390,
           periodLabelEs: "año",
           periodLabelEn: "year",
           billingTextEs: "Facturado anualmente",
@@ -183,66 +188,134 @@ export const PRICING_CONFIG = {
         },
       },
       savings: {
-        amountUsd: 38, // 19*12 = 228 -> 228 - 190 = 38
+        amountUsd: 78, // 39*12 = 468 -> 468 - 390 = 78 (Ahorra 2 meses)
         percentEffective: 16.7,
-        labelEs: "Ahorras $38 al año",
-        labelEn: "Save $38 per year",
+        labelEs: "Ahorras $78 al año",
+        labelEn: "Save $78 per year",
       },
       featuresEs: [
-        "Equipos ilimitados en la consola",
-        "Control remoto desde navegador sin visor local",
-        "Acceso no asistido con credenciales protegidas",
-        "Telemetría RMM avanzada de hardware y procesos",
-        "Alertas inteligentes configurables por equipo y cliente",
-        "Transferencia de archivos y terminal remota",
-        "Network Discovery y sondeo de red local (LAN Probe)",
-        "Administración multi-cliente y multi-organización",
-        "Agrupación por sitios, etiquetas y técnicos",
-        "Historial y diagnóstico de eventos",
+        "Hasta 50 equipos en la consola",
+        "Hasta 3 técnicos independientes",
+        "Control remoto web sin visor local",
+        "Terminal remota en vivo (PowerShell y Bash)",
+        "Reinicio remoto y control de servicios del SO",
+        "Telemetría RMM avanzada multi-disco y red",
+        "Historial de métricas de 7 días",
+        "Network Discovery (Sonda LAN de subred)",
+        "Fichas técnicas de inventario en PDF",
+        "Enrutamiento de alertas por equipo y técnico",
       ],
       featuresEn: [
-        "Unlimited endpoints in console",
+        "Up to 50 endpoints in console",
+        "Up to 3 independent technician accounts",
         "Browser-based remote desktop without local viewer",
-        "Unattended access with secured credentials",
-        "Advanced hardware & process RMM telemetry",
-        "Smart per-endpoint & client configurable alerts",
-        "File transfer and remote shell terminal",
-        "Network Discovery and LAN Subnet Probe",
-        "Multi-client and multi-organization management",
-        "Site, tags, and technician grouping",
-        "Historical audit & event diagnostics",
+        "Live remote shell terminal (PowerShell & Bash)",
+        "Remote reboot & OS background service control",
+        "Advanced multi-disk and network RMM telemetry",
+        "7-day telemetry metrics history",
+        "Network Discovery (Subnet LAN Probe)",
+        "Hardware inventory technical sheets in PDF",
+        "Alert routing by endpoint and technician",
+      ],
+    },
+    BUSINESS: {
+      id: "BUSINESS" as PlanTier,
+      key: "business" as const,
+      name: "Business / MSP",
+      nameEn: "Business / MSP",
+      taglineEs: "Para proveedores de servicios gestionados (MSPs) y empresas con múltiples sedes.",
+      taglineEn: "For Managed Service Providers (MSPs) and multi-site IT organizations.",
+      ctaTextEs: "Comenzar Business",
+      ctaTextEn: "Start Business",
+      requiresPaymentMethod: true,
+      featured: false,
+      limits: {
+        maxDevices: 250,
+        deviceLabelEs: "Hasta 250 equipos",
+        deviceLabelEn: "Up to 250 endpoints",
+        retentionDays: 30,
+        multiClient: true,
+        networkDiscovery: "full" as const,
+        support: "priority" as const,
+      },
+      pricing: {
+        monthly: {
+          price: 79,
+          periodLabelEs: "mes",
+          periodLabelEn: "month",
+          billingTextEs: "Facturado mensualmente",
+          billingTextEn: "Billed monthly",
+        },
+        yearly: {
+          price: 790,
+          periodLabelEs: "año",
+          periodLabelEn: "year",
+          billingTextEs: "Facturado anualmente",
+          billingTextEn: "Billed annually",
+        },
+      },
+      savings: {
+        amountUsd: 158, // 79*12 = 948 -> 948 - 790 = 158 (Ahorra 2 meses)
+        percentEffective: 16.7,
+        labelEs: "Ahorras $158 al año",
+        labelEn: "Save $158 per year",
+      },
+      featuresEs: [
+        "Hasta 250 equipos y 10 técnicos",
+        "Multi-Tenant: Organizaciones y clientes aislados",
+        "Tokens de enrolamiento independientes por cliente",
+        "Sonda LAN continua multi-subred",
+        "Módulo AI Health Score (0 - 100)",
+        "Detección de anomalías y fugas de memoria",
+        "Proyección predictiva de saturación de disco",
+        "Gestión inteligente de incidentes sin fatiga",
+        "Historial extendido de telemetría de 30 días",
+        "Reportes y fichas PDF con logo personalizado",
+      ],
+      featuresEn: [
+        "Up to 250 endpoints and 10 technicians",
+        "Multi-Tenant: Isolated client organizations",
+        "Independent enrollment tokens per client",
+        "Continuous multi-subnet LAN probe",
+        "AI Health Score module (0 - 100)",
+        "Anomaly & memory leak detection",
+        "Predictive disk exhaustion projection",
+        "Smart incident deduplication without alert fatigue",
+        "Extended 30-day telemetry history",
+        "Custom-branded PDF audit sheets & reports",
       ],
     },
     ENTERPRISE: {
       id: "ENTERPRISE" as PlanTier,
-      key: "corporate",
-      name: "Corporativo",
-      nameEn: "Corporate",
-      taglineEs: "Para organizaciones con múltiples sedes y altos requisitos de gestión.",
-      taglineEn: "For organizations with multi-site fleets and high governance.",
-      ctaTextEs: "Contactar / Comenzar Corporativo",
-      ctaTextEn: "Contact / Start Corporate",
+      key: "corporate" as const,
+      name: "Enterprise",
+      nameEn: "Enterprise",
+      isStartingPrice: true,
+      taglineEs: "Para medianas y grandes corporaciones, flotas masivas y operaciones críticas.",
+      taglineEn: "For mid to large enterprises, high-scale fleets, and mission-critical ops.",
+      ctaTextEs: "Contactar / Comenzar Enterprise",
+      ctaTextEn: "Contact / Start Enterprise",
       requiresPaymentMethod: true,
       featured: false,
       limits: {
         maxDevices: "unlimited",
-        deviceLabelEs: "Equipos ilimitados",
-        deviceLabelEn: "Unlimited endpoints",
+        deviceLabelEs: "300+ equipos / Ilimitado",
+        deviceLabelEn: "300+ endpoints / Custom",
         retentionDays: 365,
         multiClient: true,
-        networkDiscovery: "enterprise",
-        support: "priority",
+        networkDiscovery: "enterprise" as const,
+        support: "dedicated" as const,
       },
       pricing: {
         monthly: {
-          price: 69,
+          price: 149,
           periodLabelEs: "mes",
           periodLabelEn: "month",
           billingTextEs: "Facturado mensualmente",
           billingTextEn: "Billed monthly",
         },
         yearly: {
-          price: 690,
+          price: 1490,
           periodLabelEs: "año",
           periodLabelEn: "year",
           billingTextEs: "Facturado anualmente",
@@ -250,28 +323,34 @@ export const PRICING_CONFIG = {
         },
       },
       savings: {
-        amountUsd: 138, // 69*12 = 828 -> 828 - 690 = 138
+        amountUsd: 298, // 149*12 = 1788 -> 1788 - 1490 = 298 (Ahorra 2 meses)
         percentEffective: 16.7,
-        labelEs: "Ahorras $138 al año",
-        labelEn: "Save $138 per year",
+        labelEs: "Ahorras $298 al año",
+        labelEn: "Save $298 per year",
       },
       featuresEs: [
-        "Todo lo incluido en el plan Profesional",
-        "Equipos ilimitados y organizaciones ilimitadas",
-        "Gestión granular de roles, técnicos y permisos",
-        "Network Discovery avanzado con políticas de red",
-        "Historial extendido de telemetría y auditoría de sesiones",
-        "Automatizaciones de despliegue silencioso",
-        "Soporte prioritario con atención técnica directa",
+        "300+ equipos y técnicos ilimitados",
+        "Multi-organización ilimitada y RBAC corporativo",
+        "AIOps DeepSeek: Diagnósticos de causa raíz",
+        "Informes diarios ejecutivos automáticos (07:00 AM)",
+        "Doble nivel de reporte: Técnico y Ejecutivo",
+        "Alertas críticas por WhatsApp corporativo",
+        "Auditoría exhaustiva de sesiones remotas",
+        "Retención de telemetría de 90+ días / 1 año",
+        "Opción de despliegue On-Premise o Nube Privada",
+        "SLA 99.9% contractual con soporte dedicado",
       ],
       featuresEn: [
-        "Everything included in Professional",
-        "Unlimited endpoints and organizations",
-        "Granular technician roles & permission policies",
-        "Advanced Network Discovery with subnet policies",
-        "Extended telemetry history & session audit trail",
-        "Silent deployment push automations",
-        "Priority support with direct technical contact",
+        "300+ endpoints and unlimited technicians",
+        "Unlimited multi-organization & corporate RBAC",
+        "DeepSeek AIOps: Root Cause Analysis diagnostics",
+        "Automated daily executive reports (07:00 AM)",
+        "Dual-tier reporting: Technical and Executive",
+        "Critical incident alerts via corporate WhatsApp",
+        "Exhaustive remote session audit trails",
+        "90+ days / 1-year telemetry metrics retention",
+        "On-Premise or Private Cloud deployment option",
+        "Contractual 99.9% SLA with dedicated support",
       ],
     },
   },
@@ -528,20 +607,20 @@ export const FAQS_CONFIG: FaqItem[] = [
   {
     qEs: "¿Cuántos equipos puedo administrar?",
     qEn: "How many endpoints can I manage?",
-    aEs: "El plan Starter incluye hasta 5 equipos para siempre sin costo. Los planes Profesional y Corporativo permiten administrar equipos ilimitados en tu organización sin pagar recargos por dispositivo.",
-    aEn: "The Starter plan includes up to 5 endpoints free forever. Professional and Corporate plans support unlimited endpoints with no per-device penalties.",
+    aEs: "El plan Starter permite administrar hasta 5 equipos. El plan Profesional cubre hasta 50 equipos, el plan Business/MSP hasta 250 equipos y el plan Enterprise está diseñado para organizaciones con más de 300 equipos o flotas ilimitadas.",
+    aEn: "The Starter plan covers up to 5 endpoints. The Professional plan covers up to 50 endpoints, Business/MSP covers up to 250 endpoints, and Enterprise is tailored for 300+ endpoints or custom unlimited fleets.",
   },
   {
     qEs: "¿Puedo usar QRMM gratis?",
-    qEn: "Can I use QRMM for free?",
-    aEs: "Sí. El plan Starter es 100% gratuito para siempre. No requiere tarjeta de crédito ni compromiso de permanencia. Puedes crear tu cuenta, descargar el agente e iniciar soporte en tus primeros 5 equipos de inmediato.",
-    aEn: "Yes. The Starter plan is 100% free forever with no credit card required. Create an account, install the agent, and support your first 5 endpoints immediately.",
+    qEn: "Can I try QRMM for free?",
+    aEs: "Sí. Ofrecemos 14 días de prueba gratuita completa en el plan Starter (hasta 5 equipos) sin solicitar tarjeta de crédito. Después del periodo de prueba, puedes continuar con Starter por solo $5 USD/mes o actualizar a Profesional.",
+    aEn: "Yes. We offer a full 14-day free trial on the Starter plan (up to 5 endpoints) with no credit card required. After the trial, continue with Starter for just $5 USD/month or upgrade to Professional.",
   },
   {
     qEs: "¿Puedo cambiar de mensual a anual?",
     qEn: "Can I switch between monthly and annual billing?",
-    aEs: "Sí, puedes cambiar la modalidad de facturación en cualquier momento desde tu panel de pagos. Al elegir la modalidad anual ahorras aproximadamente un 17% ($38 USD/año en Profesional y $138 USD/año en Corporativo).",
-    aEn: "Yes, switch anytime in your billing panel. Annual billing saves ~17% ($38 USD/year on Professional and $138 USD/year on Corporate).",
+    aEs: "Sí, puedes cambiar la modalidad de facturación en cualquier momento. Al optar por la facturación anual ahorras 2 meses completos (equivalente a pagar 10 meses y recibir 12 meses de servicio, con ahorros desde $10 hasta $298 USD/año según el plan).",
+    aEn: "Yes, switch anytime from your billing panel. Choosing annual billing saves 2 full months (pay 10 months and get 12 months of service, saving from $10 up to $298 USD/year depending on your plan).",
   },
   {
     qEs: "¿Puedo cancelar mi suscripción?",
@@ -564,8 +643,8 @@ export const FAQS_CONFIG: FaqItem[] = [
   {
     qEs: "¿Puedo administrar varios clientes y organizaciones?",
     qEn: "Can I manage multiple clients and organizations?",
-    aEs: "Sí. Los planes Profesional y Corporativo permiten estructurar tu inventario en múltiples clientes, sedes y grupos, asignando técnicos y configurando alertas personalizadas para cada cuenta.",
-    aEn: "Yes. Professional and Corporate plans let you organize inventory across multiple clients, sites, and groups with role-based technician assignments.",
+    aEs: "Sí. Los planes Business/MSP y Enterprise incluyen arquitectura Multi-Tenant aislada, permitiendo gestionar múltiples empresas clientes con tokens de enrolamiento independientes, roles de técnicos y reportes de marca blanca.",
+    aEn: "Yes. Business/MSP and Enterprise plans include isolated Multi-Tenant architecture, allowing you to manage multiple client organizations with independent tokens, technician roles, and custom-branded reports.",
   },
   {
     qEs: "¿QRMM requiere un VPS propio?",
