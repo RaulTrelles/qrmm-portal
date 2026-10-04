@@ -1206,10 +1206,7 @@ PS C:\\Windows\\system32> # Incidencia resuelta en 15 segundos sin cerrar la ses
               className={`q-portal-pill-btn ${billingCycle === "yearly" ? "q-portal-pill-btn--active" : ""}`}
               onClick={() => setBillingCycle("yearly")}
             >
-              <span>{lang === "es" ? "Anual" : "Yearly"}</span>
-              <span className="q-portal-pill-saving-badge">
-                {lang === "es" ? "Ahorra 2 meses" : "Save 2 months"}
-              </span>
+              {lang === "es" ? "Anual" : "Yearly"}
             </button>
           </div>
         </div>

@@ -81,7 +81,7 @@ export const PRICING_CONFIG = {
   starterMaxDevices: 5,
   billingOptions: [
     { id: "monthly" as const, labelEs: "Mensual", labelEn: "Monthly" },
-    { id: "yearly" as const, labelEs: "Anual", labelEn: "Yearly", discountBadgeEs: "Ahorra 2 meses", discountBadgeEn: "Save 2 months" },
+    { id: "yearly" as const, labelEs: "Anual", labelEn: "Yearly" },
   ],
   plans: {
     STARTER: {
@@ -619,8 +619,8 @@ export const FAQS_CONFIG: FaqItem[] = [
   {
     qEs: "¿Puedo cambiar de mensual a anual?",
     qEn: "Can I switch between monthly and annual billing?",
-    aEs: "Sí, puedes cambiar la modalidad de facturación en cualquier momento. Al optar por la facturación anual ahorras 2 meses completos (equivalente a pagar 10 meses y recibir 12 meses de servicio, con ahorros desde $10 hasta $298 USD/año según el plan).",
-    aEn: "Yes, switch anytime from your billing panel. Choosing annual billing saves 2 full months (pay 10 months and get 12 months of service, saving from $10 up to $298 USD/year depending on your plan).",
+    aEs: "Sí, puedes cambiar la modalidad de facturación en cualquier momento. La modalidad anual ofrece tarifas reducidas equivalentes a pagar 10 meses por 12 meses de servicio completo, con ahorros desde $10 hasta $298 USD/año según el plan.",
+    aEn: "Yes, switch anytime from your billing panel. Annual billing offers reduced rates equivalent to paying 10 months for 12 months of full service, saving from $10 up to $298 USD/year depending on your plan.",
   },
   {
     qEs: "¿Puedo cancelar mi suscripción?",
