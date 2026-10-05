@@ -55,6 +55,7 @@ import {
   XCircle,
   ShieldAlert,
   Sparkles,
+  MapPin,
 } from "lucide-react";
 import { RemoteDesktopModal } from "../RemoteDesktopModal/RemoteDesktopModal";
 import { copyToClipboard } from "../../utils/clipboard";
@@ -899,7 +900,7 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
             <>
               <div className="q-modal-section">
                 <span className="q-modal-section-title">Especificaciones de Hardware</span>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
                   <div style={{ background: "var(--color-surface-muted)", padding: 12, borderRadius: 8 }}>
                     <Cpu size={18} color="var(--color-brand-primary)" style={{ marginBottom: 4 }} />
                     <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>CPU</div>
@@ -928,6 +929,18 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                       {freeStorageGB >= 1000
                         ? `${(freeStorageGB / 1024).toFixed(1)} TB ${isEs ? "libres" : "free"}`
                         : `${Math.round(freeStorageGB * 10) / 10} GB ${isEs ? "libres" : "free"}`}
+                    </div>
+                  </div>
+                  <div style={{ background: "var(--color-surface-muted)", padding: 12, borderRadius: 8 }}>
+                    <MapPin size={18} color="var(--color-brand-primary)" style={{ marginBottom: 4 }} />
+                    <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>
+                      {isEs ? "UBICACIÓN GEOGRÁFICA" : "GEOLOCATION & SITE"}
+                    </div>
+                    <div style={{ fontWeight: 600, fontSize: 13 }}>
+                      {device.client_area ? `Lima (${device.client_area})` : "Lima, Perú"}
+                    </div>
+                    <div style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>
+                      IP: {device.private_ip || device.public_ip || "192.168.1.x"}
                     </div>
                   </div>
                 </div>

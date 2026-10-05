@@ -15,16 +15,38 @@ import { DeviceDetailModal } from "./components/DeviceDetailModal/DeviceDetailMo
 import { dashboardSocket } from "./services/socket";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { getDeviceById } from "./services/api";
+import { trackPageView, trackEvent } from "./services/analytics";
 import type { Device } from "./types/device";
 
 function AppContent() {
   const { token, isLoading } = useAuth();
   const [theme, setTheme] = useState<"light" | "dark">(() => {
-    return (localStorage.getItem("q_theme") as "light" | "dark") || "light";
+    return (localStorage.getItem("q_theme") as "light" | "dark") || "dark";
   });
-  const [activeView, setActiveView] = useState<ViewType>("dashboard");
-  const [visitorView, setVisitorView] = useState<"portal" | "login">("portal");
-  const [visitorMode, setVisitorMode] = useState<"login" | "register">("login");
+  const [activeView, setActiveView] = useState<ViewType>(() => {
+    const path = window.location.pathname.replace(/^\//, "");
+    const validViews: ViewType[] = [
+      "dashboard",
+      "inventory",
+      "ai-health",
+      "discovery",
+      "clients",
+      "users",
+      "payments",
+      "settings",
+    ];
+    if (validViews.includes(path as ViewType)) {
+      return path as ViewType;
+    }
+    return "dashboard";
+  });
+  const [visitorView, setVisitorView] = useState<"portal" | "login">(() => {
+    const path = window.location.pathname.toLowerCase();
+    return path.includes("login") || path.includes("register") ? "login" : "portal";
+  });
+  const [visitorMode, setVisitorMode] = useState<"login" | "register">(() => {
+    return window.location.pathname.toLowerCase().includes("register") ? "register" : "login";
+  });
   const [showPortalPreview, setShowPortalPreview] = useState<boolean>(false);
   const [isLiveConnected, setIsLiveConnected] = useState<boolean>(false);
   const [refreshKey, setRefreshKey] = useState<number>(0);
@@ -43,6 +65,51 @@ function AppContent() {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("q_theme", theme);
   }, [theme]);
+
+  // Rastreo automático de vistas y permanencia en Google Analytics 4 (SPA)
+  useEffect(() => {
+    if (!token) {
+      if (visitorView === "portal") {
+        trackPageView("Portal Comercial & Precios", "/portal");
+      } else if (visitorMode === "register") {
+        trackPageView("Registro de Organización", "/register");
+      } else {
+        trackPageView("Inicio de Sesión", "/login");
+      }
+      return;
+    }
+
+    if (showPortalPreview) {
+      trackPageView("Vista Previa del Portal Público", "/portal-preview");
+      return;
+    }
+
+    const viewMeta: Record<ViewType, { title: string; path: string }> = {
+      dashboard: { title: "Panel de Monitoreo RMM", path: "/dashboard" },
+      inventory: { title: "Inventario de Dispositivos", path: "/inventory" },
+      "ai-health": { title: "Salud y Diagnóstico Predictivo IA", path: "/ai-health" },
+      discovery: { title: "Descubrimiento de Red", path: "/discovery" },
+      clients: { title: "Gestión de Clientes y Áreas", path: "/clients" },
+      users: { title: "Administración de Usuarios", path: "/users" },
+      payments: { title: "Planes y Suscripciones", path: "/plans" },
+      settings: { title: "Configuración y Alertas", path: "/settings" },
+    };
+
+    const current = viewMeta[activeView] || { title: "Consola Qhapana RMM", path: `/${activeView}` };
+    trackPageView(current.title, current.path);
+  }, [token, visitorView, visitorMode, showPortalPreview, activeView]);
+
+  // Evento de apertura de ficha de equipo
+  useEffect(() => {
+    if (selectedDevice) {
+      trackEvent("view_device_detail", {
+        device_id: selectedDevice.id,
+        hostname: selectedDevice.hostname,
+        os_type: selectedDevice.os_type,
+        current_state: selectedDevice.status?.current_state,
+      });
+    }
+  }, [selectedDevice]);
 
   useEffect(() => {
     if (!token) return;

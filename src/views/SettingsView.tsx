@@ -12,29 +12,40 @@ import {
   ShieldCheck,
   Loader2,
   Users,
+  Calendar,
+  FileText,
+  CreditCard,
 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 import { Card } from "../components/Card/Card";
 import { Button } from "../components/Button/Button";
 import { Badge } from "../components/Badge/Badge";
+import { BillingView } from "./BillingView";
 import {
   getAlertSettings,
   updateAlertSettings,
   testAlertEmail,
   updateClientAreas,
+  generateExecutiveHealthReport,
 } from "../services/api";
 import type { AlertSettings } from "../services/api";
 import "./SettingsView.css";
 
 
 export const SettingsView: React.FC = () => {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<"alerts" | "billing">("alerts");
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [testing, setTesting] = useState<boolean>(false);
+  const [generatingReport, setGeneratingReport] = useState<boolean>(false);
 
   // Estados del formulario
   const [emailAlertsEnabled, setEmailAlertsEnabled] = useState<boolean>(true);
   const [notifyOnOffline, setNotifyOnOffline] = useState<boolean>(true);
   const [notifyOnContainerCrash, setNotifyOnContainerCrash] = useState<boolean>(true);
+  const [notifyOnPerformanceIssues, setNotifyOnPerformanceIssues] = useState<boolean>(true);
+  const [reportSchedule, setReportSchedule] = useState<string>("daily");
   const [deliveryChannel, setDeliveryChannel] = useState<"google_oauth" | "smtp">("google_oauth");
 
   // Destinatarios múltiples
@@ -74,6 +85,8 @@ export const SettingsView: React.FC = () => {
       setEmailAlertsEnabled(data.email_alerts_enabled);
       setNotifyOnOffline(data.notify_on_device_offline);
       setNotifyOnContainerCrash(data.notify_on_container_crash);
+      setNotifyOnPerformanceIssues(data.notify_on_performance_issues ?? true);
+      setReportSchedule(data.report_schedule || "daily");
       setDeliveryChannel(data.delivery_channel || "google_oauth");
       setRecipients(data.alert_recipients || []);
       setClientAreas(data.client_areas && data.client_areas.length > 0 ? data.client_areas : ["General"]);
@@ -172,6 +185,8 @@ export const SettingsView: React.FC = () => {
         email_alerts_enabled: emailAlertsEnabled,
         notify_on_device_offline: notifyOnOffline,
         notify_on_container_crash: notifyOnContainerCrash,
+        notify_on_performance_issues: notifyOnPerformanceIssues,
+        report_schedule: reportSchedule,
         alert_recipients: recipients,
         client_areas: clientAreas,
         delivery_channel: deliveryChannel,
@@ -185,7 +200,7 @@ export const SettingsView: React.FC = () => {
 
       setFeedback({
         type: "success",
-        message: "Configuración de alertas guardada exitosamente.",
+        message: "Configuración de alertas y programación guardada exitosamente.",
       });
       if (smtpPassword) {
         setSmtpPasswordConfigured(true);
@@ -195,6 +210,29 @@ export const SettingsView: React.FC = () => {
       setFeedback({ type: "error", message: err.message || "Error al guardar la configuración." });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleGenerateImmediateReport = async () => {
+    try {
+      setGeneratingReport(true);
+      setFeedback(null);
+      await generateExecutiveHealthReport({
+        report_type: "DAILY",
+        send_email: true,
+        language: "es",
+      });
+      setFeedback({
+        type: "success",
+        message: "Informe de salud, saturación y diagnóstico por IA generado y enviado a su correo con éxito.",
+      });
+    } catch (err: any) {
+      setFeedback({
+        type: "error",
+        message: `Error al generar el informe: ${err.message}`,
+      });
+    } finally {
+      setGeneratingReport(false);
     }
   };
 
@@ -253,14 +291,33 @@ export const SettingsView: React.FC = () => {
         </div>
       </div>
 
-      {feedback && (
-        <div className={`q-feedback-banner q-feedback-banner--${feedback.type}`}>
-          {feedback.type === "success" ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
-          <span>{feedback.message}</span>
-        </div>
-      )}
+      <div className="q-settings-tabs-bar">
+        <button
+          className={`q-settings-tab-btn ${activeTab === "alerts" ? "q-tab-active" : ""}`}
+          onClick={() => setActiveTab("alerts")}
+        >
+          <Bell size={16} /> Notificaciones y Alertas
+        </button>
+        <button
+          className={`q-settings-tab-btn ${activeTab === "billing" ? "q-tab-active" : ""}`}
+          onClick={() => setActiveTab("billing")}
+        >
+          <CreditCard size={16} /> Suscripción & Facturación
+        </button>
+      </div>
 
-      <div className="q-settings-grid">
+      {activeTab === "billing" ? (
+        <BillingView />
+      ) : (
+        <>
+          {feedback && (
+            <div className={`q-feedback-banner q-feedback-banner--${feedback.type}`}>
+              {feedback.type === "success" ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
+              <span>{feedback.message}</span>
+            </div>
+          )}
+
+          <div className="q-settings-grid">
         {/* CARD 1: DISPARADORES */}
         <Card className="q-settings-card">
           <div className="q-card-header-row">
@@ -318,6 +375,56 @@ export const SettingsView: React.FC = () => {
               />
               <span className="q-switch-slider"></span>
             </label>
+          </div>
+
+          <div className="q-toggle-row">
+            <div className="q-toggle-label">
+              <span className="q-toggle-title">Saturación Crítica de Recursos</span>
+              <span className="q-toggle-desc">Disparar alerta si un equipo supera umbrales de saturación (CPU &gt; 85%, RAM &gt; 90%, Disco &gt; 90%)</span>
+            </div>
+            <label className="q-switch">
+              <input
+                type="checkbox"
+                disabled={!emailAlertsEnabled}
+                checked={notifyOnPerformanceIssues && emailAlertsEnabled}
+                onChange={(e) => setNotifyOnPerformanceIssues(e.target.checked)}
+              />
+              <span className="q-switch-slider"></span>
+            </label>
+          </div>
+
+          <div style={{ marginTop: "8px", paddingTop: "14px", borderTop: "1px solid var(--color-border)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+              <Calendar size={18} color="var(--color-brand-primary)" />
+              <strong style={{ fontSize: "14px", color: "var(--color-text-primary)" }}>
+                Programación de Entrega Automática de Informes
+              </strong>
+            </div>
+            <p style={{ margin: "0 0 12px 0", fontSize: "12.5px", color: "var(--color-text-secondary)", lineHeight: "1.4" }}>
+              Los administradores deciden con qué frecuencia el sistema envía el informe ejecutivo con diagnóstico preventivo por IA a los destinatarios configurados.
+            </p>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+              <select
+                className="q-select-field"
+                value={reportSchedule}
+                onChange={(e) => setReportSchedule(e.target.value)}
+                style={{ minWidth: "220px", flex: 1 }}
+              >
+                <option value="daily">Diario (Todos los días, 08:00 AM)</option>
+                <option value="weekly">Semanal (Cada Lunes, 08:00 AM)</option>
+                <option value="disabled">Desactivado (Solo bajo demanda)</option>
+              </select>
+              <Button
+                type="button"
+                variant="secondary"
+                icon={generatingReport ? <Loader2 size={16} className="q-spin" /> : <FileText size={16} />}
+                onClick={handleGenerateImmediateReport}
+                disabled={generatingReport || saving || recipients.length === 0}
+                title="Generar y despachar informe consolidado de salud e incidencias por correo ahora mismo"
+              >
+                {generatingReport ? "Generando..." : "Enviar Informe de Salud Ahora"}
+              </Button>
+            </div>
           </div>
         </Card>
 
@@ -466,116 +573,118 @@ export const SettingsView: React.FC = () => {
         </Card>
       </div>
 
-      {/* CARD 3: CANAL DE ENTREGA */}
-      <Card className="q-settings-card">
-        <div className="q-card-header-row">
-          <div className="q-card-heading">
-            <Server size={20} color="var(--color-brand-primary)" />
-            <div>
-              <h3>Canal de Envío y Servidor de Mensajería</h3>
-              <p>Seleccione entre Google Messaging OAuth o servidor SMTP corporativo</p>
-            </div>
-          </div>
-          <div style={{ display: "flex", gap: "6px" }}>
-            <Button
-              variant={deliveryChannel === "google_oauth" ? "primary" : "outline"}
-              onClick={() => setDeliveryChannel("google_oauth")}
-            >
-              Google OAuth (Gmail)
-            </Button>
-            <Button
-              variant={deliveryChannel === "smtp" ? "primary" : "outline"}
-              onClick={() => setDeliveryChannel("smtp")}
-            >
-              Servidor SMTP
-            </Button>
-          </div>
-        </div>
-
-        {deliveryChannel === "google_oauth" ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "12px", background: "var(--color-bg-primary)", borderRadius: "var(--radius-md)", border: "1px solid var(--color-border)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <ShieldCheck size={20} color="var(--color-status-success)" />
+      {/* CARD 3: CANAL DE ENTREGA (Exclusivo para Superusuarios) */}
+      {user?.role === "SUPERADMIN" && (
+        <Card className="q-settings-card">
+          <div className="q-card-header-row">
+            <div className="q-card-heading">
+              <Server size={20} color="var(--color-brand-primary)" />
               <div>
-                <strong>Google Messaging (OAuth 2.0 / Gmail API)</strong>
-                <p style={{ margin: "2px 0 0", fontSize: "12px", color: "var(--color-text-tertiary)" }}>
-                  Autenticación directa de Google configurada en variables de entorno (.env).
-                </p>
+                <h3>Canal de Envío y Servidor de Mensajería</h3>
+                <p>Configuración de infraestructura de entrega de correo (Exclusivo Superadministrador)</p>
               </div>
             </div>
-            <div style={{ fontSize: "12.5px", color: "var(--color-text-secondary)", display: "flex", flexDirection: "column", gap: "4px" }}>
-              <div>• <strong>Client ID:</strong> <code>{googleClientId || "Configurado en .env"}</code></div>
-              <div>• <strong>Estado del Token:</strong> {googleOauthConfigured ? <Badge variant="success">Token Presente</Badge> : <Badge variant="warning">Pendiente</Badge>}</div>
-              <div>• <strong>Modo Resiliente:</strong> Si el token de Google expira, conmuta automáticamente a SMTP si está configurado.</div>
+            <div style={{ display: "flex", gap: "6px" }}>
+              <Button
+                variant={deliveryChannel === "google_oauth" ? "primary" : "outline"}
+                onClick={() => setDeliveryChannel("google_oauth")}
+              >
+                Google OAuth (Gmail)
+              </Button>
+              <Button
+                variant={deliveryChannel === "smtp" ? "primary" : "outline"}
+                onClick={() => setDeliveryChannel("smtp")}
+              >
+                Servidor SMTP
+              </Button>
             </div>
           </div>
-        ) : (
-          <div className="q-form-grid">
-            <div className="q-form-group">
-              <label className="q-form-label">Servidor SMTP (Host)</label>
-              <input
-                type="text"
-                className="q-input-field"
-                placeholder="smtp.gmail.com o smtp.office365.com"
-                value={smtpHost}
-                onChange={(e) => setSmtpHost(e.target.value)}
-              />
+
+          {deliveryChannel === "google_oauth" ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "12px", background: "var(--color-bg-primary)", borderRadius: "var(--radius-md)", border: "1px solid var(--color-border)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <ShieldCheck size={20} color="var(--color-status-success)" />
+                <div>
+                  <strong>Google Messaging (OAuth 2.0 / Gmail API)</strong>
+                  <p style={{ margin: "2px 0 0", fontSize: "12px", color: "var(--color-text-tertiary)" }}>
+                    Autenticación directa de Google configurada en variables de entorno (.env).
+                  </p>
+                </div>
+              </div>
+              <div style={{ fontSize: "12.5px", color: "var(--color-text-secondary)", display: "flex", flexDirection: "column", gap: "4px" }}>
+                <div>• <strong>Client ID:</strong> <code>{googleClientId || "Configurado en .env"}</code></div>
+                <div>• <strong>Estado del Token:</strong> {googleOauthConfigured ? <Badge variant="success">Token Presente</Badge> : <Badge variant="warning">Pendiente</Badge>}</div>
+                <div>• <strong>Modo Resiliente:</strong> Si el token de Google expira, conmuta automáticamente a SMTP si está configurado.</div>
+              </div>
             </div>
-            <div className="q-form-group">
-              <label className="q-form-label">Puerto SMTP</label>
-              <input
-                type="number"
-                className="q-input-field"
-                placeholder="587"
-                value={smtpPort}
-                onChange={(e) => setSmtpPort(parseInt(e.target.value) || 587)}
-              />
-            </div>
-            <div className="q-form-group">
-              <label className="q-form-label">Usuario SMTP / Correo</label>
-              <input
-                type="text"
-                className="q-input-field"
-                placeholder="usuario@dominio.com"
-                value={smtpUser}
-                onChange={(e) => setSmtpUser(e.target.value)}
-              />
-            </div>
-            <div className="q-form-group">
-              <label className="q-form-label">
-                Contraseña SMTP {smtpPasswordConfigured && <span style={{ color: "var(--color-status-success)" }}>(Configurada)</span>}
-              </label>
-              <input
-                type="password"
-                className="q-input-field"
-                placeholder={smtpPasswordConfigured ? "•••••••••• (Dejar en blanco para mantener)" : "Contraseña de aplicación"}
-                value={smtpPassword}
-                onChange={(e) => setSmtpPassword(e.target.value)}
-              />
-            </div>
-            <div className="q-form-group">
-              <label className="q-form-label">Correo Remitente (From)</label>
-              <input
-                type="text"
-                className="q-input-field"
-                placeholder="alertas@qhapana-rmm.local"
-                value={smtpFromEmail}
-                onChange={(e) => setSmtpFromEmail(e.target.value)}
-              />
-            </div>
-            <div className="q-form-group" style={{ justifyContent: "center" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", cursor: "pointer", marginTop: "16px" }}>
+          ) : (
+            <div className="q-form-grid">
+              <div className="q-form-group">
+                <label className="q-form-label">Servidor SMTP (Host)</label>
                 <input
-                  type="checkbox"
-                  checked={smtpUseTls}
-                  onChange={(e) => setSmtpUseTls(e.target.checked)}
+                  type="text"
+                  className="q-input-field"
+                  placeholder="smtp.gmail.com o smtp.office365.com"
+                  value={smtpHost}
+                  onChange={(e) => setSmtpHost(e.target.value)}
                 />
-                Utilizar conexión segura STARTTLS
-              </label>
+              </div>
+              <div className="q-form-group">
+                <label className="q-form-label">Puerto SMTP</label>
+                <input
+                  type="number"
+                  className="q-input-field"
+                  placeholder="587"
+                  value={smtpPort}
+                  onChange={(e) => setSmtpPort(parseInt(e.target.value) || 587)}
+                />
+              </div>
+              <div className="q-form-group">
+                <label className="q-form-label">Usuario SMTP / Correo</label>
+                <input
+                  type="text"
+                  className="q-input-field"
+                  placeholder="usuario@dominio.com"
+                  value={smtpUser}
+                  onChange={(e) => setSmtpUser(e.target.value)}
+                />
+              </div>
+              <div className="q-form-group">
+                <label className="q-form-label">
+                  Contraseña SMTP {smtpPasswordConfigured && <span style={{ color: "var(--color-status-success)" }}>(Configurada)</span>}
+                </label>
+                <input
+                  type="password"
+                  className="q-input-field"
+                  placeholder={smtpPasswordConfigured ? "•••••••••• (Dejar en blanco para mantener)" : "Contraseña de aplicación"}
+                  value={smtpPassword}
+                  onChange={(e) => setSmtpPassword(e.target.value)}
+                />
+              </div>
+              <div className="q-form-group">
+                <label className="q-form-label">Correo Remitente (From)</label>
+                <input
+                  type="text"
+                  className="q-input-field"
+                  placeholder="alertas@qhapana-rmm.local"
+                  value={smtpFromEmail}
+                  onChange={(e) => setSmtpFromEmail(e.target.value)}
+                />
+              </div>
+              <div className="q-form-group" style={{ justifyContent: "center" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", cursor: "pointer", marginTop: "16px" }}>
+                  <input
+                    type="checkbox"
+                    checked={smtpUseTls}
+                    onChange={(e) => setSmtpUseTls(e.target.checked)}
+                  />
+                  Utilizar conexión segura STARTTLS
+                </label>
+              </div>
             </div>
-          </div>
-        )}
-      </Card>
+          )}
+        </Card>
+      )}
 
       {/* BARRA DE ACCIONES */}
       <div className="q-settings-actions">
@@ -597,6 +706,8 @@ export const SettingsView: React.FC = () => {
           {saving ? "Guardando..." : "Guardar Configuración"}
         </Button>
       </div>
+      </>
+      )}
     </div>
   );
 };

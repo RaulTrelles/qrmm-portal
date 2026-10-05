@@ -10,15 +10,22 @@ import {
   Printer,
   Building2,
   Calendar,
+  Zap,
 } from "lucide-react";
 import { Badge } from "../components/Badge/Badge";
 import { Button } from "../components/Button/Button";
 import { KpiCard } from "../components/KpiCard/KpiCard";
+import { BillingView } from "./BillingView";
+import { AdminFinOpsView } from "./AdminFinOpsView";
+import { useAuth } from "../context/AuthContext";
 import { getTransactions, getPaymentStats } from "../services/api";
 import type { Transaction, PaymentStats } from "../types/payment";
+import { ShieldAlert } from "lucide-react";
 import "./PaymentsView.css";
 
 export const PaymentsView: React.FC = () => {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<"history" | "billing" | "finops">("history");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [stats, setStats] = useState<PaymentStats | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -54,19 +61,86 @@ export const PaymentsView: React.FC = () => {
 
   return (
     <div className="q-payments-view">
-      {/* Cabecera */}
-      <div className="q-payments-header">
-        <div>
-          <h1>Historial de Pagos y Facturación SaaS</h1>
-          <p>
-            Supervisa las transacciones realizadas, suscripciones activas por cliente y emite comprobantes digitales.
-          </p>
-        </div>
+      {/* Switcher de Pestañas */}
+      <div style={{ display: "flex", gap: "8px", background: "var(--color-surface-muted, #f1f3f5)", padding: "4px", borderRadius: "999px", width: "fit-content", marginBottom: "8px" }}>
+        <button
+          style={{
+            border: "none",
+            background: activeTab === "history" ? "var(--color-brand-primary)" : "none",
+            color: activeTab === "history" ? "#fff" : "var(--color-text-secondary)",
+            padding: "8px 18px",
+            borderRadius: "999px",
+            fontSize: "13px",
+            fontWeight: 600,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+          }}
+          onClick={() => setActiveTab("history")}
+        >
+          <CreditCard size={15} /> Historial de Transacciones
+        </button>
+        <button
+          style={{
+            border: "none",
+            background: activeTab === "billing" ? "var(--color-brand-primary)" : "none",
+            color: activeTab === "billing" ? "#fff" : "var(--color-text-secondary)",
+            padding: "8px 18px",
+            borderRadius: "999px",
+            fontSize: "13px",
+            fontWeight: 600,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+          }}
+          onClick={() => setActiveTab("billing")}
+        >
+          <Zap size={15} /> Mi Suscripción & Facturación
+        </button>
 
-        <Button variant="secondary" size="sm" onClick={fetchData} loading={isLoading}>
-          <RefreshCw size={14} /> Actualizar
-        </Button>
+        {user?.role === "SUPERADMIN" && (
+          <button
+            style={{
+              border: "none",
+              background: activeTab === "finops" ? "var(--color-brand-primary)" : "none",
+              color: activeTab === "finops" ? "#fff" : "var(--color-text-secondary)",
+              padding: "8px 18px",
+              borderRadius: "999px",
+              fontSize: "13px",
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+            onClick={() => setActiveTab("finops")}
+          >
+            <ShieldAlert size={15} /> FinOps & Operaciones
+          </button>
+        )}
       </div>
+
+      {activeTab === "billing" ? (
+        <BillingView />
+      ) : activeTab === "finops" ? (
+        <AdminFinOpsView />
+      ) : (
+        <>
+          {/* Cabecera */}
+          <div className="q-payments-header">
+            <div>
+              <h1>Historial de Pagos y Facturación SaaS</h1>
+              <p>
+                Supervisa las transacciones realizadas, suscripciones activas por cliente y emite comprobantes digitales.
+              </p>
+            </div>
+
+            <Button variant="secondary" size="sm" onClick={fetchData} loading={isLoading}>
+              <RefreshCw size={14} /> Actualizar
+            </Button>
+          </div>
 
       {/* Tarjetas KPI */}
       <div className="q-payments-kpis">
@@ -283,6 +357,8 @@ export const PaymentsView: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   );

@@ -8,19 +8,14 @@ import {
   Sun,
   Moon,
   Monitor,
-  Download,
-  Upload,
-  FolderOpen,
   Radio,
   ChevronDown,
   Activity,
   Laptop,
   ArrowRight,
   LayoutDashboard,
-  Server,
   AlertTriangle,
   XCircle,
-  Terminal,
   Globe,
   Building,
   Users,
@@ -57,8 +52,8 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
     return (localStorage.getItem("q_portal_theme") as "light" | "dark") || "light";
   });
 
-  // Estados de Navegación & Mockup Interactivo
-  const [mockupTab, setMockupTab] = useState<"dashboard" | "desktop" | "terminal" | "files" | "discovery">("dashboard");
+  // Estados de Navegación & Showcase Interactivo del Producto Real
+  const [mockupTab, setMockupTab] = useState<"dashboard" | "desktop" | "aihealth" | "discovery" | "specs" | "os">("dashboard");
   const [openFaq, setOpenFaq] = useState<Record<number, boolean>>({ 0: true, 1: true });
 
   // Estados de Precios & Checkout
@@ -303,11 +298,6 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
       ---------------------------------------------------------------------- */}
       <section className="q-portal-hero">
         <div className="q-portal-hero-content">
-          <div className="q-portal-badge-pill">
-            <span className="q-portal-badge-dot"></span>
-            <span>QHAPANA RMM • PLATAFORMA INTEGRAL TI</span>
-          </div>
-
           <h1 className="q-portal-hero-title">
             {lang === "es"
               ? "Control remoto y RMM en una sola plataforma."
@@ -374,10 +364,40 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
         </div>
 
         {/* ----------------------------------------------------------------------
-            3. PRODUCT DASHBOARD PREVIEW (MOCKUP INTERACTIVO)
+            3. PRODUCT HERO STAGE & REAL PRODUCT SHOWCASE
         ---------------------------------------------------------------------- */}
-        <div className="q-portal-mockup-wrapper">
-          <div className="q-portal-mockup-window">
+        <div className="q-portal-showcase-stage">
+          {/* A. Hero Commercial Showcase (Lifestyle Laptop & Mobile Phone on Desk) */}
+          <div className="q-portal-device-stage">
+            <div className="q-portal-device-canvas">
+              <img
+                src="/showcase/hero-workspace-mockup.jpg"
+                alt="Qhapana RMM en PC y Móvil"
+                className="q-portal-device-img"
+              />
+
+              {/* Micro-chips flotantes interactivos de telemetría */}
+              <div className="q-portal-float-badge q-portal-float-badge--top-left">
+                <span className="q-portal-live-beacon"></span>
+                <span>{lang === "es" ? "6 Equipos Conectados en Tiempo Real" : "6 Active Endpoints Live"}</span>
+              </div>
+              <div className="q-portal-float-badge q-portal-float-badge--top-right">
+                <ShieldCheck size={14} style={{ color: "var(--portal-accent-teal)" }} />
+                <span>{lang === "es" ? "Latencia P2P < 25ms • Sin VPN" : "P2P Latency < 25ms • Zero VPN"}</span>
+              </div>
+              <div className="q-portal-float-badge q-portal-float-badge--bottom-left">
+                <Globe size={14} style={{ color: "#3b82f6" }} />
+                <span>{lang === "es" ? "Geolocalización & Mapa de Flota" : "Fleet Geolocation & Live Map"}</span>
+              </div>
+              <div className="q-portal-float-badge q-portal-float-badge--bottom-right">
+                <Laptop size={14} style={{ color: "#8b5cf6" }} />
+                <span>{lang === "es" ? "100% Responsivo en Móvil y Tablet" : "100% Mobile & Tablet Responsive"}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* B. Tour de Capturas Reales de la Plataforma */}
+          <div className="q-portal-mockup-window" style={{ marginTop: "40px" }}>
             {/* Barra superior de la ventana */}
             <div className="q-portal-mockup-titlebar">
               <div className="q-portal-window-dots">
@@ -391,244 +411,144 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
                   onClick={() => setMockupTab("dashboard")}
                 >
                   <LayoutDashboard size={14} />
-                  <span>{lang === "es" ? "Panel Central RMM" : "Central RMM"}</span>
+                  <span>{lang === "es" ? "1. Dashboard & Mapa de Flota" : "1. Dashboard & Fleet Map"}</span>
                 </button>
                 <button
                   className={`q-portal-mockup-tab-btn ${mockupTab === "desktop" ? "q-portal-mockup-tab-btn--active" : ""}`}
                   onClick={() => setMockupTab("desktop")}
                 >
                   <Monitor size={14} />
-                  <span>{lang === "es" ? "Escritorio Remoto Web" : "Remote Desktop"}</span>
+                  <span>{lang === "es" ? "2. Control Remoto & Terminal" : "2. Remote Desktop"}</span>
                 </button>
                 <button
-                  className={`q-portal-mockup-tab-btn ${mockupTab === "terminal" ? "q-portal-mockup-tab-btn--active" : ""}`}
-                  onClick={() => setMockupTab("terminal")}
+                  className={`q-portal-mockup-tab-btn ${mockupTab === "aihealth" ? "q-portal-mockup-tab-btn--active" : ""}`}
+                  onClick={() => setMockupTab("aihealth")}
                 >
-                  <Terminal size={14} />
-                  <span>{lang === "es" ? "Terminal Remota" : "Remote Shell"}</span>
-                </button>
-                <button
-                  className={`q-portal-mockup-tab-btn ${mockupTab === "files" ? "q-portal-mockup-tab-btn--active" : ""}`}
-                  onClick={() => setMockupTab("files")}
-                >
-                  <FolderOpen size={14} />
-                  <span>{lang === "es" ? "Archivos" : "File Transfer"}</span>
+                  <Sparkles size={14} />
+                  <span>{lang === "es" ? "3. AI Health Predictivo" : "3. Predictive AI Health"}</span>
                 </button>
                 <button
                   className={`q-portal-mockup-tab-btn ${mockupTab === "discovery" ? "q-portal-mockup-tab-btn--active" : ""}`}
                   onClick={() => setMockupTab("discovery")}
                 >
                   <Radio size={14} />
-                  <span>{lang === "es" ? "Sonda de Red LAN" : "LAN Probe"}</span>
+                  <span>{lang === "es" ? "4. Sonda LAN Discovery" : "4. LAN Probe"}</span>
+                </button>
+                <button
+                  className={`q-portal-mockup-tab-btn ${mockupTab === "specs" ? "q-portal-mockup-tab-btn--active" : ""}`}
+                  onClick={() => setMockupTab("specs")}
+                >
+                  <Cpu size={14} />
+                  <span>{lang === "es" ? "5. Ficha Hardware & Ubicación" : "5. Hardware Specs"}</span>
+                </button>
+                <button
+                  className={`q-portal-mockup-tab-btn ${mockupTab === "os" ? "q-portal-mockup-tab-btn--active" : ""}`}
+                  onClick={() => setMockupTab("os")}
+                >
+                  <Activity size={14} />
+                  <span>{lang === "es" ? "6. Distribución por SO" : "6. OS Breakdown"}</span>
                 </button>
               </div>
               <div className="q-portal-mockup-status-indicator">
                 <span className="q-portal-live-beacon"></span>
-                <span>182/186 {lang === "es" ? "EN LÍNEA" : "ONLINE"}</span>
+                <span>{lang === "es" ? "PRODUCCIÓN EN VIVO" : "LIVE PLATFORM"}</span>
               </div>
             </div>
 
-            {/* Contenido de la ventana según pestaña seleccionada */}
-            <div className="q-portal-mockup-body">
+            {/* Contenido con Capturas Reales */}
+            <div className="q-portal-real-capture-view">
               {mockupTab === "dashboard" && (
-                <div className="q-mockup-view-dashboard">
-                  <div className="q-mockup-kpi-row">
-                    <div className="q-mockup-kpi-card">
-                      <span className="q-mockup-kpi-title">{lang === "es" ? "Organizaciones" : "Clients / Orgs"}</span>
-                      <span className="q-mockup-kpi-val">14</span>
-                      <span className="q-mockup-kpi-sub">MSP Multi-Tenant</span>
-                    </div>
-                    <div className="q-mockup-kpi-card">
-                      <span className="q-mockup-kpi-title">{lang === "es" ? "Equipos Gestionados" : "Managed Endpoints"}</span>
-                      <span className="q-mockup-kpi-val">186</span>
-                      <span className="q-mockup-kpi-sub" style={{ color: "var(--portal-accent-teal)" }}>
-                        182 {lang === "es" ? "conectados" : "online"}
-                      </span>
-                    </div>
-                    <div className="q-mockup-kpi-card">
-                      <span className="q-mockup-kpi-title">{lang === "es" ? "Alertas Activas" : "Active Alerts"}</span>
-                      <span className="q-mockup-kpi-val" style={{ color: "#f59e0b" }}>3</span>
-                      <span className="q-mockup-kpi-sub">{lang === "es" ? "2 advertencias, 1 crítica" : "2 warnings, 1 critical"}</span>
-                    </div>
-                    <div className="q-mockup-kpi-card">
-                      <span className="q-mockup-kpi-title">{lang === "es" ? "Carga Promedio CPU" : "Fleet Avg CPU"}</span>
-                      <span className="q-mockup-kpi-val">28.4%</span>
-                      <span className="q-mockup-kpi-sub">{lang === "es" ? "Estable y saludable" : "Healthy telemetry"}</span>
-                    </div>
-                  </div>
-
-                  <div className="q-mockup-table-preview">
-                    <div className="q-mockup-table-header">
-                      <span>{lang === "es" ? "Equipo / Hostname" : "Endpoint Hostname"}</span>
-                      <span>{lang === "es" ? "Cliente / Organización" : "Client Org"}</span>
-                      <span>IP / Red</span>
-                      <span>CPU</span>
-                      <span>RAM</span>
-                      <span>{lang === "es" ? "Acción Rápida" : "Quick Action"}</span>
-                    </div>
-                    {[
-                      { host: "SRV-DATACENTER-01", org: "Financiera Andina", ip: "192.168.10.5", cpu: "14%", ram: "42%", status: "online", os: "Win Server 2022" },
-                      { host: "WS-DESIGN-04", org: "Estudio Creativo", ip: "192.168.20.18", cpu: "78%", ram: "84%", status: "warning", os: "Windows 11 Pro" },
-                      { host: "SRV-BACKUP-LINUX", org: "Logística del Sur", ip: "10.0.4.12", cpu: "8%", ram: "31%", status: "online", os: "Ubuntu 22.04 LTS" },
-                      { host: "POS-TIENDA-MIRAFLORES", org: "Retail Market", ip: "192.168.1.102", cpu: "19%", ram: "55%", status: "online", os: "Windows 10 IoT" },
-                    ].map((row, idx) => (
-                      <div key={idx} className="q-mockup-table-row">
-                        <div className="q-mockup-row-host">
-                          <span className={`q-mockup-status-dot q-mockup-status-dot--${row.status}`}></span>
-                          <div>
-                            <strong>{row.host}</strong>
-                            <small>{row.os}</small>
-                          </div>
-                        </div>
-                        <div>{row.org}</div>
-                        <code style={{ fontSize: "12px", opacity: 0.85 }}>{row.ip}</code>
-                        <div style={{ color: parseInt(row.cpu) > 70 ? "#f59e0b" : "inherit" }}>{row.cpu}</div>
-                        <div>{row.ram}</div>
-                        <div>
-                          <button
-                            onClick={() => setMockupTab("desktop")}
-                            className="q-mockup-btn-connect"
-                          >
-                            <Monitor size={12} style={{ marginRight: 4 }} />
-                            {lang === "es" ? "Conectar" : "Connect"}
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                <div className="q-portal-capture-wrapper">
+                  <img
+                    src="/showcase/real-dashboard.png"
+                    alt="Dashboard Real con Indicadores y Mapa de Ubicación"
+                    className="q-portal-capture-img"
+                  />
+                  <div className="q-portal-capture-caption">
+                    <strong>{lang === "es" ? "Panel Central Unificado:" : "Central Unified Panel:"}</strong>{" "}
+                    {lang === "es"
+                      ? "Monitorea CPU promedio, consumo de RAM, discos y mapa de geolocalización de equipos activos con actualización por WebSockets en milisegundos."
+                      : "Monitor fleet CPU, RAM usage, storage gauges, and geographic fleet map with sub-second WebSocket updates."}
                   </div>
                 </div>
               )}
 
               {mockupTab === "desktop" && (
-                <div className="q-mockup-view-desktop">
-                  <div className="q-mockup-remote-bar">
-                    <div className="q-mockup-remote-info">
-                      <span className="q-mockup-status-dot q-mockup-status-dot--online"></span>
-                      <span>SRV-DATACENTER-01 (Windows Server 2022)</span>
-                    </div>
-                    <div className="q-mockup-remote-controls">
-                      <button className="q-mockup-ctrl-btn">Ctrl+Alt+Del</button>
-                      <button className="q-mockup-ctrl-btn">{lang === "es" ? "Portapapeles" : "Clipboard"}</button>
-                      <button onClick={() => setMockupTab("files")} className="q-mockup-ctrl-btn">
-                        <FolderOpen size={12} style={{ marginRight: 4 }} />
-                        {lang === "es" ? "Archivos" : "Files"}
-                      </button>
-                      <button onClick={() => setMockupTab("terminal")} className="q-mockup-ctrl-btn">
-                        <Terminal size={12} style={{ marginRight: 4 }} />
-                        {lang === "es" ? "Terminal" : "Shell"}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="q-mockup-desktop-screen">
-                    <div className="q-mockup-remote-wallpaper">
-                      <div className="q-mockup-simulated-app">
-                        <div className="q-sim-app-bar">Task Manager - Windows Server</div>
-                        <div className="q-sim-app-body">
-                          <div>CPU: Intel Xeon Gold • 2.80 GHz (14% en uso)</div>
-                          <div>Memoria: 32.0 GB ECC (13.4 GB en uso)</div>
-                          <div>Disco C: SSD NVMe 1TB (412 GB libres)</div>
-                          <div style={{ marginTop: 8, color: "var(--portal-accent-teal)" }}>
-                            ✔ Agente Qhapana RMM v2.4 activo como servicio de sistema
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                <div className="q-portal-capture-wrapper">
+                  <img
+                    src="/showcase/remote-control-mockup.jpg"
+                    alt="Control Remoto Web y Terminal"
+                    className="q-portal-capture-img"
+                  />
+                  <div className="q-portal-capture-caption">
+                    <strong>{lang === "es" ? "Control Remoto Sin Clientes Pesados:" : "Browser-based Remote Control:"}</strong>{" "}
+                    {lang === "es"
+                      ? "Conéctate por escritorio remoto o abre una terminal PowerShell/SSH sin interrumpir la sesión del usuario final y sin costos por canal."
+                      : "Connect via WebRTC remote desktop or remote shell without disrupting the user session and with zero channel licensing fees."}
                   </div>
                 </div>
               )}
 
-              {mockupTab === "terminal" && (
-                <div className="q-mockup-view-terminal">
-                  <div className="q-mockup-term-header">
-                    <span>PowerShell Remoto • SRV-DATACENTER-01 (Sin interrumpir al usuario en pantalla)</span>
-                  </div>
-                  <pre className="q-mockup-term-body">
-                    <code>{`Windows PowerShell (Sesión Remota Segura Web)
-Copyright (C) Microsoft Corporation. All rights reserved.
-
-PS C:\\Windows\\system32> Get-Service | Where-Object {$_.Status -eq "Stopped" -and $_.StartType -eq "Automatic"}
-Status   Name               DisplayName
-------   ----               -----------
-Stopped  Spooler            Cola de impresión
-
-PS C:\\Windows\\system32> Start-Service Spooler
-PS C:\\Windows\\system32> Get-Service Spooler
-Status   Name               DisplayName
-------   ----               -----------
-Running  Spooler            Cola de impresión
-
-PS C:\\Windows\\system32> # Incidencia resuelta en 15 segundos sin cerrar la sesión del usuario.`}</code>
-                  </pre>
-                </div>
-              )}
-
-              {mockupTab === "files" && (
-                <div className="q-mockup-view-files">
-                  <div className="q-mockup-files-pane">
-                    <div className="q-mockup-pane-title">
-                      <Laptop size={14} style={{ marginRight: 6 }} />
-                      <span>{lang === "es" ? "Tu Navegador Local" : "Local Browser"}</span>
-                    </div>
-                    <div className="q-mockup-file-item">📁 C:\Instaladores\Agentes\</div>
-                    <div className="q-mockup-file-item">📄 fix_database_script.sql</div>
-                    <div className="q-mockup-file-item">📄 parche_seguridad_qrmm.zip</div>
-                  </div>
-                  <div className="q-mockup-files-divider">
-                    <button className="q-mockup-ctrl-btn" title="Subir archivo al equipo remoto">
-                      <Upload size={14} style={{ marginRight: 4 }} />
-                      {lang === "es" ? "Enviar" : "Upload"}
-                    </button>
-                    <button className="q-mockup-ctrl-btn" title="Descargar archivo a tu equipo">
-                      <Download size={14} style={{ marginRight: 4 }} />
-                      {lang === "es" ? "Bajar" : "Download"}
-                    </button>
-                  </div>
-                  <div className="q-mockup-files-pane">
-                    <div className="q-mockup-pane-title">
-                      <Server size={14} style={{ marginRight: 6 }} />
-                      <span>{lang === "es" ? "Disco Remoto (SRV-DATACENTER-01)" : "Remote Disk"}</span>
-                    </div>
-                    <div className="q-mockup-file-item">📁 D:\Empresa\Backups_Diarios\</div>
-                    <div className="q-mockup-file-item">📄 backup_2026_10_03.bak (4.2 GB)</div>
-                    <div className="q-mockup-file-item">📁 C:\Program Files\Qhapana\Logs\</div>
+              {mockupTab === "aihealth" && (
+                <div className="q-portal-capture-wrapper">
+                  <img
+                    src="/showcase/real-ai-health.png"
+                    alt="AI Health y Diagnósticos Predictivos"
+                    className="q-portal-capture-img"
+                  />
+                  <div className="q-portal-capture-caption">
+                    <strong>{lang === "es" ? "Inteligencia Artificial Proactiva:" : "Proactive AI Health:"}</strong>{" "}
+                    {lang === "es"
+                      ? "Detección de anomalías correlacionadas, puntuación de salud de flota (91/100) y generación automática de informes ejecutivos."
+                      : "Correlated anomaly detection, fleet health index (91/100), and automated executive diagnostic reporting."}
                   </div>
                 </div>
               )}
 
               {mockupTab === "discovery" && (
-                <div className="q-mockup-view-discovery">
-                  <div className="q-mockup-discovery-banner">
-                    <Radio size={16} color="var(--portal-accent-teal)" style={{ marginRight: 8 }} />
-                    <span>
-                      {lang === "es"
-                        ? "Sonda LAN activa en 192.168.10.0/24 • 18 dispositivos detectados en la subred"
-                        : "Active LAN Probe on 192.168.10.0/24 • 18 devices discovered in subnet"}
-                    </span>
+                <div className="q-portal-capture-wrapper">
+                  <img
+                    src="/showcase/real-discovery.png"
+                    alt="Sonda de Red LAN y Detección de Puertos"
+                    className="q-portal-capture-img"
+                  />
+                  <div className="q-portal-capture-caption">
+                    <strong>{lang === "es" ? "Descubrimiento de Red Automático:" : "Automated Network Discovery:"}</strong>{" "}
+                    {lang === "es"
+                      ? "Escanea la subred local mediante agentes telemétricos, detecta dispositivos no gestionados, impresoras y puertos abiertos (SMB 445, RDP 3389)."
+                      : "Scans local LAN subnets via lightweight agent probes, identifying unmanaged endpoints, network printers, and open ports."}
                   </div>
-                  <div className="q-mockup-table-preview">
-                    <div className="q-mockup-table-header">
-                      <span>IP</span>
-                      <span>Hostname</span>
-                      <span>MAC Address</span>
-                      <span>Tipo Estimado</span>
-                      <span>Estado en QRMM</span>
-                    </div>
-                    {[
-                      { ip: "192.168.10.1", host: "gateway-core.empresa.lan", mac: "00:1A:2B:3C:4D:5E", type: "Router / Firewall", status: "LAN Only" },
-                      { ip: "192.168.10.5", host: "SRV-DATACENTER-01", mac: "B4:2E:99:A1:C2:F0", type: "Windows Server", status: "Gestionado (Agente Activo)" },
-                      { ip: "192.168.10.22", host: "HP-LaserJet-Finance", mac: "3C:D9:2B:10:88:91", type: "Impresora de Red", status: "LAN Only" },
-                      { ip: "192.168.10.45", host: "LAPTOP-GERENCIA", mac: "DC:A6:32:7F:1B:40", type: "Windows 11 Laptop", status: "No Gestionado (Detectado)" },
-                    ].map((dev, idx) => (
-                      <div key={idx} className="q-mockup-table-row">
-                        <code>{dev.ip}</code>
-                        <strong>{dev.host}</strong>
-                        <span style={{ fontSize: "12px", opacity: 0.8 }}>{dev.mac}</span>
-                        <span>{dev.type}</span>
-                        <span style={{ color: dev.status.includes("Activo") ? "var(--portal-accent-teal)" : "#f59e0b" }}>
-                          {dev.status}
-                        </span>
-                      </div>
-                    ))}
+                </div>
+              )}
+
+              {mockupTab === "specs" && (
+                <div className="q-portal-capture-wrapper">
+                  <img
+                    src="/showcase/real-device-modal.png"
+                    alt="Ficha Técnica de Hardware y Ubicación"
+                    className="q-portal-capture-img"
+                  />
+                  <div className="q-portal-capture-caption">
+                    <strong>{lang === "es" ? "Auditoría Completa de Hardware & Ubicación:" : "Full Hardware & Geolocation Audit:"}</strong>{" "}
+                    {lang === "es"
+                      ? "Especificaciones exactas de CPU, memoria, particiones de almacenamiento, periféricos conectados y geolocalización de sede física."
+                      : "Exact hardware specs for CPU, RAM, disk partitions, connected peripherals, and physical branch geolocation."}
+                  </div>
+                </div>
+              )}
+
+              {mockupTab === "os" && (
+                <div className="q-portal-capture-wrapper">
+                  <img
+                    src="/showcase/real-os-distribution.png"
+                    alt="Distribución de Sistemas Operativos"
+                    className="q-portal-capture-img"
+                  />
+                  <div className="q-portal-capture-caption">
+                    <strong>{lang === "es" ? "Visibilidad Multiplataforma:" : "Cross-Platform Visibility:"}</strong>{" "}
+                    {lang === "es"
+                      ? "Control unificado para Windows Server (2016-2022), Windows 10/11 Pro y distribuciones Linux (Ubuntu/Debian) en un solo panel."
+                      : "Unified fleet management across Windows Server, Windows 10/11, and Linux distributions from one centralized screen."}
                   </div>
                 </div>
               )}

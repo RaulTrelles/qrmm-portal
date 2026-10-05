@@ -229,6 +229,8 @@ export interface AlertSettings {
   email_alerts_enabled: boolean;
   notify_on_device_offline: boolean;
   notify_on_container_crash: boolean;
+  notify_on_performance_issues?: boolean;
+  report_schedule?: "daily" | "weekly" | "disabled" | string;
   alert_recipients: string[];
   client_areas?: string[];
   delivery_channel: "google_oauth" | "smtp";
@@ -247,6 +249,8 @@ export interface AlertSettingsUpdatePayload {
   email_alerts_enabled: boolean;
   notify_on_device_offline: boolean;
   notify_on_container_crash: boolean;
+  notify_on_performance_issues?: boolean;
+  report_schedule?: "daily" | "weekly" | "disabled" | string;
   alert_recipients: string[];
   client_areas?: string[];
   delivery_channel: "google_oauth" | "smtp";
@@ -259,6 +263,27 @@ export interface AlertSettingsUpdatePayload {
   google_client_id?: string;
   google_client_secret?: string;
   google_refresh_token?: string;
+}
+
+export async function generateExecutiveHealthReport(options?: {
+  report_type?: "DAILY" | "WEEKLY" | "EXECUTIVE" | "TECHNICAL";
+  send_email?: boolean;
+  language?: string;
+}): Promise<any> {
+  const res = await fetch(`${API_BASE}/ai/reports/generate`, {
+    method: "POST",
+    headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify({
+      report_type: options?.report_type || "DAILY",
+      send_email: options?.send_email ?? true,
+      language: options?.language || "es",
+    }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al generar o enviar el informe de salud");
+  }
+  return res.json();
 }
 
 export async function getAlertSettings(): Promise<AlertSettings> {
@@ -894,5 +919,409 @@ export async function sendReportEmail(reportId: string): Promise<any> {
   }
   return res.json();
 }
+
+// =============================================================================
+// BILLING MULTI-PROVIDER (LEMON SQUEEZY & PADDLE)
+// =============================================================================
+
+export interface PlanPriceItem {
+  id: string;
+  provider: string;
+  provider_price_id: string;
+  billing_cycle: "monthly" | "yearly";
+  currency: string;
+  amount: number;
+}
+
+export interface EntitlementItem {
+  code: string;
+  name: string;
+  description?: string;
+  category: string;
+  enabled: boolean;
+  limit_value?: number;
+}
+
+export interface BillingPlan {
+  id: string;
+  code: string;
+  name: string;
+  description?: string;
+  max_devices?: number | null;
+  active: boolean;
+  sort_order: number;
+  prices: PlanPriceItem[];
+  entitlements: EntitlementItem[];
+}
+
+export interface SubscriptionOverview {
+  id?: string;
+  organization_id: string;
+  organization_name: string;
+  plan_code: string;
+  plan_name: string;
+  status: "trialing" | "active" | "past_due" | "paused" | "cancelled" | "expired";
+  billing_cycle: "monthly" | "yearly";
+  amount: number;
+  currency: string;
+  provider: string;
+  current_period_start?: string;
+  current_period_end?: string;
+  cancel_at_period_end: boolean;
+  is_past_due: boolean;
+  past_due_since?: string;
+  in_grace_period: boolean;
+  grace_period_days_left?: number;
+  devices_count: number;
+  max_devices?: number | null;
+  device_limit_reached: boolean;
+  billing_bypassed?: boolean;
+  custom_device_limit?: number | null;
+  enforcement_enabled?: boolean;
+  capabilities: string[];
+}
+
+export interface CheckoutInitiateResult {
+  success: boolean;
+  checkout_url: string;
+  provider: string;
+  plan_code: string;
+  billing_cycle: string;
+  provider_price_id: string;
+  status?: string;
+}
+
+export async function getBillingPlans(): Promise<BillingPlan[]> {
+  const res = await fetch(`${API_BASE}/billing/plans`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al obtener planes comerciales");
+  }
+  return res.json();
+}
+
+export async function getCurrentSubscription(): Promise<SubscriptionOverview> {
+  const res = await fetch(`${API_BASE}/billing/subscription`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al obtener el estado de la suscripción");
+  }
+  return res.json();
+}
+
+export async function initiateBillingCheckout(
+  planCode: string,
+  billingCycle: "monthly" | "yearly",
+  provider?: string,
+  discountCode?: string,
+): Promise<CheckoutInitiateResult> {
+  const res = await fetch(`${API_BASE}/billing/checkout`, {
+    method: "POST",
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({
+      plan_code: planCode,
+      billing_cycle: billingCycle,
+      provider: provider || undefined,
+      discount_code: discountCode || undefined,
+    }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al iniciar el proceso de checkout");
+  }
+  return res.json();
+}
+
+export async function cancelBillingSubscription(): Promise<{ success: boolean; message: string; cancel_at_period_end: boolean }> {
+  const res = await fetch(`${API_BASE}/billing/subscription/cancel`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al cancelar la suscripción");
+  }
+  return res.json();
+}
+
+export async function resumeBillingSubscription(): Promise<{ success: boolean; message: string }> {
+  const res = await fetch(`${API_BASE}/billing/subscription/resume`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al reactivar la suscripción");
+  }
+  return res.json();
+}
+
+// ==============================================================================
+// FinOps & SuperAdmin Operations Hub
+// ==============================================================================
+
+export interface FinOpsSystemConfig {
+  billing_enforcement_enabled: boolean;
+  default_provider: string;
+  grace_period_days: number;
+  maintenance_mode: boolean;
+  maintenance_message?: string;
+  updated_at?: string;
+}
+
+export interface FinOpsOverview {
+  mrr: number;
+  arr: number;
+  currency: string;
+  total_organizations: number;
+  bypassed_organizations: number;
+  total_devices: number;
+  active_subscriptions: number;
+  past_due_subscriptions: number;
+  cancelled_subscriptions: number;
+  total_webhooks: number;
+  failed_webhooks: number;
+  system_config: FinOpsSystemConfig;
+}
+
+export interface FinOpsWebhookEvent {
+  id: string;
+  provider: string;
+  event_id: string;
+  event_type: string;
+  status: string;
+  error?: string;
+  received_at?: string;
+  processed_at?: string;
+  payload?: any;
+}
+
+export interface OrgBillingOverridePayload {
+  plan_code?: string;
+  status?: string;
+  billing_bypassed?: boolean;
+  custom_device_limit?: number;
+  reason?: string;
+}
+
+export async function getFinOpsOverview(): Promise<FinOpsOverview> {
+  const res = await fetch(`${API_BASE}/billing/admin/overview`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al obtener métricas FinOps");
+  }
+  return res.json();
+}
+
+export async function updateFinOpsSettings(payload: Partial<FinOpsSystemConfig>): Promise<FinOpsSystemConfig> {
+  const res = await fetch(`${API_BASE}/billing/admin/settings`, {
+    method: "PATCH",
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al actualizar configuración global de facturación");
+  }
+  return res.json();
+}
+
+export async function getFinOpsOrganizations(search?: string): Promise<SubscriptionOverview[]> {
+  const url = new URL(`${API_BASE}/billing/admin/organizations`);
+  if (search) url.searchParams.set("search", search);
+
+  const res = await fetch(url.toString(), {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al listar organizaciones FinOps");
+  }
+  return res.json();
+}
+
+export async function overrideOrgBilling(
+  orgId: string,
+  payload: OrgBillingOverridePayload,
+): Promise<SubscriptionOverview> {
+  const res = await fetch(`${API_BASE}/billing/admin/organizations/${orgId}/override`, {
+    method: "PATCH",
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al modificar facturación de la organización");
+  }
+  return res.json();
+}
+
+export async function getFinOpsWebhooks(status?: string, limit = 50): Promise<FinOpsWebhookEvent[]> {
+  const url = new URL(`${API_BASE}/billing/admin/webhooks`);
+  url.searchParams.set("limit", String(limit));
+  if (status) url.searchParams.set("status", status);
+
+  const res = await fetch(url.toString(), {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al obtener registro de webhooks");
+  }
+  return res.json();
+}
+
+export async function retryFinOpsWebhook(eventId: string): Promise<{ success: boolean; result?: any; error?: string }> {
+  const res = await fetch(`${API_BASE}/billing/admin/webhooks/${eventId}/retry`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al reintentar webhook");
+  }
+  return res.json();
+}
+
+export async function updatePlanPrices(
+  planId: string,
+  prices: Array<{ provider: string; billing_cycle: string; provider_price_id: string; amount?: number }>,
+): Promise<any> {
+  const res = await fetch(`${API_BASE}/billing/admin/plans/${planId}/prices`, {
+    method: "PATCH",
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({ prices }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al actualizar precios del plan");
+  }
+  return res.json();
+}
+
+// ==============================================================================
+// Motor de Cupones y Códigos de Descuento
+// ==============================================================================
+
+export interface DiscountValidateResult {
+  valid: boolean;
+  code: string;
+  discount_type: "percentage" | "fixed";
+  value: number;
+  currency: string;
+  description?: string;
+  applicable_plans?: string[];
+  original_amount: number;
+  discount_amount: number;
+  final_amount: number;
+  message: string;
+}
+
+export interface DiscountCodeItem {
+  id: string;
+  code: string;
+  description?: string | null;
+  discount_type: "percentage" | "fixed";
+  value: number;
+  currency: string;
+  max_redemptions?: number | null;
+  times_redeemed: number;
+  valid_from: string;
+  valid_until?: string | null;
+  is_active: boolean;
+  applicable_plans: string[];
+  created_at: string;
+}
+
+export interface CreateDiscountPayload {
+  code: string;
+  description?: string;
+  discount_type: "percentage" | "fixed";
+  value: number;
+  currency?: string;
+  max_redemptions?: number | null;
+  valid_until?: string | null;
+  applicable_plans?: string[];
+}
+
+export async function validateDiscountCode(
+  code: string,
+  planCode?: string,
+  billingCycle = "monthly",
+): Promise<DiscountValidateResult> {
+  const res = await fetch(`${API_BASE}/billing/discounts/validate`, {
+    method: "POST",
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({
+      code,
+      plan_code: planCode || undefined,
+      billing_cycle: billingCycle,
+    }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al validar el cupón");
+  }
+  return res.json();
+}
+
+export async function getAdminDiscounts(activeOnly = false): Promise<DiscountCodeItem[]> {
+  const url = new URL(`${API_BASE}/billing/admin/discounts`);
+  if (activeOnly) url.searchParams.set("active_only", "true");
+
+  const res = await fetch(url.toString(), {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al obtener códigos de descuento");
+  }
+  return res.json();
+}
+
+export async function createAdminDiscount(payload: CreateDiscountPayload): Promise<DiscountCodeItem> {
+  const res = await fetch(`${API_BASE}/billing/admin/discounts`, {
+    method: "POST",
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al crear código de descuento");
+  }
+  return res.json();
+}
+
+export async function toggleAdminDiscount(discountId: string): Promise<DiscountCodeItem> {
+  const res = await fetch(`${API_BASE}/billing/admin/discounts/${discountId}/toggle`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al cambiar estado del cupón");
+  }
+  return res.json();
+}
+
+export async function deleteAdminDiscount(discountId: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetch(`${API_BASE}/billing/admin/discounts/${discountId}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al eliminar código de descuento");
+  }
+  return res.json();
+}
+
+
 
 
