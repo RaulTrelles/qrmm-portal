@@ -80,6 +80,9 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
   const isMouseDownRef = useRef(false);
   const isRenderingRef = useRef(false);
   const pendingFrameRef = useRef<{ data: string; w: number; h: number } | null>(null);
+  const pingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectAttemptsRef = useRef(0);
 
   const fetchRemoteFiles = useCallback(async (path?: string) => {
     try {
@@ -209,8 +212,18 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
     ws.onopen = () => {
       setConnected(true);
       setConnecting(false);
+      setError(null);
+      reconnectAttemptsRef.current = 0;
       // Enviar calidad inicial
       sendQualityConfig(ws, quality);
+
+      // Heartbeat periódico (Ping-Pong cada 12 segundos para evitar timeouts de proxies como Traefik/Coolify)
+      if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
+      pingIntervalRef.current = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: "ping" }));
+        }
+      }, 12000);
     };
 
     ws.onmessage = (event) => {
@@ -218,6 +231,8 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
         const msg = JSON.parse(event.data);
         if (msg.type === "desktop_frame" && msg.data) {
           renderFrame(msg.data, msg.width, msg.height);
+        } else if (msg.type === "pong") {
+          // Heartbeat confirmado por el backend
         } else if (msg.type === "error") {
           setError(msg.message || "Error recibido del servidor");
         }
@@ -227,27 +242,47 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
     };
 
     ws.onclose = (e) => {
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current);
+        pingIntervalRef.current = null;
+      }
       setConnected(false);
       setConnecting(false);
-      if (e.code !== 1000) {
-        setError("La conexión con el equipo se ha cerrado.");
+
+      if (e.code !== 1000 && isOpen) {
+        // Intento de auto-reconexión transparente en fluctuaciones transitorias de red
+        if (reconnectAttemptsRef.current < 3) {
+          reconnectAttemptsRef.current += 1;
+          setConnecting(true);
+          reconnectTimeoutRef.current = setTimeout(() => {
+            connectWebSocket();
+          }, 1500);
+        } else {
+          setError("La conexión con el equipo se ha cerrado.");
+        }
       }
     };
 
     ws.onerror = () => {
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current);
+        pingIntervalRef.current = null;
+      }
       setConnected(false);
       setConnecting(false);
-      setError("No se pudo establecer la conexión de escritorio remoto con el equipo.");
+      if (reconnectAttemptsRef.current >= 3) {
+        setError("No se pudo establecer la conexión de escritorio remoto con el equipo.");
+      }
     };
   }, [device.id, isOpen, quality]);
 
-  // Enviar configuración de calidad, escala y FPS optimizados para baja latencia
+  // Enviar configuración de calidad, escala y FPS optimizados para baja latencia (estilo AnyDesk / RustDesk)
   const sendQualityConfig = (ws: WebSocket | null, q: "low" | "medium" | "high") => {
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
     const settings = {
-      low: { quality: 40, fps: 15, scale: 0.65 },
-      medium: { quality: 55, fps: 15, scale: 0.75 },
-      high: { quality: 62, fps: 12, scale: 1.0 },
+      low: { quality: 38, fps: 20, scale: 0.60 },
+      medium: { quality: 48, fps: 20, scale: 0.75 },
+      high: { quality: 58, fps: 22, scale: 0.85 },
     }[q];
 
     ws.send(JSON.stringify({
@@ -316,8 +351,17 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
   // Ciclo de vida: Abrir y cerrar WebSocket
   useEffect(() => {
     if (isOpen) {
+      reconnectAttemptsRef.current = 0;
       connectWebSocket();
     } else {
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current);
+        pingIntervalRef.current = null;
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
       if (wsRef.current) {
         wsRef.current.close(1000, "Modal cerrado");
         wsRef.current = null;
@@ -328,6 +372,14 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
     }
 
     return () => {
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current);
+        pingIntervalRef.current = null;
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
       if (wsRef.current) {
         wsRef.current.close(1000, "Unmount");
         wsRef.current = null;
@@ -577,21 +629,21 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
               <button
                 className={`q-rd-toggle-btn ${quality === "low" ? "active" : ""}`}
                 onClick={() => handleQualityChange("low")}
-                title="Baja calidad, máxima velocidad (12 FPS, 45% JPEG)"
+                title="Fluidez Máxima / Red Lenta (20 FPS, compresión rápida)"
               >
                 Baja
               </button>
               <button
                 className={`q-rd-toggle-btn ${quality === "medium" ? "active" : ""}`}
                 onClick={() => handleQualityChange("medium")}
-                title="Equilibrada (18 FPS, 65% JPEG)"
+                title="Equilibrada estándar AnyDesk (20 FPS, 75% escala)"
               >
                 Media
               </button>
               <button
                 className={`q-rd-toggle-btn ${quality === "high" ? "active" : ""}`}
                 onClick={() => handleQualityChange("high")}
-                title="Alta nitidez (24 FPS, 85% JPEG)"
+                title="Alta Definición HD (22 FPS, 85% escala)"
               >
                 Alta
               </button>
