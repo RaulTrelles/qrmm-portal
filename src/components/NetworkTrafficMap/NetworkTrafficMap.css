@@ -1,0 +1,472 @@
+/* ==============================================================================
+   NetworkTrafficMap - Commercial Grade Presentation Map ($0 API Cost)
+   Fully compliant with AGENTS.md Design System tokens
+   ============================================================================== */
+
+.q-commercial-map-panel {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  position: relative;
+  width: 100%;
+}
+
+/* Header Commercial Control Bar */
+.q-commercial-map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background-color: var(--color-surface-default);
+  border-bottom: 1px solid var(--color-border-default);
+  z-index: 10;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.q-commercial-map-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.q-map-pulse-icon {
+  color: var(--color-brand-primary);
+  animation: q-icon-pulse 2s infinite ease-in-out;
+}
+
+@keyframes q-icon-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+.q-commercial-map-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.q-commercial-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.q-commercial-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-status-success);
+  box-shadow: 0 0 6px var(--color-status-success);
+  animation: q-dot-ping 1.6s infinite cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes q-dot-ping {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+/* Controls (Style toggles & actions) */
+.q-commercial-map-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.q-map-style-toggle {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--color-surface-muted, #f1f5f9);
+  padding: 3px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-default);
+}
+
+.q-map-style-btn {
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--motion-fast);
+  white-space: nowrap;
+}
+
+.q-map-style-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.q-map-style-btn--active {
+  background-color: var(--color-surface-default);
+  color: var(--color-brand-primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  font-weight: 700;
+}
+
+.q-map-action-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background-color: var(--color-surface-muted, #f1f5f9);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--motion-fast);
+}
+
+.q-map-action-icon-btn:hover {
+  background-color: var(--color-surface-default);
+  color: var(--color-brand-primary);
+  border-color: var(--color-border-strong);
+}
+
+/* Map Body Canvas */
+.q-commercial-map-body {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  background-color: #0b1329;
+  overflow: hidden;
+}
+
+.q-commercial-map-leaflet {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Custom Overlays inside Leaflet */
+.q-commercial-map-hud-top {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.q-commercial-hud-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.q-commercial-hud-chip-icon {
+  color: #38bdf8;
+  animation: q-icon-pulse 1.8s infinite;
+}
+
+.q-commercial-hud-coords {
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Custom Leaflet Markers */
+.q-leaflet-custom-marker-wrapper {
+  background: transparent !important;
+  border: none !important;
+}
+
+.q-leaflet-marker {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transform: translate(-18px, -18px);
+}
+
+.q-leaflet-marker-pin {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border: 2.5px solid var(--color-brand-primary);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  position: relative;
+  z-index: 3;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.q-leaflet-marker:hover .q-leaflet-marker-pin {
+  transform: scale(1.18);
+}
+
+.q-leaflet-marker--online .q-leaflet-marker-pin {
+  border-color: #10b981;
+  color: #059669;
+}
+
+.q-leaflet-marker--offline .q-leaflet-marker-pin {
+  border-color: #ef4444;
+  color: #dc2626;
+  opacity: 0.85;
+}
+
+.q-leaflet-marker--hub .q-leaflet-marker-pin {
+  border-color: #6366f1;
+  background: #1e1b4b;
+  color: #a5b4fc;
+}
+
+.q-leaflet-marker--selected .q-leaflet-marker-pin {
+  border-color: #6366f1;
+  transform: scale(1.22);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.35);
+}
+
+/* Radar Pulse Ring */
+.q-leaflet-radar-pulse {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.28);
+  pointer-events: none;
+  z-index: 1;
+  animation: q-leaflet-radar 2.4s infinite cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes q-leaflet-radar {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* Label Pill Attached to Marker */
+.q-leaflet-marker-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 4px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: #ffffff;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 4;
+}
+
+.q-leaflet-label-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #10b981;
+}
+
+.q-leaflet-marker--offline .q-leaflet-label-dot {
+  background-color: #ef4444;
+}
+
+/* Animated Polylines for Network Traffic */
+.q-leaflet-traffic-arc--active {
+  animation: q-leaflet-flow 1.5s linear infinite;
+}
+
+@keyframes q-leaflet-flow {
+  0% {
+    stroke-dashoffset: 28;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Footer Inspection Card */
+.q-commercial-map-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background-color: var(--color-surface-default);
+  border-top: 1px solid var(--color-border-default);
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.q-commercial-map-footer--empty {
+  justify-content: space-between;
+  background-color: var(--color-surface-muted, #f8fafc);
+  padding: 10px 18px;
+}
+
+.q-map-footer-node-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.q-map-footer-icon-wrap {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-selected, #f5f3ff);
+  color: var(--color-brand-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.q-map-footer-node-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.q-map-footer-node-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--color-text-primary);
+}
+
+.q-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.q-status-dot--online {
+  background-color: var(--color-status-success);
+  box-shadow: 0 0 6px var(--color-status-success);
+}
+
+.q-status-dot--offline {
+  background-color: var(--color-status-danger);
+}
+
+.q-map-footer-area-tag {
+  font-size: 10.5px;
+  font-weight: 600;
+  background: var(--color-surface-muted, #f1f5f9);
+  color: var(--color-text-secondary);
+  padding: 1px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border-default);
+}
+
+.q-map-footer-node-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--color-text-secondary);
+}
+
+.q-map-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Leaflet Overrides for Design System */
+.leaflet-container {
+  font-family: inherit !important;
+  background: #0f172a;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid var(--color-border-default) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  border-radius: var(--radius-md) !important;
+  overflow: hidden;
+  margin-top: 12px !important;
+  margin-left: 12px !important;
+}
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  background-color: var(--color-surface-default) !important;
+  color: var(--color-text-primary) !important;
+  border-bottom: 1px solid var(--color-border-default) !important;
+  width: 28px !important;
+  height: 28px !important;
+  line-height: 28px !important;
+  font-size: 15px !important;
+  transition: all var(--motion-fast);
+}
+
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
+  background-color: var(--color-surface-muted, #f1f5f9) !important;
+  color: var(--color-brand-primary) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .q-commercial-map-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .q-commercial-map-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .q-commercial-map-body {
+    height: 250px;
+  }
+  .q-commercial-map-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .q-map-footer-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

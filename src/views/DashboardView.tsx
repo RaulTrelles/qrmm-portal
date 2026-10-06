@@ -8,6 +8,7 @@ import { DeviceDetailModal } from "../components/DeviceDetailModal/DeviceDetailM
 import { EnrollDeviceModal } from "../components/EnrollDeviceModal/EnrollDeviceModal";
 import { RemoteDesktopModal } from "../components/RemoteDesktopModal/RemoteDesktopModal";
 import { Button } from "../components/Button/Button";
+import { NetworkTrafficMap } from "../components/NetworkTrafficMap/NetworkTrafficMap";
 import { useAuth } from "../context/AuthContext";
 import {
   Server,
@@ -17,8 +18,6 @@ import {
   Cpu,
   HardDrive,
   Activity,
-  MapPin,
-  Monitor,
   ExternalLink,
   Wifi,
   Gauge,
@@ -32,115 +31,6 @@ export interface DashboardViewProps {
   refreshTrigger: number;
 }
 
-interface DeviceGeoLocation {
-  city: string;
-  region: string;
-  country: string;
-  xPercent: number; // Porcentaje relativo X en mapa SVG
-  yPercent: number; // Porcentaje relativo Y en mapa SVG
-}
-
-// Función auxiliar para determinar geolocalización basada en sede, hostname, IP o distribución determinista
-const PRESET_SPOTS: DeviceGeoLocation[] = [
-  { city: "Callao, Lima", region: "Hub Puerto Callao", country: "PE", xPercent: 18, yPercent: 44 },
-  { city: "Lima Centro, Lima", region: "Datacenter Central", country: "PE", xPercent: 42, yPercent: 24 },
-  { city: "Ate, Lima Este", region: "Sede Facturación & Logística", country: "PE", xPercent: 82, yPercent: 32 },
-  { city: "San Isidro, Lima", region: "Sede Financiera Las Begonias", country: "PE", xPercent: 52, yPercent: 52 },
-  { city: "Miraflores, Lima", region: "Oficina Corporativa Larco", country: "PE", xPercent: 30, yPercent: 74 },
-  { city: "Surco, Lima", region: "Nodo IPN Fibra Óptica", country: "PE", xPercent: 76, yPercent: 70 },
-  { city: "Los Olivos, Lima", region: "Hub Lima Cono Norte", country: "PE", xPercent: 36, yPercent: 15 },
-  { city: "San Miguel, Lima", region: "Sucursal Av. La Marina", country: "PE", xPercent: 22, yPercent: 58 },
-  { city: "La Molina, Lima", region: "Campus Tecnológico Este", country: "PE", xPercent: 86, yPercent: 54 },
-  { city: "Chorrillos, Lima", region: "Estación Terrena Sur", country: "PE", xPercent: 44, yPercent: 86 },
-  { city: "San Juan de Lurigancho", region: "Nodo Troncal Metro", country: "PE", xPercent: 64, yPercent: 16 },
-  { city: "Magdalena, Lima", region: "Sede Operaciones Pacífico", country: "PE", xPercent: 32, yPercent: 62 },
-];
-
-const getDeviceLocation = (device: Device, fallbackIndex: number = 0): DeviceGeoLocation => {
-  const host = (device.hostname || "").toLowerCase();
-  const area = (device.client_area || "").toLowerCase();
-
-  // Mapeos específicos de alta separación por HOSTNAME
-  if (host.includes("kraken")) {
-    return {
-      city: "Lima Centro, Lima",
-      region: "Datacenter Central (Tier III)",
-      country: "PE",
-      xPercent: 42,
-      yPercent: 24,
-    };
-  }
-  if (host.includes("factura")) {
-    return {
-      city: "Ate, Lima Este",
-      region: "Sede Facturación & Logística",
-      country: "PE",
-      xPercent: 82,
-      yPercent: 32,
-    };
-  }
-  if (host.includes("concar")) {
-    return {
-      city: "San Isidro, Lima",
-      region: "Sede Financiera Las Begonias",
-      country: "PE",
-      xPercent: 52,
-      yPercent: 52,
-    };
-  }
-  if (host.includes("finanza")) {
-    return {
-      city: "Miraflores, Lima",
-      region: "Oficina Corporativa Larco",
-      country: "PE",
-      xPercent: 30,
-      yPercent: 74,
-    };
-  }
-  if (host.includes("ipn")) {
-    return {
-      city: "Surco, Lima",
-      region: "Nodo IPN Fibra Óptica",
-      country: "PE",
-      xPercent: 76,
-      yPercent: 70,
-    };
-  }
-  if (host.includes("desktop") || host.includes("v99")) {
-    return {
-      city: "Callao, Lima",
-      region: "Hub Puerto & Distribución",
-      country: "PE",
-      xPercent: 18,
-      yPercent: 44,
-    };
-  }
-
-  // Mapeos secundarios por Área (para equipos adicionales)
-  if (area.includes("kraken")) {
-    return {
-      city: "Lima Centro, Lima",
-      region: "Datacenter Secundario",
-      country: "PE",
-      xPercent: 46,
-      yPercent: 18,
-    };
-  }
-  if (area.includes("callao")) {
-    return {
-      city: "Callao, Lima",
-      region: "Sede Portuaria",
-      country: "PE",
-      xPercent: 16,
-      yPercent: 50,
-    };
-  }
-
-  // Si no coincide por nombre o área, se asigna uno de los spots ampliamente espaciados
-  const safeIdx = Math.abs(fallbackIndex) % PRESET_SPOTS.length;
-  return PRESET_SPOTS[safeIdx];
-};
-
 export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) => {
   const { activeOrganization } = useAuth();
   const [devices, setDevices] = useState<Device[]>([]);
@@ -152,8 +42,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
   const [remoteDevice, setRemoteDevice] = useState<Device | null>(null);
   const [enrollModalOpen, setEnrollModalOpen] = useState<boolean>(false);
 
-  const [mapHoveredDevice, setMapHoveredDevice] = useState<Device | null>(null);
-  const [selectedMapPinId, setSelectedMapPinId] = useState<string | null>(null);
   const [areaFilter, setAreaFilter] = useState<string>("all");
 
   const availableAreas = useMemo(() => {
@@ -344,10 +232,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
     });
   }, [devices, search, osFilter, stateFilter, areaFilter]);
 
-  const selectedMapDevice = useMemo(() => {
-    if (!selectedMapPinId) return mapHoveredDevice || devices[0] || null;
-    return devices.find((d) => d.id === selectedMapPinId) || null;
-  }, [selectedMapPinId, mapHoveredDevice, devices]);
+
 
   const handleDeleteDevice = async (device: Device) => {
     try {
@@ -519,15 +404,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
           <div className="q-it-server-list">
             {devices.map((dev) => {
               const isOnline = dev.status.current_state === "ONLINE";
-              const isSelected = selectedMapDevice?.id === dev.id;
+              const isSelected = selectedDevice?.id === dev.id;
               const ping = isOnline ? "0.3 ms" : "offline";
               return (
                 <div
                   key={dev.id}
                   className={`q-it-server-row ${isSelected ? "q-it-server-row--selected" : ""}`}
                   onClick={() => {
-                    setSelectedMapPinId(dev.id);
-                    setMapHoveredDevice(dev);
+                    setSelectedDevice(dev);
                   }}
                 >
                   <div className="q-it-server-icon-badge">
@@ -579,335 +463,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
 
         {/* PANEL DERECHO: Live network traffic Map + Dual Mini Charts */}
         <div className="q-it-right-stack">
-          {/* Top: Live network traffic */}
-          <div className="q-it-panel q-it-panel--map">
-            <div className="q-it-panel-header">
-              <div className="q-it-panel-title-group">
-                <Radio size={16} className="q-it-icon-pulse-blue" />
-                <h3 className="q-it-panel-title">Live network traffic</h3>
-              </div>
-              <div className="q-it-live-badge">
-                <span className="q-it-dot-pulse"></span>
-                <span>LIVE TRAFFIC</span>
-              </div>
-            </div>
-
-            {/* Lienzo de Mapa SVG Interactivo con Arcos de Tráfico en Vivo */}
-            <div className="q-fleet-map-canvas q-it-map-canvas">
-              <svg className="q-fleet-map-svg" viewBox="0 0 600 320" preserveAspectRatio="none">
-                <defs>
-                  {/* Degradado Océano Pacífico (NOC Dark Blue) */}
-                  <linearGradient id="q-ocean-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="var(--q-map-ocean, #0d1527)" stopOpacity="0.95" />
-                    <stop offset="100%" stopColor="var(--q-map-ocean-deep, #090f1d)" stopOpacity="1" />
-                  </linearGradient>
-
-                  {/* Degradado Suelo / Continente */}
-                  <linearGradient id="q-land-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="var(--q-map-land, #172033)" />
-                    <stop offset="100%" stopColor="var(--q-map-relief, #1e293b)" />
-                  </linearGradient>
-
-                  {/* Degradado de Arcos de Vuelo / Tráfico en Vivo */}
-                  <linearGradient id="q-arc-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#818cf8" stopOpacity="0.8" />
-                    <stop offset="50%" stopColor="#06b6d4" stopOpacity="0.9" />
-                    <stop offset="100%" stopColor="#a855f7" stopOpacity="0.8" />
-                  </linearGradient>
-
-                  {/* Cuadrícula Geodésica de Navegación */}
-                  <pattern id="q-map-grid" width="30" height="30" patternUnits="userSpaceOnUse">
-                    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="currentColor" strokeWidth="0.5" opacity="0.08" />
-                  </pattern>
-
-                  {/* Sombra para el Litoral Costero */}
-                  <filter id="q-coast-shadow" x="-5%" y="-5%" width="115%" height="115%">
-                    <feDropShadow dx="-2" dy="2" stdDeviation="3" floodColor="#06b6d4" floodOpacity="0.15" />
-                  </filter>
-                </defs>
-
-                {/* Capa Base: Océano Pacífico */}
-                <rect width="600" height="320" fill="url(#q-ocean-gradient)" />
-                <rect width="600" height="320" fill="url(#q-map-grid)" />
-
-                {/* Líneas de Profundidad Batimétrica Marina */}
-                <path
-                  d="M -20,70 Q 50,90 120,60 T 170,105"
-                  fill="none"
-                  stroke="#0284c7"
-                  strokeWidth="1"
-                  strokeDasharray="4 4"
-                  opacity="0.3"
-                />
-                <path
-                  d="M -20,160 Q 40,185 90,165 T 145,215"
-                  fill="none"
-                  stroke="#0284c7"
-                  strokeWidth="1"
-                  strokeDasharray="4 4"
-                  opacity="0.3"
-                />
-                <path
-                  d="M -20,250 Q 50,270 125,255 T 180,305"
-                  fill="none"
-                  stroke="#0284c7"
-                  strokeWidth="1"
-                  strokeDasharray="4 4"
-                  opacity="0.3"
-                />
-
-                {/* Marca de Agua Geográfica: Océano Pacífico */}
-                <text x="35" y="285" className="q-map-ocean-watermark">
-                  OCÉANO PACÍFICO
-                </text>
-
-                {/* Islas Frente al Callao */}
-                <ellipse
-                  cx="42"
-                  cy="170"
-                  rx="20"
-                  ry="8"
-                  transform="rotate(-30 42 170)"
-                  className="q-map-island"
-                />
-                <text x="42" y="173" className="q-map-island-label">
-                  I. San Lorenzo
-                </text>
-
-                <ellipse
-                  cx="64"
-                  cy="192"
-                  rx="7"
-                  ry="4"
-                  transform="rotate(-15 64 192)"
-                  className="q-map-island"
-                />
-                <text x="64" y="202" className="q-map-island-label">
-                  El Frontón
-                </text>
-
-                {/* Masa Continental Principal: Región Metropolitana & Litoral */}
-                <path
-                  d="M 195,0 
-                     Q 175,45 155,85 
-                     L 125,112 
-                     L 76,134 
-                     Q 60,142 66,152 
-                     L 92,156 
-                     L 122,160 
-                     Q 142,178 162,205 
-                     Q 178,235 192,265 
-                     Q 208,295 224,320 
-                     L 235,340 
-                     L 600,340 
-                     L 600,0 
-                     Z"
-                  fill="url(#q-land-gradient)"
-                  stroke="var(--color-border-strong)"
-                  strokeWidth="1.8"
-                  filter="url(#q-coast-shadow)"
-                  className="q-map-landmass"
-                />
-
-                {/* Cuenca Hidrográfica del Río Rímac */}
-                <path
-                  d="M 600,102 Q 470,110 340,120 T 205,138 T 130,152"
-                  fill="none"
-                  stroke="#06b6d4"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  opacity="0.45"
-                />
-                <text x="330" y="115" className="q-map-river-label">
-                  RÍO RÍMAC
-                </text>
-
-                {/* Cordillera / Relieve Oriental */}
-                <path
-                  d="M 490,15 Q 530,55 550,95 T 575,170 T 590,260"
-                  fill="none"
-                  stroke="var(--color-border-strong)"
-                  strokeWidth="1.2"
-                  strokeDasharray="3 3"
-                  opacity="0.4"
-                />
-
-                {/* Rótulos Geográficos de Zonas de Flota */}
-                <text x="110" y="115" className="q-map-district-label">
-                  CALLAO (PUERTO)
-                </text>
-                <text x="255" y="65" className="q-map-district-label">
-                  LIMA CENTRO (DATACENTER)
-                </text>
-                <text x="312" y="188" className="q-map-district-label">
-                  SAN ISIDRO (FINANCIERO)
-                </text>
-                <text x="178" y="260" className="q-map-district-label">
-                  MIRAFLORES (COSTA)
-                </text>
-                <text x="495" y="85" className="q-map-district-label">
-                  LIMA ESTE (ATE)
-                </text>
-                <text x="450" y="245" className="q-map-district-label">
-                  SURCO (NODO FIBRA)
-                </text>
-
-                {/* ARCOS CURVADOS DE TRÁFICO NOC ENTRE NODOS (Estilo Flight Paths) */}
-                {devices.map((dev, i) => {
-                  const loc = getDeviceLocation(dev, i);
-                  if (loc.xPercent === 42 && loc.yPercent === 24) return null;
-                  const targetX = (loc.xPercent / 100) * 600;
-                  const targetY = (loc.yPercent / 100) * 320;
-                  const midX = (252 + targetX) / 2;
-                  const midY = Math.min(77, targetY) - 36;
-                  const isOnline = dev.status.current_state === "ONLINE";
-
-                  return (
-                    <g key={i}>
-                      <path
-                        d={`M 252,77 Q ${midX},${midY} ${targetX},${targetY}`}
-                        fill="none"
-                        stroke={isOnline ? "url(#q-arc-gradient)" : "var(--color-border-strong)"}
-                        strokeWidth={isOnline ? "1.8" : "1"}
-                        strokeDasharray={isOnline ? "5 4" : "2 4"}
-                        opacity={isOnline ? "0.75" : "0.2"}
-                        className={isOnline ? "q-it-packet-arc" : ""}
-                      />
-                      {isOnline && (
-                        <circle
-                          cx={midX}
-                          cy={midY}
-                          r="2.5"
-                          fill="#06b6d4"
-                          className="q-it-packet-dot"
-                        />
-                      )}
-                    </g>
-                  );
-                })}
-
-                {/* HUD GPS Telemetría Top-Right */}
-                <g transform="translate(420, 8)">
-                  <rect
-                    width="172"
-                    height="20"
-                    rx="4"
-                    fill="var(--color-surface-default)"
-                    opacity="0.88"
-                    stroke="var(--color-border-default)"
-                    strokeWidth="0.8"
-                  />
-                  <text
-                    x="86"
-                    y="14"
-                    fill="var(--color-text-secondary)"
-                    fontSize="9"
-                    fontWeight="650"
-                    textAnchor="middle"
-                    letterSpacing="0.4"
-                  >
-                    GPS: 12.0464° S, 77.0428° W
-                  </text>
-                </g>
-
-                {/* Rosa de los Vientos / Brújula Top-Left */}
-                <g transform="translate(26, 26)">
-                  <circle
-                    cx="0"
-                    cy="0"
-                    r="12"
-                    fill="var(--color-surface-default)"
-                    stroke="var(--color-border-default)"
-                    strokeWidth="1"
-                    opacity="0.85"
-                  />
-                  <polygon points="0,-10 -3,-1 0,0 3,-1" fill="var(--color-brand-primary)" />
-                  <polygon points="0,10 -3,1 0,0 3,1" fill="var(--color-text-tertiary)" opacity="0.6" />
-                  <text x="0" y="-13" fill="var(--color-brand-primary)" fontSize="8" fontWeight="800" textAnchor="middle">
-                    N
-                  </text>
-                </g>
-              </svg>
-
-              {/* Pines Geográficos de los Equipos Reales con Separación Óptima */}
-              {devices.map((device, idx) => {
-                const loc = getDeviceLocation(device, idx);
-                const isOnline = device.status.current_state === "ONLINE";
-                const isSelected = selectedMapDevice?.id === device.id;
-
-                return (
-                  <div
-                    key={device.id}
-                    className={`q-map-pin ${isOnline ? "q-map-pin--online" : "q-map-pin--offline"} ${
-                      isSelected ? "q-map-pin--selected" : ""
-                    }`}
-                    style={{ left: `${loc.xPercent}%`, top: `${loc.yPercent}%` }}
-                    onMouseEnter={() => setMapHoveredDevice(device)}
-                    onClick={() => setSelectedMapPinId(device.id)}
-                    title={`${device.hostname} • ${loc.city} (${loc.region})`}
-                  >
-                    <div className="q-map-pin-pulse"></div>
-                    <div className="q-map-pin-dot">
-                      <MapPin size={13} />
-                    </div>
-                    <div className="q-map-pin-tag">
-                      <span className="q-map-pin-tag-dot"></span>
-                      <span>{device.hostname}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Infobar al pie del mapa */}
-            {selectedMapDevice && (
-              <div className="q-fleet-map-infobar">
-                <div className="q-map-info-device">
-                  <div className="q-map-info-status">
-                    <span
-                      className={`q-map-status-dot ${
-                        selectedMapDevice.status.current_state === "ONLINE"
-                          ? "q-map-status-dot--online"
-                          : "q-map-status-dot--offline"
-                      }`}
-                    ></span>
-                    <strong className="q-map-info-name">{selectedMapDevice.hostname}</strong>
-                    <span className="q-map-info-area">{selectedMapDevice.client_area || "Sede General"}</span>
-                  </div>
-                  <div className="q-map-info-geo">
-                    <MapPin size={12} style={{ color: "var(--color-brand-primary)" }} />
-                    <span>
-                      {(() => {
-                        const devIndex = devices.findIndex((d) => d.id === selectedMapDevice.id);
-                        return getDeviceLocation(selectedMapDevice, devIndex >= 0 ? devIndex : 0).city;
-                      })()}{" "}
-                      • IP:{" "}
-                      <code>{selectedMapDevice.private_ip || selectedMapDevice.public_ip || "192.168.1.x"}</code>
-                    </span>
-                  </div>
-                </div>
-
-                <div className="q-map-info-actions">
-                  <button
-                    className="q-map-action-btn"
-                    onClick={() => setSelectedDevice(selectedMapDevice)}
-                    title="Ver Ficha Técnica"
-                  >
-                    <ExternalLink size={13} style={{ marginRight: 4 }} />
-                    <span>Detalle</span>
-                  </button>
-                  <button
-                    className="q-map-action-btn q-map-action-btn--primary"
-                    onClick={() => setRemoteDevice(selectedMapDevice)}
-                    title="Iniciar Conexión Remota"
-                  >
-                    <Monitor size={13} style={{ marginRight: 4 }} />
-                    <span>Conectar</span>
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+          {/* Top: Live network traffic (Realistic Commercial Presentation Map, $0 Cost) */}
+          <NetworkTrafficMap
+            devices={devices}
+            selectedDevice={selectedDevice}
+            onSelectDevice={(dev) => setSelectedDevice(dev)}
+            onOpenRemote={(dev) => setRemoteDevice(dev)}
+          />
         </div>
       </section>
 

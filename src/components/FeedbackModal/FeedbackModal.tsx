@@ -78,7 +78,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, o
         <div className="q-feedback-header">
           <div className="q-feedback-title-group">
             <h3>💬 Reportar Problema o Sugerencia</h3>
-            <p>Tu feedback nos ayuda a mejorar. El equipo de soporte te responderá directamente.</p>
+            <p>Tu feedback nos ayuda a mejorar. El equipo de soporte (soporte@qhapana.com) te responderá directamente.</p>
           </div>
           <button className="q-feedback-close-btn" onClick={onClose} aria-label="Cerrar ventana">
             <X size={20} />
@@ -92,7 +92,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, o
             </div>
             <h4>¡Reporte recibido con éxito!</h4>
             <p>
-              Hemos registrado tu incidencia y notificado inmediatamente al equipo de soporte e ingeniería. Te
+              Hemos registrado tu incidencia y notificado inmediatamente a <strong>soporte@qhapana.com</strong>. Te
               responderemos por correo a <strong>{contactEmail || user?.email}</strong> y podrás ver el avance en la
               sección de <strong>Soporte y Sugerencias</strong> de tu consola.
             </p>
