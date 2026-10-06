@@ -221,7 +221,9 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
         const geo = resolveCoordinates(match, idx);
         setActiveGeoInfo(geo);
         if (mapInstanceRef.current) {
-          mapInstanceRef.current.flyTo([geo.lat, geo.lng], 14, { duration: 1.0 });
+          const currentZoom = mapInstanceRef.current.getZoom();
+          const targetZoom = Math.max(currentZoom, 13);
+          mapInstanceRef.current.flyTo([geo.lat, geo.lng], targetZoom, { duration: 0.8 });
         }
       }
     } else if (!selectedDevice) {
@@ -244,12 +246,35 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
-    // Center in Lima Metropolitan Area
+    // Recuperar zoom y posición guardados si el usuario ya hizo acercamiento previamente
+    let initialCenter: [number, number] = [-12.068, -77.045];
+    let initialZoom = 12;
+
+    try {
+      const storedZoom = sessionStorage.getItem("qrmm_map_zoom");
+      const storedLat = sessionStorage.getItem("qrmm_map_lat");
+      const storedLng = sessionStorage.getItem("qrmm_map_lng");
+      if (storedZoom && storedLat && storedLng) {
+        initialZoom = parseInt(storedZoom, 10);
+        initialCenter = [parseFloat(storedLat), parseFloat(storedLng)];
+        hasInitialFitRef.current = true;
+      }
+    } catch {}
+
     const map = L.map(mapContainerRef.current, {
-      center: [-12.068, -77.045],
-      zoom: 12,
+      center: initialCenter,
+      zoom: initialZoom,
       zoomControl: false,
       attributionControl: false,
+    });
+
+    // Guardar permanentemente cada acercamiento (zoom in), alejamiento o paneo del usuario
+    map.on("zoomend moveend", () => {
+      try {
+        sessionStorage.setItem("qrmm_map_zoom", String(map.getZoom()));
+        sessionStorage.setItem("qrmm_map_lat", String(map.getCenter().lat));
+        sessionStorage.setItem("qrmm_map_lng", String(map.getCenter().lng));
+      } catch {}
     });
 
     // Custom Zoom control top-left
@@ -361,12 +386,14 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
 
       const marker = L.marker([node.lat, node.lng], { icon: customIcon });
 
-      // Click to inspect
+      // Click to inspect (preservando el nivel de zoom actual del usuario)
       marker.on("click", () => {
         setActiveSelectedDevice(node.device);
         setActiveGeoInfo(node);
         if (onSelectDevice) onSelectDevice(node.device);
-        mapInstanceRef.current?.flyTo([node.lat, node.lng], 14, { duration: 0.8 });
+        const currentZoom = mapInstanceRef.current?.getZoom() || 13;
+        const targetZoom = Math.max(currentZoom, 13);
+        mapInstanceRef.current?.flyTo([node.lat, node.lng], targetZoom, { duration: 0.7 });
       });
 
       // Hover Tooltip con IP Real y Estado
@@ -393,15 +420,26 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
       markersLayerRef.current?.addLayer(marker);
     });
 
-    // Auto-fit bounds ÚNICAMENTE en la carga inicial (conserva el zoom manual del usuario)
+    // Auto-fit bounds ÚNICAMENTE en la primera carga si el usuario no tiene zoom guardado
     if (bounds.isValid() && !hasInitialFitRef.current && !activeSelectedDevice) {
-      mapInstanceRef.current.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 });
+      let hasStored = false;
+      try {
+        hasStored = Boolean(sessionStorage.getItem("qrmm_map_zoom"));
+      } catch {}
+      if (!hasStored) {
+        mapInstanceRef.current.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 });
+      }
       hasInitialFitRef.current = true;
     }
   }, [nodes, activeSelectedDevice, hubNode, onSelectDevice]);
 
-  // Center Fleet Action
+  // Center Fleet Action (restablece explícitamente a vista general)
   const handleResetBounds = () => {
+    try {
+      sessionStorage.removeItem("qrmm_map_zoom");
+      sessionStorage.removeItem("qrmm_map_lat");
+      sessionStorage.removeItem("qrmm_map_lng");
+    } catch {}
     if (!mapInstanceRef.current || nodes.length === 0) return;
     const bounds = L.latLngBounds([]);
     nodes.forEach((n) => bounds.extend([n.lat, n.lng]));
