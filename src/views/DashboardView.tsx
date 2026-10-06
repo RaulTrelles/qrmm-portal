@@ -421,7 +421,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
                     <Server size={15} />
                   </div>
                   <div className="q-it-server-meta">
-                    <span className="q-it-server-hostname">{dev.hostname}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                      <span className="q-it-server-hostname">{dev.hostname}</span>
+                      <span className="q-it-server-ip-badge" title="Dirección IP del equipo">
+                        {dev.private_ip || dev.public_ip || "Sin IP"}
+                      </span>
+                    </div>
                     <span className="q-it-server-desc">{dev.client_area || "Sede General"}</span>
                   </div>
                   <div className="q-it-server-pills">

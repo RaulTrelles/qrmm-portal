@@ -196,14 +196,17 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
   const tileLayerRef = useRef<L.TileLayer | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const polylinesLayerRef = useRef<L.LayerGroup | null>(null);
+  const hasInitialFitRef = useRef<boolean>(false);
+  const prevSelectedDeviceIdRef = useRef<string | null>(null);
 
   const [activeLayer, setActiveLayer] = useState<TileLayerKey>("commercial");
   const [activeSelectedDevice, setActiveSelectedDevice] = useState<Device | null>(null);
   const [activeGeoInfo, setActiveGeoInfo] = useState<{ city: string; region: string; lat: number; lng: number } | null>(null);
 
-  // Sync selectedDevice prop with local state
+  // Sync selectedDevice prop with local state (solo vuela si cambia el id del equipo seleccionado)
   useEffect(() => {
-    if (selectedDevice) {
+    if (selectedDevice && selectedDevice.id !== prevSelectedDeviceIdRef.current) {
+      prevSelectedDeviceIdRef.current = selectedDevice.id;
       setActiveSelectedDevice(selectedDevice);
       const match = devices.find((d) => d.id === selectedDevice.id);
       if (match) {
@@ -211,11 +214,14 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
         const geo = resolveCoordinates(match, idx);
         setActiveGeoInfo(geo);
         if (mapInstanceRef.current) {
-          mapInstanceRef.current.flyTo([geo.lat, geo.lng], 14, { duration: 1.2 });
+          mapInstanceRef.current.flyTo([geo.lat, geo.lng], 14, { duration: 1.0 });
         }
       }
+    } else if (!selectedDevice) {
+      prevSelectedDeviceIdRef.current = null;
+      setActiveSelectedDevice(null);
     }
-  }, [selectedDevice, devices]);
+  }, [selectedDevice]);
 
   // Compute geolocated nodes
   const nodes = useMemo<NodeGeoData[]>(() => {
@@ -340,6 +346,7 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
             <div class="q-leaflet-marker-label">
               <span class="q-leaflet-label-dot"></span>
               <span class="q-leaflet-label-text">${node.device.hostname}</span>
+              <span class="q-leaflet-label-ip">${node.device.private_ip || node.device.public_ip || "Sin IP"}</span>
             </div>
           </div>
         `,
@@ -355,11 +362,14 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
         mapInstanceRef.current?.flyTo([node.lat, node.lng], 14, { duration: 0.8 });
       });
 
-      // Hover Tooltip
+      // Hover Tooltip con IP Real y Estado
       marker.bindTooltip(
         `
         <div style="font-family: inherit; font-size: 12px; line-height: 1.4; color: #1e293b;">
           <div style="font-weight: 700; color: #0f172a; margin-bottom: 2px;">${node.device.hostname}</div>
+          <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11px; color: #2563eb; font-weight: 700; margin-bottom: 3px;">
+            IP: ${node.device.private_ip || "Sin IP"}${node.device.public_ip ? ` • Púb: ${node.device.public_ip}` : ""}
+          </div>
           <div style="color: #64748b; font-size: 11px;">${node.city} • ${node.region}</div>
           <div style="margin-top: 4px; display: flex; align-items: center; gap: 6px;">
             <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: ${
@@ -375,9 +385,10 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
       markersLayerRef.current?.addLayer(marker);
     });
 
-    // Auto-fit bounds if nodes exist
-    if (bounds.isValid() && !activeSelectedDevice) {
+    // Auto-fit bounds ÚNICAMENTE en la carga inicial (conserva el zoom manual del usuario)
+    if (bounds.isValid() && !hasInitialFitRef.current && !activeSelectedDevice) {
       mapInstanceRef.current.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 });
+      hasInitialFitRef.current = true;
     }
   }, [nodes, activeSelectedDevice, hubNode, onSelectDevice]);
 
