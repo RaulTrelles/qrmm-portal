@@ -112,14 +112,14 @@ function resolveCoordinates(device: Device, index: number): NodeGeoData {
     };
   }
 
-  // FacturadorII -> Callao (Nodo Facturación, con micro-offset para visualización independiente)
+  // FacturadorII -> Callao (Misma máquina física que SRVKRAKEN)
   if (host.includes("factura")) {
     return {
       device,
-      lat: -12.0515,
-      lng: -77.1285,
+      lat: -12.0565,
+      lng: -77.1181,
       city: "Callao",
-      region: "Nodo Facturación Kraken (Callao)",
+      region: "Sede Central Kraken (Misma Máquina)",
     };
   }
 
@@ -331,6 +331,9 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
     if (hubNode) {
       nodes.forEach((node) => {
         if (node.device.id === hubNode.device.id) return;
+        // Si el nodo está en la misma máquina física o predio que el hub, no dibujar línea cruzando distritos
+        if (Math.abs(node.lat - hubNode.lat) < 0.0005 && Math.abs(node.lng - hubNode.lng) < 0.0005) return;
+
         const isOnline = node.device.status.current_state === "ONLINE";
 
         // Animated Traffic Path
@@ -351,13 +354,41 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
       });
     }
 
-    // 2. Render Markers
+    // 2. Detección de nodos co-ubicados en la misma máquina o ubicación GPS exacta
+    const locationGroups: Record<string, NodeGeoData[]> = {};
+    nodes.forEach((n) => {
+      const key = `${n.lat.toFixed(4)}_${n.lng.toFixed(4)}`;
+      if (!locationGroups[key]) locationGroups[key] = [];
+      locationGroups[key].push(n);
+    });
+
+    const renderedLocIndex: Record<string, number> = {};
+
+    // 3. Render Markers
     nodes.forEach((node) => {
       const isOnline = node.device.status.current_state === "ONLINE";
       const isSelected = activeSelectedDevice?.id === node.device.id;
       const isHub = node.isDatacenterHub;
 
-      bounds.extend([node.lat, node.lng]);
+      const key = `${node.lat.toFixed(4)}_${node.lng.toFixed(4)}`;
+      const coLocated = locationGroups[key] || [node];
+      const countAtLoc = coLocated.length;
+      const idxAtLoc = renderedLocIndex[key] || 0;
+      renderedLocIndex[key] = idxAtLoc + 1;
+
+      let markerLat = node.lat;
+      let markerLng = node.lng;
+
+      // Si hay más de un equipo en la misma máquina/sede (como SRVKRAKEN y FacturadorII),
+      // aplicar micro-desplazamiento visual (~20 metros) para que ambos sean interactivos y visibles
+      if (countAtLoc > 1) {
+        const offset = 0.00030; // ~30 metros dentro del mismo predio
+        const angle = (2 * Math.PI * idxAtLoc) / countAtLoc - Math.PI / 2;
+        markerLat = node.lat + Math.sin(angle) * offset;
+        markerLng = node.lng + Math.cos(angle) * offset;
+      }
+
+      bounds.extend([markerLat, markerLng]);
 
       // Custom HTML Marker Icon
       const customIcon = L.divIcon({
@@ -384,7 +415,7 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
         `,
       });
 
-      const marker = L.marker([node.lat, node.lng], { icon: customIcon });
+      const marker = L.marker([markerLat, markerLng], { icon: customIcon });
 
       // Click to inspect (preservando el nivel de zoom actual del usuario)
       marker.on("click", () => {
@@ -393,7 +424,7 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
         if (onSelectDevice) onSelectDevice(node.device);
         const currentZoom = mapInstanceRef.current?.getZoom() || 13;
         const targetZoom = Math.max(currentZoom, 13);
-        mapInstanceRef.current?.flyTo([node.lat, node.lng], targetZoom, { duration: 0.7 });
+        mapInstanceRef.current?.flyTo([markerLat, markerLng], targetZoom, { duration: 0.7 });
       });
 
       // Hover Tooltip con IP Real y Estado
@@ -404,7 +435,10 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
           <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11px; color: #2563eb; font-weight: 700; margin-bottom: 3px;">
             IP: ${node.device.private_ip || "Sin IP"}${node.device.public_ip ? ` • Púb: ${node.device.public_ip}` : ""}
           </div>
-          <div style="color: #64748b; font-size: 11px;">${node.city} • ${node.region}</div>
+          <div style="color: #64748b; font-size: 11px;">
+            ${node.city} • ${node.region}
+            ${countAtLoc > 1 ? '<span style="display: block; color: #0284c7; font-weight: 600; margin-top: 1px;">🖥️ Mismo Servidor / Sede Central Kraken</span>' : ''}
+          </div>
           <div style="font-family: ui-monospace, monospace; font-size: 11px; color: #059669; font-weight: 700; margin-top: 1px;">📍 GPS: ${node.lat.toFixed(4)}, ${node.lng.toFixed(4)}</div>
           <div style="margin-top: 4px; display: flex; align-items: center; gap: 6px;">
             <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: ${
