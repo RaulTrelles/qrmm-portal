@@ -64,15 +64,16 @@
 }
 
 .q-feedback-modal {
-  background: var(--color-surface-card, #ffffff);
-  border: 1px solid var(--color-border-subtle, #e2e8f0);
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
   border-radius: var(--radius-lg, 12px);
   width: 100%;
   max-width: 540px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   animation: q-feedback-scale-up 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--color-text-primary);
 }
 
 @keyframes q-feedback-scale-up {
@@ -85,26 +86,26 @@
   align-items: center;
   justify-content: space-between;
   padding: 18px 24px;
-  border-bottom: 1px solid var(--color-border-subtle, #e2e8f0);
+  border-bottom: 1px solid var(--color-border-default);
 }
 
 .q-feedback-title-group h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 700;
-  color: var(--color-text-primary, #0f172a);
+  color: var(--color-text-primary);
 }
 
 .q-feedback-title-group p {
   margin: 4px 0 0 0;
   font-size: 12.5px;
-  color: var(--color-text-secondary, #64748b);
+  color: var(--color-text-secondary);
 }
 
 .q-feedback-close-btn {
   background: transparent;
   border: none;
-  color: var(--color-text-secondary, #64748b);
+  color: var(--color-text-secondary);
   cursor: pointer;
   padding: 6px;
   border-radius: 6px;
@@ -115,8 +116,8 @@
 }
 
 .q-feedback-close-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--color-text-primary, #0f172a);
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
 }
 
 .q-feedback-body {
@@ -140,8 +141,8 @@
 }
 
 .q-feedback-cat-card {
-  border: 1px solid var(--color-border-subtle, #e2e8f0);
-  background: var(--color-surface-subtle, #f8fafc);
+  border: 1px solid var(--color-border-default);
+  background-color: var(--color-surface-page);
   border-radius: var(--radius-md, 8px);
   padding: 10px 12px;
   cursor: pointer;
@@ -152,14 +153,14 @@
 }
 
 .q-feedback-cat-card:hover {
-  border-color: var(--color-brand-primary, #6366f1);
-  background: rgba(99, 102, 241, 0.04);
+  border-color: var(--color-brand-primary);
+  background-color: var(--color-surface-hover);
 }
 
 .q-feedback-cat-card.active {
-  border-color: var(--color-brand-primary, #6366f1);
-  background: rgba(99, 102, 241, 0.1);
-  box-shadow: 0 0 0 1px var(--color-brand-primary, #6366f1);
+  border-color: var(--color-brand-primary);
+  background-color: var(--color-surface-selected);
+  box-shadow: 0 0 0 1px var(--color-brand-primary);
 }
 
 .q-feedback-cat-icon {
@@ -174,12 +175,12 @@
 .q-feedback-cat-name {
   font-size: 13px;
   font-weight: 600;
-  color: var(--color-text-primary, #0f172a);
+  color: var(--color-text-primary);
 }
 
 .q-feedback-cat-desc {
   font-size: 11px;
-  color: var(--color-text-secondary, #64748b);
+  color: var(--color-text-secondary);
 }
 
 /* Form Fields */
@@ -192,7 +193,7 @@
 .q-feedback-label {
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--color-text-primary, #1e293b);
+  color: var(--color-text-primary);
 }
 
 .q-feedback-input,
@@ -201,10 +202,10 @@
   width: 100%;
   padding: 10px 12px;
   font-size: 13.5px;
-  border: 1px solid var(--color-border-subtle, #cbd5e1);
+  border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md, 8px);
-  background: var(--color-surface-card, #ffffff);
-  color: var(--color-text-primary, #0f172a);
+  background-color: var(--color-surface-page);
+  color: var(--color-text-primary);
   transition: border-color 0.15s ease;
   box-sizing: border-box;
 }
@@ -213,8 +214,24 @@
 .q-feedback-textarea:focus,
 .q-feedback-select:focus {
   outline: none;
-  border-color: var(--color-brand-primary, #6366f1);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  border-color: var(--color-brand-primary);
+  box-shadow: var(--focus-ring);
+  background-color: var(--color-surface-default);
+}
+
+.q-feedback-select option {
+  background-color: var(--color-surface-default);
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .q-feedback-select option {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="light"] .q-feedback-select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
 }
 
 .q-feedback-textarea {
@@ -227,7 +244,7 @@
   justify-content: flex-end;
   gap: 12px;
   padding: 16px 24px;
-  border-top: 1px solid var(--color-border-subtle, #e2e8f0);
+  border-top: 1px solid var(--color-border-default);
 }
 
 /* Success Card */

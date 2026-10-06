@@ -45,14 +45,17 @@
   /* Semantic Surface Tokens */
   --color-surface-page: var(--neutral-50);
   --color-surface-default: var(--neutral-0);
+  --color-surface-card: var(--neutral-0);
   --color-surface-raised: var(--neutral-0);
   --color-surface-muted: var(--neutral-100);
+  --color-surface-subtle: var(--neutral-100);
   --color-surface-selected: var(--purple-50);
   --color-surface-hover: #FAF8FF;
   --color-surface-overlay: rgba(17, 24, 39, 0.45);
 
   /* Semantic Border Tokens */
   --color-border-default: var(--neutral-200);
+  --color-border-subtle: var(--neutral-200);
   --color-border-strong: var(--neutral-300);
   --color-border-focus: var(--purple-600);
 
@@ -132,13 +135,16 @@
 
   --color-surface-page: #0F172A;
   --color-surface-default: #1E293B;
+  --color-surface-card: #1E293B;
   --color-surface-raised: #334155;
   --color-surface-muted: #1E293B;
+  --color-surface-subtle: #0F172A;
   --color-surface-selected: rgba(123, 87, 232, 0.22);
   --color-surface-hover: rgba(123, 87, 232, 0.12);
   --color-surface-overlay: rgba(0, 0, 0, 0.75);
 
   --color-border-default: #334155;
+  --color-border-subtle: #334155;
   --color-border-strong: #475569;
   --color-border-focus: #7B57E8;
 
