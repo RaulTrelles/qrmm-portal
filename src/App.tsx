@@ -9,6 +9,7 @@ import { ClientsView } from "./views/ClientsView";
 import { UsersView } from "./views/UsersView";
 import { PaymentsView } from "./views/PaymentsView";
 import { AIHealthView } from "./views/AIHealthView";
+import { SupportView } from "./views/SupportView";
 import { PortalView } from "./views/PortalView";
 import { LoginView } from "./views/LoginView";
 import { DeviceDetailModal } from "./components/DeviceDetailModal/DeviceDetailModal";
@@ -34,6 +35,7 @@ function AppContent() {
       "users",
       "payments",
       "settings",
+      "support",
     ];
     if (validViews.includes(path as ViewType)) {
       return path as ViewType;
@@ -93,6 +95,7 @@ function AppContent() {
       users: { title: "Administración de Usuarios", path: "/users" },
       payments: { title: "Planes y Suscripciones", path: "/plans" },
       settings: { title: "Configuración y Alertas", path: "/settings" },
+      support: { title: "Mesa de Ayuda, Soporte & Feedback", path: "/support" },
     };
 
     const current = viewMeta[activeView] || { title: "Consola Qhapana RMM", path: `/${activeView}` };
@@ -241,6 +244,8 @@ function AppContent() {
           <UsersView />
         ) : activeView === "payments" ? (
           <PaymentsView />
+        ) : activeView === "support" ? (
+          <SupportView />
         ) : (
           <SettingsView />
         )}

@@ -27,6 +27,9 @@ import {
   testAlertEmail,
   updateClientAreas,
   generateExecutiveHealthReport,
+  getPaymentSettings,
+  updatePaymentSettings,
+  type PaymentSettings,
 } from "../services/api";
 import type { AlertSettings } from "../services/api";
 import "./SettingsView.css";
@@ -34,11 +37,21 @@ import "./SettingsView.css";
 
 export const SettingsView: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<"alerts" | "billing">("alerts");
+  const [activeTab, setActiveTab] = useState<"alerts" | "billing" | "payments">("alerts");
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [testing, setTesting] = useState<boolean>(false);
   const [generatingReport, setGeneratingReport] = useState<boolean>(false);
+
+  // Modalidades de pago y modo Beta
+  const [paymentSettings, setPaymentSettings] = useState<PaymentSettings>({
+    enable_lemon_squeezy: true,
+    enable_b2b_wire: true,
+    allow_beta_free_trial: true,
+    beta_badge_text: "Programa Beta Qhapana",
+    beta_description: "",
+  });
+  const [savingPaymentSettings, setSavingPaymentSettings] = useState<boolean>(false);
 
   // Estados del formulario
   const [emailAlertsEnabled, setEmailAlertsEnabled] = useState<boolean>(true);
@@ -98,10 +111,39 @@ export const SettingsView: React.FC = () => {
       setSmtpFromEmail(data.smtp_from_email || "alertas@qhapana-rmm.local");
       setGoogleOauthConfigured(data.google_oauth_configured);
       setGoogleClientId(data.google_client_id || "");
+
+      // Cargar configuración de pasarelas y modo beta
+      try {
+        const pData = await getPaymentSettings();
+        setPaymentSettings(pData);
+      } catch (pErr) {
+        console.warn("No se pudo cargar payment settings:", pErr);
+      }
     } catch (err: any) {
       setFeedback({ type: "error", message: err.message || "Error al cargar la configuración de alertas" });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSavePaymentSettings = async () => {
+    try {
+      setSavingPaymentSettings(true);
+      setFeedback(null);
+      const updated = await updatePaymentSettings({
+        enable_lemon_squeezy: paymentSettings.enable_lemon_squeezy,
+        enable_b2b_wire: paymentSettings.enable_b2b_wire,
+        allow_beta_free_trial: paymentSettings.allow_beta_free_trial,
+      });
+      setPaymentSettings(updated);
+      setFeedback({
+        type: "success",
+        message: "Configuración de modalidades de pago y modo Beta actualizada exitosamente.",
+      });
+    } catch (err: any) {
+      setFeedback({ type: "error", message: err.message || "Error al actualizar pasarelas de pago" });
+    } finally {
+      setSavingPaymentSettings(false);
     }
   };
 
@@ -298,16 +340,114 @@ export const SettingsView: React.FC = () => {
         >
           <Bell size={16} /> Notificaciones y Alertas
         </button>
+        {user?.role === "SUPERADMIN" && (
+          <button
+            className={`q-settings-tab-btn ${activeTab === "payments" ? "q-tab-active" : ""}`}
+            onClick={() => setActiveTab("payments")}
+          >
+            <CreditCard size={16} /> Modos de Pago & Beta
+          </button>
+        )}
         <button
           className={`q-settings-tab-btn ${activeTab === "billing" ? "q-tab-active" : ""}`}
           onClick={() => setActiveTab("billing")}
         >
-          <CreditCard size={16} /> Suscripción & Facturación
+          <FileText size={16} /> Suscripción & Facturación
         </button>
       </div>
 
       {activeTab === "billing" ? (
         <BillingView />
+      ) : activeTab === "payments" ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {feedback && (
+            <div className={`q-feedback-banner q-feedback-banner--${feedback.type}`}>
+              {feedback.type === "success" ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
+              <span>{feedback.message}</span>
+            </div>
+          )}
+
+          <Card className="q-settings-card">
+            <div className="q-card-header-row">
+              <div className="q-card-heading">
+                <CreditCard size={20} color="var(--color-brand-primary)" />
+                <div>
+                  <h3>Control de Pasarelas y Modalidades de Cobro</h3>
+                  <p>
+                    Activa o desactiva pasarelas de pago externas o habilita el Modo Beta de pruebas para evitar costos de comisiones y ganar usuarios reales.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="q-toggle-row">
+              <div className="q-toggle-label">
+                <span className="q-toggle-title">🚀 Modo Beta / Prueba Gratuita ($0)</span>
+                <span className="q-toggle-desc">
+                  Permite a nuevos clientes registrarse y activar el plan Pro a $0 sin requerir tarjeta. Ideal para ganar tracción, realizar pruebas reales y recopilar feedback técnico sin costo de procesamiento.
+                </span>
+              </div>
+              <label className="q-switch">
+                <input
+                  type="checkbox"
+                  checked={paymentSettings.allow_beta_free_trial}
+                  onChange={(e) =>
+                    setPaymentSettings({ ...paymentSettings, allow_beta_free_trial: e.target.checked })
+                  }
+                />
+                <span className="q-switch-slider"></span>
+              </label>
+            </div>
+
+            <div className="q-toggle-row">
+              <div className="q-toggle-label">
+                <span className="q-toggle-title">💳 Pasarela Lemon Squeezy (Tarjetas, PayPal, Apple Pay)</span>
+                <span className="q-toggle-desc">
+                  Habilita el cobro formal automatizado a través de Lemon Squeezy Merchant of Record en el checkout del portal comercial.
+                </span>
+              </div>
+              <label className="q-switch">
+                <input
+                  type="checkbox"
+                  checked={paymentSettings.enable_lemon_squeezy}
+                  onChange={(e) =>
+                    setPaymentSettings({ ...paymentSettings, enable_lemon_squeezy: e.target.checked })
+                  }
+                />
+                <span className="q-switch-slider"></span>
+              </label>
+            </div>
+
+            <div className="q-toggle-row">
+              <div className="q-toggle-label">
+                <span className="q-toggle-title">🏦 Transferencia Bancaria B2B (Facturación Comercial)</span>
+                <span className="q-toggle-desc">
+                  Permite a clientes corporativos solicitar factura y abonar mediante cuenta corriente bancaria previa verificación manual.
+                </span>
+              </div>
+              <label className="q-switch">
+                <input
+                  type="checkbox"
+                  checked={paymentSettings.enable_b2b_wire}
+                  onChange={(e) =>
+                    setPaymentSettings({ ...paymentSettings, enable_b2b_wire: e.target.checked })
+                  }
+                />
+                <span className="q-switch-slider"></span>
+              </label>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+              <Button
+                variant="primary"
+                onClick={handleSavePaymentSettings}
+                disabled={savingPaymentSettings}
+              >
+                {savingPaymentSettings ? "Guardando..." : "Guardar Modalidades de Pago"}
+              </Button>
+            </div>
+          </Card>
+        </div>
       ) : (
         <>
           {feedback && (

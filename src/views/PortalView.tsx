@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { Button } from "../components/Button/Button";
 import { useAuth } from "../context/AuthContext";
-import { processCheckout, verifyPromoCode, getLemonSqueezyCheckoutUrl } from "../services/api";
+import { processCheckout, verifyPromoCode, getLemonSqueezyCheckoutUrl, getPaymentSettings, type PaymentSettings } from "../services/api";
 import type { PlanTier } from "../types/payment";
 import {
   PRICING_CONFIG,
@@ -61,7 +61,14 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly");
   const [selectedPlan, setSelectedPlan] = useState<PlanTier | null>(null);
   const [checkoutModalOpen, setCheckoutModalOpen] = useState<boolean>(false);
-  const [checkoutMethod, setCheckoutMethod] = useState<string>("LEMON_SQUEEZY");
+  const [activePaymentSettings, setActivePaymentSettings] = useState<PaymentSettings>({
+    enable_lemon_squeezy: true,
+    enable_b2b_wire: true,
+    allow_beta_free_trial: true,
+    beta_badge_text: "Programa Beta Qhapana",
+    beta_description: "Acceso 100% bonificado e inmediato para empresas que prueben la plataforma y nos envíen sus sugerencias.",
+  });
+  const [checkoutMethod, setCheckoutMethod] = useState<string>("BETA_TRIAL");
   const [customerName, setCustomerName] = useState<string>(user?.full_name || "");
   const [customerEmail, setCustomerEmail] = useState<string>(user?.email || "");
   const [customerPassword, setCustomerPassword] = useState<string>("");
@@ -72,6 +79,21 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
   const [checkoutLoading, setCheckoutLoading] = useState<boolean>(false);
   const [checkoutSuccess, setCheckoutSuccess] = useState<any | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getPaymentSettings()
+      .then((cfg) => {
+        setActivePaymentSettings(cfg);
+        if (cfg.allow_beta_free_trial) {
+          setCheckoutMethod("BETA_TRIAL");
+        } else if (cfg.enable_lemon_squeezy) {
+          setCheckoutMethod("LEMON_SQUEEZY");
+        } else {
+          setCheckoutMethod("WIRE");
+        }
+      })
+      .catch((e) => console.warn("Fallo cargando modalidades de pago en portal:", e));
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("q_portal_lang", lang);
@@ -166,6 +188,29 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
             lang === "es"
               ? "Cuenta creada con éxito. Tu plan Starter gratuito ya está activo."
               : "Account created successfully. Your free Starter plan is now active.",
+        });
+        return;
+      }
+
+      // Si el método seleccionado es Programa Beta (Acceso Gratuito Inmediato)
+      if (checkoutMethod === "BETA_TRIAL") {
+        const res = await processCheckout({
+          full_name: customerName.trim() || customerEmail.split("@")[0],
+          email: customerEmail.trim(),
+          password: customerPassword.trim(),
+          organization_name: orgName.trim() || `${customerName || "Empresa"} Workspace`,
+          plan_tier: selectedPlan,
+          billing_cycle: billingCycle,
+          currency: PRICING_CONFIG.currencyCode,
+          amount: 0,
+          gateway: "BETA_TRIAL",
+        });
+        setCheckoutSuccess({
+          ...res,
+          message:
+            lang === "es"
+              ? "¡Bienvenido al Programa Beta! Tu organización y plan PRO han sido activados de inmediato sin costo. Disfruta de la plataforma y ayúdanos reportando problemas o sugerencias desde el botón de ayuda."
+              : "Welcome to the Beta Program! Your organization and PRO plan are activated immediately at no cost. Enjoy the platform and share your feedback via the help button.",
         });
         return;
       }
@@ -1812,14 +1857,30 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
                           onChange={(e) => setCheckoutMethod(e.target.value)}
                           className="q-checkout-input"
                         >
-                          {PRICING_CONFIG.paymentMethods.map((m) => (
-                            <option key={m.id} value={m.id}>
-                              {m.name} — {m.detail}
+                          {activePaymentSettings.allow_beta_free_trial && (
+                            <option value="BETA_TRIAL">
+                              🚀 {lang === "es" ? "Programa Beta (Acceso Gratuito Inmediato $0)" : "Beta Program (Instant Free Access $0)"}
                             </option>
-                          ))}
+                          )}
+                          {activePaymentSettings.enable_lemon_squeezy && (
+                            <option value="LEMON_SQUEEZY">
+                              💳 Lemon Squeezy (Tarjeta, Apple Pay, PayPal)
+                            </option>
+                          )}
+                          {activePaymentSettings.enable_b2b_wire && (
+                            <option value="WIRE">
+                              🏦 {lang === "es" ? "Transferencia Bancaria B2B (Facturación)" : "B2B Bank Wire (Invoice)"}
+                            </option>
+                          )}
                         </select>
                         <div className="q-checkout-method-hint">
-                          {checkoutMethod === "LEMON_SQUEEZY" ? (
+                          {checkoutMethod === "BETA_TRIAL" ? (
+                            <span>
+                              {lang === "es"
+                                ? "🎁 Acceso 100% bonificado e inmediato al plan PRO. Tu cuenta se activará al instante para que comiences a probar sin costo a cambio de tus sugerencias de mejora."
+                                : "🎁 100% free immediate PRO access. Your account activates instantly so you can test without cost in exchange for your feedback."}
+                            </span>
+                          ) : checkoutMethod === "LEMON_SQUEEZY" ? (
                             <span>
                               {lang === "es"
                                 ? "🔒 Serás redirigido a la pasarela segura de Lemon Squeezy (MoR) para pagar con Tarjeta (Visa, Mastercard, Amex), Apple Pay o PayPal. Activación instantánea."

@@ -16,10 +16,12 @@ import {
   CreditCard,
   Globe,
   Sparkles,
+  LifeBuoy,
 } from "lucide-react";
+import { FeedbackFAB, FeedbackModal } from "../FeedbackModal/FeedbackModal";
 import "./AppShell.css";
 
-export type ViewType = "dashboard" | "inventory" | "ai-health" | "discovery" | "clients" | "users" | "payments" | "settings";
+export type ViewType = "dashboard" | "inventory" | "ai-health" | "discovery" | "clients" | "users" | "payments" | "settings" | "support";
 
 export interface AppShellProps {
   children: React.ReactNode;
@@ -68,10 +70,14 @@ export const AppShell: React.FC<AppShellProps> = ({
         return "Descubrimiento de Red (Network Discovery)";
       case "settings":
         return "Configuración del Sistema y Alertas";
+      case "support":
+        return "Mesa de Ayuda, Soporte & Sugerencias";
       default:
         return "Qhapana RMM";
     }
   };
+
+  const [feedbackOpen, setFeedbackOpen] = React.useState<boolean>(false);
 
   return (
     <div className="q-shell">
@@ -152,6 +158,16 @@ export const AppShell: React.FC<AppShellProps> = ({
           >
             <Bell size={18} />
             <span>Configuración y Alertas</span>
+          </div>
+
+          <div className="q-nav-section-title">Atención y Experiencia</div>
+          <div
+            className={`q-nav-item ${activeView === "support" ? "q-nav-item--active" : ""}`}
+            onClick={() => onViewChange("support")}
+            style={{ cursor: "pointer" }}
+          >
+            <LifeBuoy size={18} />
+            <span>Soporte & Sugerencias</span>
           </div>
 
           {onOpenPortal && (
@@ -272,6 +288,10 @@ export const AppShell: React.FC<AppShellProps> = ({
 
         <main className="q-content">{children}</main>
       </div>
+
+      {/* Botón flotante y modal de soporte accesibles desde cualquier vista */}
+      <FeedbackFAB onOpen={() => setFeedbackOpen(true)} />
+      <FeedbackModal isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
     </div>
   );
 };

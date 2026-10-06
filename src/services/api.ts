@@ -1322,6 +1322,130 @@ export async function deleteAdminDiscount(discountId: string): Promise<{ success
   return res.json();
 }
 
+// =============================================================================
+// MODALIDADES DE PAGO Y SOPORTE / FEEDBACK DE USUARIOS
+// =============================================================================
+
+export interface PaymentSettings {
+  enable_lemon_squeezy: boolean;
+  enable_b2b_wire: boolean;
+  allow_beta_free_trial: boolean;
+  beta_badge_text: string;
+  beta_description: string;
+}
+
+export interface SupportTicket {
+  id: string;
+  organization_id?: string | null;
+  organization_name?: string | null;
+  user_id?: string | null;
+  category: "BUG" | "SUGGESTION" | "QUESTION" | "BILLING" | string;
+  priority: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL" | string;
+  title: string;
+  description: string;
+  contact_name?: string | null;
+  contact_email?: string | null;
+  device_info?: Record<string, any> | null;
+  status: "OPEN" | "IN_REVIEW" | "RESOLVED" | "CLOSED" | string;
+  admin_response?: string | null;
+  responded_at?: string | null;
+  responded_by_name?: string | null;
+  created_at: string;
+  updated_at?: string | null;
+}
+
+export async function getPaymentSettings(): Promise<PaymentSettings> {
+  const res = await fetch(`${API_BASE}/support/payment-settings`);
+  if (!res.ok) {
+    return {
+      enable_lemon_squeezy: true,
+      enable_b2b_wire: true,
+      allow_beta_free_trial: true,
+      beta_badge_text: "Programa Beta Qhapana",
+      beta_description: "Acceso 100% bonificado e inmediato para empresas que prueben la plataforma y nos envíen sus sugerencias.",
+    };
+  }
+  return res.json();
+}
+
+export async function updatePaymentSettings(payload: Partial<PaymentSettings>): Promise<PaymentSettings> {
+  const res = await fetch(`${API_BASE}/support/payment-settings`, {
+    method: "PATCH",
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al actualizar configuración de pagos");
+  }
+  return res.json();
+}
+
+export async function createSupportTicket(payload: {
+  category: string;
+  priority: string;
+  title: string;
+  description: string;
+  contact_name?: string;
+  contact_email?: string;
+  device_info?: Record<string, any>;
+}): Promise<SupportTicket> {
+  const res = await fetch(`${API_BASE}/support/tickets`, {
+    method: "POST",
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al enviar el reporte de soporte");
+  }
+  return res.json();
+}
+
+export async function getClientTickets(): Promise<SupportTicket[]> {
+  const res = await fetch(`${API_BASE}/support/tickets`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al obtener los tickets de soporte");
+  }
+  return res.json();
+}
+
+export async function getAdminTickets(statusFilter?: string, categoryFilter?: string): Promise<SupportTicket[]> {
+  const baseOrigin = typeof window !== "undefined" ? window.location.origin : "http://localhost:5173";
+  const url = new URL(`${API_BASE}/support/tickets/admin`, baseOrigin);
+  if (statusFilter && statusFilter !== "ALL") url.searchParams.set("status_filter", statusFilter);
+  if (categoryFilter && categoryFilter !== "ALL") url.searchParams.set("category_filter", categoryFilter);
+
+  const res = await fetch(url.toString(), {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al listar tickets administrativos");
+  }
+  return res.json();
+}
+
+export async function respondToTicket(
+  ticketId: string,
+  payload: { admin_response: string; status: string }
+): Promise<SupportTicket> {
+  const res = await fetch(`${API_BASE}/support/tickets/${ticketId}/respond`, {
+    method: "PATCH",
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al enviar la respuesta al ticket");
+  }
+  return res.json();
+}
+
+
 
 
 

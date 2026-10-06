@@ -1,0 +1,207 @@
+/* =============================================================================
+   Design System Support & Feedback View Styles
+   ============================================================================= */
+
+.q-support-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: q-support-fade-in 0.2s ease-out;
+}
+
+@keyframes q-support-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.q-support-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .q-support-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .q-support-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Control Bar */
+.q-support-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--color-surface-card, #ffffff);
+  border: 1px solid var(--color-border-subtle, #e2e8f0);
+  border-radius: var(--radius-lg, 12px);
+  padding: 14px 18px;
+}
+
+.q-support-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.q-support-select {
+  padding: 8px 12px;
+  font-size: 13px;
+  border: 1px solid var(--color-border-subtle, #cbd5e1);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-surface-subtle, #f8fafc);
+  color: var(--color-text-primary, #0f172a);
+}
+
+.q-support-search {
+  padding: 8px 12px;
+  font-size: 13px;
+  border: 1px solid var(--color-border-subtle, #cbd5e1);
+  border-radius: var(--radius-md, 8px);
+  min-width: 220px;
+}
+
+/* Tickets List / Cards */
+.q-support-ticket-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.q-support-ticket-card {
+  background: var(--color-surface-card, #ffffff);
+  border: 1px solid var(--color-border-subtle, #e2e8f0);
+  border-radius: var(--radius-lg, 12px);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.15s ease;
+}
+
+.q-support-ticket-card:hover {
+  border-color: var(--color-brand-primary, #6366f1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.q-support-ticket-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.q-support-ticket-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.q-support-ticket-title {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--color-text-primary, #0f172a);
+}
+
+.q-support-ticket-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--color-text-secondary, #64748b);
+  flex-wrap: wrap;
+}
+
+.q-support-ticket-desc {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--color-text-primary, #334155);
+  white-space: pre-wrap;
+}
+
+/* Official Response Box */
+.q-support-response-box {
+  background: rgba(99, 102, 241, 0.05);
+  border-left: 4px solid var(--color-brand-primary, #6366f1);
+  border-radius: 0 var(--radius-md, 8px) var(--radius-md, 8px) 0;
+  padding: 14px 16px;
+  margin-top: 6px;
+}
+
+.q-support-response-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-brand-primary, #4f46e5);
+}
+
+.q-support-response-text {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--color-text-primary, #0f172a);
+  white-space: pre-wrap;
+}
+
+/* Empty State */
+.q-support-empty-state {
+  text-align: center;
+  padding: 60px 24px;
+  background: var(--color-surface-card, #ffffff);
+  border: 1px dashed var(--color-border-subtle, #cbd5e1);
+  border-radius: var(--radius-lg, 12px);
+}
+
+.q-support-empty-state h4 {
+  margin: 12px 0 6px 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text-primary, #0f172a);
+}
+
+.q-support-empty-state p {
+  margin: 0 auto 20px auto;
+  max-width: 440px;
+  font-size: 13.5px;
+  color: var(--color-text-secondary, #64748b);
+  line-height: 1.5;
+}
+
+/* Response Modal */
+.q-support-respond-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.q-support-respond-dialog {
+  background: var(--color-surface-card, #ffffff);
+  border: 1px solid var(--color-border-subtle, #e2e8f0);
+  border-radius: var(--radius-lg, 12px);
+  width: 100%;
+  max-width: 580px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
