@@ -353,6 +353,28 @@ export async function updateDeviceArea(
   return res.json();
 }
 
+export async function updateDeviceLocation(
+  deviceId: string,
+  latitude: number,
+  longitude: number,
+  locationName?: string
+): Promise<Device> {
+  const res = await fetch(`${API_BASE}/devices/${deviceId}/location`, {
+    method: "PATCH",
+    headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify({
+      latitude,
+      longitude,
+      location_name: locationName,
+    }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al grabar las coordenadas GPS del equipo");
+  }
+  return res.json();
+}
+
 export async function getClientAreas(): Promise<string[]> {
   try {
     const res = await fetch(`${API_BASE}/settings/areas`, {

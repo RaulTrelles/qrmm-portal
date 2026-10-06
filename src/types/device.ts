@@ -34,6 +34,9 @@ export interface DeviceSpecs {
   disk_free_gb?: number;
   disks?: DiskSpec[];
   peripherals?: PeripheralSpecs;
+  latitude?: number;
+  longitude?: number;
+  location_name?: string;
 }
 export interface DockerContainer {
   id?: string;
@@ -92,6 +95,9 @@ export interface Device {
   enrollment_status: string;
   tags: string[];
   client_area?: string;
+  latitude?: number;
+  longitude?: number;
+  location_name?: string;
   specs?: DeviceSpecs;
   alert_recipients?: string[];
   registered_at: string;

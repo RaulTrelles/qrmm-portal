@@ -83,13 +83,20 @@ function resolveCoordinates(device: Device, index: number): NodeGeoData {
   const host = (device.hostname || "").toLowerCase().trim();
   const area = (device.client_area || "").toLowerCase().trim();
 
-  // 1. Coordenadas explícitas si vienen en specs (latitud/longitud directas de GPS)
-  if (device.specs && (device.specs as any).latitude && (device.specs as any).longitude) {
-    const lat = Number((device.specs as any).latitude);
-    const lng = Number((device.specs as any).longitude);
-    if (!isNaN(lat) && !isNaN(lng)) {
-      return { device, lat, lng, city: device.client_area || "Ubicación Personalizada", region: "Coordenadas GPS fijadas" };
-    }
+  // 1. Coordenadas GPS Reales Persistidas en Base de Datos (Máxima Prioridad)
+  const dbLat = device.latitude != null ? Number(device.latitude) : (device.specs?.latitude != null ? Number(device.specs.latitude) : null);
+  const dbLng = device.longitude != null ? Number(device.longitude) : (device.specs?.longitude != null ? Number(device.specs.longitude) : null);
+  const locName = device.location_name || device.specs?.location_name || (device.client_area ? `Sede ${device.client_area}` : "Ubicación Registrada");
+
+  if (dbLat !== null && dbLng !== null && !isNaN(dbLat) && !isNaN(dbLng)) {
+    return {
+      device,
+      lat: dbLat,
+      lng: dbLng,
+      city: device.client_area || locName.split("-")[0]?.trim() || "Lima Metropolitana",
+      region: locName,
+      isDatacenterHub: host.includes("kraken") && !host.includes("factura"),
+    };
   }
 
   // 2. Mapeo explícito por equipo especificado por el usuario:
@@ -371,6 +378,7 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
             IP: ${node.device.private_ip || "Sin IP"}${node.device.public_ip ? ` • Púb: ${node.device.public_ip}` : ""}
           </div>
           <div style="color: #64748b; font-size: 11px;">${node.city} • ${node.region}</div>
+          <div style="font-family: ui-monospace, monospace; font-size: 11px; color: #059669; font-weight: 700; margin-top: 1px;">📍 GPS: ${node.lat.toFixed(4)}, ${node.lng.toFixed(4)}</div>
           <div style="margin-top: 4px; display: flex; align-items: center; gap: 6px;">
             <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: ${
               isOnline ? "#16a34a" : "#dc2626"
@@ -484,7 +492,8 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
               <div className="q-map-footer-node-meta">
                 <MapPin size={12} />
                 <span>
-                  {activeGeoInfo?.city || "Lima Centro"} ({activeGeoInfo?.region || "Región Datacenter"}) • IP:{" "}
+                  {activeGeoInfo?.region || activeSelectedDevice.location_name || activeGeoInfo?.city || "Lima Centro"} • GPS:{" "}
+                  <strong>{activeGeoInfo?.lat ? `${activeGeoInfo.lat.toFixed(4)}, ${activeGeoInfo.lng.toFixed(4)}` : "Fijado"}</strong> • IP:{" "}
                   {activeSelectedDevice.private_ip || "192.168.0.10"}
                 </span>
               </div>

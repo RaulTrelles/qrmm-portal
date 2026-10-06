@@ -15,6 +15,7 @@ import {
   getDeviceSystemLogs,
   terminateDeviceProcess,
   updateDeviceArea,
+  updateDeviceLocation,
   getClientAreas,
   getDeviceAIHealth,
   triggerDeviceAIDiagnosis,
@@ -205,6 +206,80 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
   const [availableAreas, setAvailableAreas] = useState<string[]>(["General"]);
   const [updatingArea, setUpdatingArea] = useState<boolean>(false);
 
+  // Estados para Georreferenciación & Grabación GPS Real del equipo
+  const [gpsLat, setGpsLat] = useState<string>(
+    device?.latitude != null ? String(device.latitude) : (device?.specs?.latitude != null ? String(device.specs.latitude) : "")
+  );
+  const [gpsLng, setGpsLng] = useState<string>(
+    device?.longitude != null ? String(device.longitude) : (device?.specs?.longitude != null ? String(device.specs.longitude) : "")
+  );
+  const [gpsLocationName, setGpsLocationName] = useState<string>(
+    device?.location_name || device?.specs?.location_name || (device?.client_area ? `Sede ${device.client_area}` : "")
+  );
+  const [savingGps, setSavingGps] = useState<boolean>(false);
+  const [gpsFeedback, setGpsFeedback] = useState<{ msg: string; type: "success" | "error" } | null>(null);
+
+  const GPS_DISTRICT_PRESETS = [
+    { label: "Callao - Sede Central Kraken", lat: -12.0565, lng: -77.1181 },
+    { label: "Callao - Nodo Facturación", lat: -12.0515, lng: -77.1285 },
+    { label: "San Isidro - Sede IPN", lat: -12.0967, lng: -77.0353 },
+    { label: "Los Olivos - Sede Finanzas", lat: -11.9611, lng: -77.0706 },
+    { label: "Surco - Sede Perkons", lat: -12.1389, lng: -76.9944 },
+    { label: "San Miguel - Soporte TI", lat: -12.0772, lng: -77.0867 },
+    { label: "Miraflores - Corporativo", lat: -12.1217, lng: -77.0298 },
+    { label: "Ate - Zona Industrial", lat: -12.0264, lng: -76.9189 },
+    { label: "Cercado de Lima - Centro", lat: -12.0464, lng: -77.0428 },
+    { label: "La Molina - Sede Este", lat: -12.0833, lng: -76.9333 },
+    { label: "Chorrillos - Sede Sur", lat: -12.1633, lng: -77.0189 },
+  ];
+
+  const handleSaveGpsCoordinates = async () => {
+    if (!device) return;
+    const latNum = parseFloat(gpsLat);
+    const lngNum = parseFloat(gpsLng);
+    if (isNaN(latNum) || isNaN(lngNum)) {
+      setGpsFeedback({
+        msg: "Debe ingresar una latitud y longitud válidas en formato decimal (ej: -12.0565, -77.1181).",
+        type: "error",
+      });
+      return;
+    }
+    if (latNum < -90 || latNum > 90 || lngNum < -180 || lngNum > 180) {
+      setGpsFeedback({
+        msg: "Coordenadas fuera de rango válido (-90 a 90 para latitud, -180 a 180 para longitud).",
+        type: "error",
+      });
+      return;
+    }
+
+    try {
+      setSavingGps(true);
+      setGpsFeedback(null);
+      const loc = gpsLocationName.trim() || device.client_area || "Sede Principal";
+      const updated = await updateDeviceLocation(device.id, latNum, lngNum, loc);
+      device.latitude = updated.latitude;
+      device.longitude = updated.longitude;
+      device.location_name = updated.location_name;
+      if (device.specs) {
+        device.specs.latitude = updated.latitude ? Number(updated.latitude) : undefined;
+        device.specs.longitude = updated.longitude ? Number(updated.longitude) : undefined;
+        device.specs.location_name = updated.location_name || undefined;
+      }
+      setGpsFeedback({
+        msg: `✓ Coordenadas GPS grabadas exitosamente: [${latNum.toFixed(4)}, ${lngNum.toFixed(4)}] • ${updated.location_name}`,
+        type: "success",
+      });
+      setTimeout(() => setGpsFeedback(null), 6000);
+    } catch (err: any) {
+      setGpsFeedback({
+        msg: err.message || "Error al grabar las coordenadas GPS del equipo",
+        type: "error",
+      });
+    } finally {
+      setSavingGps(false);
+    }
+  };
+
   useEffect(() => {
     if (device?.alert_recipients) {
       setDeviceAlertRecipients(device.alert_recipients);
@@ -212,6 +287,10 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
       setDeviceAlertRecipients([]);
     }
     setDeviceArea(device?.client_area || "General");
+    setGpsLat(device?.latitude != null ? String(device.latitude) : (device?.specs?.latitude != null ? String(device.specs.latitude) : ""));
+    setGpsLng(device?.longitude != null ? String(device.longitude) : (device?.specs?.longitude != null ? String(device.specs.longitude) : ""));
+    setGpsLocationName(device?.location_name || device?.specs?.location_name || (device?.client_area ? `Sede ${device.client_area}` : ""));
+    setGpsFeedback(null);
     setEmailInputError(null);
     setSaveRecipientsSuccess(null);
     setSaveRecipientsError(null);
@@ -937,11 +1016,173 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                       {isEs ? "UBICACIÓN GEOGRÁFICA" : "GEOLOCATION & SITE"}
                     </div>
                     <div style={{ fontWeight: 600, fontSize: 13 }}>
-                      {device.client_area ? `Lima (${device.client_area})` : "Lima, Perú"}
+                      {device.location_name || (device.client_area ? `Lima (${device.client_area})` : "Lima, Perú")}
                     </div>
                     <div style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>
-                      IP: {device.private_ip || device.public_ip || "192.168.1.x"}
+                      {device.latitude != null && device.longitude != null
+                        ? `GPS: ${Number(device.latitude).toFixed(4)}, ${Number(device.longitude).toFixed(4)}`
+                        : `IP: ${device.private_ip || device.public_ip || "192.168.1.x"}`}
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECCIÓN GEORREFERENCIACIÓN & GRABACIÓN GPS */}
+              <div className="q-modal-section">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <span className="q-modal-section-title" style={{ margin: 0, display: "flex", alignItems: "center", gap: 6 }}>
+                    <MapPin size={15} color="var(--color-brand-primary)" />
+                    Georreferenciación & Coordenadas GPS del Equipo
+                  </span>
+                  <Badge variant={device.latitude && device.longitude ? "success" : "neutral"}>
+                    {device.latitude && device.longitude ? "GPS Grabado en BD" : "GPS Pendiente"}
+                  </Badge>
+                </div>
+
+                <div
+                  style={{
+                    background: "var(--color-surface-muted)",
+                    border: "1px solid var(--color-border-default)",
+                    borderRadius: 10,
+                    padding: "16px 18px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 14,
+                  }}
+                >
+                  <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.4 }}>
+                    Fije y grabe la posición geográfica real (GPS) del equipo para su ubicación exacta en el mapa satelital y comercial NOC.
+                  </div>
+
+                  {gpsFeedback && (
+                    <div
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: 8,
+                        fontSize: 13,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        background: gpsFeedback.type === "success" ? "rgba(16, 185, 129, 0.12)" : "rgba(239, 68, 68, 0.12)",
+                        color: gpsFeedback.type === "success" ? "var(--color-status-success)" : "var(--color-status-danger)",
+                        border: `1px solid ${gpsFeedback.type === "success" ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)"}`,
+                      }}
+                    >
+                      {gpsFeedback.type === "success" ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}
+                      <span>{gpsFeedback.msg}</span>
+                    </div>
+                  )}
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 140px 140px auto", gap: 12, alignItems: "flex-end" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--color-text-tertiary)", marginBottom: 4 }}>
+                        SEDE / NOMBRE DE UBICACIÓN
+                      </label>
+                      <input
+                        type="text"
+                        value={gpsLocationName}
+                        onChange={(e) => setGpsLocationName(e.target.value)}
+                        placeholder="Ej: Callao - Sede Central Kraken"
+                        style={{
+                          width: "100%",
+                          padding: "8px 12px",
+                          borderRadius: 6,
+                          border: "1px solid var(--color-border-default)",
+                          background: "var(--color-surface-default)",
+                          color: "var(--color-text-primary)",
+                          fontSize: 13,
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--color-text-tertiary)", marginBottom: 4 }}>
+                        LATITUD GPS (DECIMAL)
+                      </label>
+                      <input
+                        type="text"
+                        value={gpsLat}
+                        onChange={(e) => setGpsLat(e.target.value)}
+                        placeholder="-12.0565"
+                        style={{
+                          width: "100%",
+                          padding: "8px 12px",
+                          borderRadius: 6,
+                          border: "1px solid var(--color-border-default)",
+                          background: "var(--color-surface-default)",
+                          color: "var(--color-text-primary)",
+                          fontSize: 13,
+                          fontFamily: "monospace",
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--color-text-tertiary)", marginBottom: 4 }}>
+                        LONGITUD GPS (DECIMAL)
+                      </label>
+                      <input
+                        type="text"
+                        value={gpsLng}
+                        onChange={(e) => setGpsLng(e.target.value)}
+                        placeholder="-77.1181"
+                        style={{
+                          width: "100%",
+                          padding: "8px 12px",
+                          borderRadius: 6,
+                          border: "1px solid var(--color-border-default)",
+                          background: "var(--color-surface-default)",
+                          color: "var(--color-text-primary)",
+                          fontSize: 13,
+                          fontFamily: "monospace",
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <Button
+                        variant="primary"
+                        icon={savingGps ? <Loader2 size={14} className="animate-spin" /> : <MapPin size={14} />}
+                        onClick={handleSaveGpsCoordinates}
+                        disabled={savingGps}
+                        style={{ height: 38 }}
+                      >
+                        {savingGps ? "Grabando..." : "Grabar GPS"}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Selector rápido de coordenadas predeterminadas de Lima / Callao */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12, color: "var(--color-text-secondary)" }}>
+                    <span style={{ fontWeight: 600 }}>Plantillas Rápidas:</span>
+                    <select
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (!val) return;
+                        const match = GPS_DISTRICT_PRESETS.find((p) => p.label === val);
+                        if (match) {
+                          setGpsLat(String(match.lat));
+                          setGpsLng(String(match.lng));
+                          setGpsLocationName(match.label);
+                        }
+                      }}
+                      style={{
+                        padding: "4px 10px",
+                        borderRadius: 6,
+                        border: "1px solid var(--color-border-default)",
+                        background: "var(--color-surface-default)",
+                        color: "var(--color-text-primary)",
+                        fontSize: 12,
+                        cursor: "pointer",
+                      }}
+                    >
+                      <option value="">Seleccionar distrito / sede de Lima...</option>
+                      {GPS_DISTRICT_PRESETS.map((p) => (
+                        <option key={p.label} value={p.label}>
+                          {p.label} ({p.lat}, {p.lng})
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
