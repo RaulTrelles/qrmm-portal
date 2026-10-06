@@ -89,9 +89,34 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
       setSelectedDevice((curr) => (curr?.id === data.device_id ? null : curr));
     });
 
+    const unsubLocation = dashboardSocket.on("device_location_updated", (data: any) => {
+      setDevices((prev) =>
+        prev.map((d) => {
+          if (d.id === data.device_id) {
+            return {
+              ...d,
+              public_ip: data.public_ip || d.public_ip,
+              latitude: data.latitude,
+              longitude: data.longitude,
+              location_name: data.location_name || d.location_name,
+              specs: {
+                ...d.specs,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                location_name: data.location_name || d.location_name,
+                public_ip: data.public_ip || d.public_ip,
+              },
+            };
+          }
+          return d;
+        })
+      );
+    });
+
     return () => {
       unsubState();
       unsubDeleted();
+      unsubLocation();
     };
   }, []);
 

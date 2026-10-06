@@ -525,10 +525,21 @@ export const UsersView: React.FC = () => {
                     onChange={(e) => setNewRole(e.target.value)}
                   >
                     <option value="OPERATOR">Operador</option>
-                    <option value="ADMIN">Administrador</option>
-                    <option value="VIEWER">Visualizador</option>
-                    {currentUser?.role === "SUPERADMIN" && <option value="SUPERADMIN">Superadmin</option>}
+                    <option value="ADMIN">Administrador de Organización</option>
+                    <option value="VIEWER">Visualizador (Solo Lectura)</option>
+                    {currentUser?.role === "SUPERADMIN" && (
+                      <option value="SUPERADMIN">👑 Superadmin (Acceso Global SaaS)</option>
+                    )}
                   </select>
+                  {currentUser?.role === "SUPERADMIN" ? (
+                    <span style={{ fontSize: "11px", color: "var(--color-brand-primary)", marginTop: "4px", display: "block" }}>
+                      🛡️ Sesión actual: Superadmin (autorizado para delegar Superadmin global).
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: "11px", color: "var(--color-text-muted)", marginTop: "4px", display: "block" }}>
+                      🔒 Sesión actual: Administrador. No puedes crear Superadmins (solo un Superadmin puede crear otro Superadmin).
+                    </span>
+                  )}
                 </div>
 
                 <div className="q-form-group">
@@ -600,10 +611,17 @@ export const UsersView: React.FC = () => {
                     onChange={(e) => setEditRole(e.target.value)}
                   >
                     <option value="OPERATOR">Operador</option>
-                    <option value="ADMIN">Administrador</option>
-                    <option value="VIEWER">Visualizador</option>
-                    {currentUser?.role === "SUPERADMIN" && <option value="SUPERADMIN">Superadmin</option>}
+                    <option value="ADMIN">Administrador de Organización</option>
+                    <option value="VIEWER">Visualizador (Solo Lectura)</option>
+                    {currentUser?.role === "SUPERADMIN" && (
+                      <option value="SUPERADMIN">👑 Superadmin (Acceso Global SaaS)</option>
+                    )}
                   </select>
+                  {currentUser?.role !== "SUPERADMIN" && (
+                    <span style={{ fontSize: "11px", color: "var(--color-text-muted)", marginTop: "4px", display: "block" }}>
+                      🔒 El rol Superadmin solo puede ser asignado por un Superadmin.
+                    </span>
+                  )}
                 </div>
 
                 <div className="q-form-group">
