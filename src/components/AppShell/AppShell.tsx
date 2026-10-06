@@ -289,9 +289,13 @@ export const AppShell: React.FC<AppShellProps> = ({
         <main className="q-content">{children}</main>
       </div>
 
-      {/* Botón flotante y modal de soporte accesibles desde cualquier vista */}
-      <FeedbackFAB onOpen={() => setFeedbackOpen(true)} />
-      <FeedbackModal isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+      {/* Botón flotante y modal de soporte accesibles solo para ADMIN y SUPERADMIN */}
+      {(user?.role === "ADMIN" || user?.role === "SUPERADMIN") && (
+        <>
+          <FeedbackFAB onOpen={() => setFeedbackOpen(true)} />
+          <FeedbackModal isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+        </>
+      )}
     </div>
   );
 };

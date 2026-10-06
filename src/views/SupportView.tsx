@@ -27,7 +27,8 @@ import "./SupportView.css";
 
 export const SupportView: React.FC = () => {
   const { user } = useAuth();
-  const isAdmin = user?.role === "SUPERADMIN" || user?.role === "ADMIN";
+  const isSuperAdmin = user?.role === "SUPERADMIN";
+  const canReport = user?.role === "ADMIN" || user?.role === "SUPERADMIN";
 
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -49,7 +50,7 @@ export const SupportView: React.FC = () => {
     setLoading(true);
     setErrorMsg(null);
     try {
-      const data = isAdmin
+      const data = isSuperAdmin
         ? await getAdminTickets(statusFilter, categoryFilter)
         : await getClientTickets();
       setTickets(data);
@@ -62,7 +63,7 @@ export const SupportView: React.FC = () => {
 
   useEffect(() => {
     fetchTickets();
-  }, [statusFilter, categoryFilter, isAdmin]);
+  }, [statusFilter, categoryFilter, isSuperAdmin]);
 
   const handleOpenResponseModal = (ticket: SupportTicket) => {
     setSelectedTicketForResponse(ticket);
@@ -145,7 +146,7 @@ export const SupportView: React.FC = () => {
           title="Total de Reportes"
           value={totalTickets}
           icon={<LifeBuoy size={20} color="var(--color-brand-primary)" />}
-          subtitle={isAdmin ? "Histórico general" : "Tus consultas enviadas"}
+          subtitle={isSuperAdmin ? "Histórico global" : "Tus reportes y consultas"}
         />
         <KpiCard
           title="Abiertos (Pendientes)"
@@ -216,10 +217,12 @@ export const SupportView: React.FC = () => {
           </Button>
         </div>
 
-        <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
-          <Plus size={16} style={{ marginRight: 6 }} />
-          Nuevo Reporte / Sugerencia
-        </Button>
+        {canReport && (
+          <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
+            <Plus size={16} style={{ marginRight: 6 }} />
+            Nuevo Reporte / Sugerencia
+          </Button>
+        )}
       </div>
 
       {/* List of Tickets */}
@@ -237,10 +240,12 @@ export const SupportView: React.FC = () => {
               ? "No se encontraron tickets con los filtros seleccionados."
               : "Si experimentas algún fallo técnico, tienes una idea o necesitas asistencia con un equipo, crea un reporte aquí y el equipo te responderá de inmediato."}
           </p>
-          <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
-            <Plus size={16} style={{ marginRight: 6 }} />
-            Enviar mi primer reporte
-          </Button>
+          {canReport && (
+            <Button variant="primary" onClick={() => setCreateModalOpen(true)}>
+              <Plus size={16} style={{ marginRight: 6 }} />
+              Enviar mi primer reporte
+            </Button>
+          )}
         </div>
       ) : (
         <div className="q-support-ticket-list">
@@ -269,7 +274,7 @@ export const SupportView: React.FC = () => {
                     </span>
                   </div>
 
-                  {isAdmin && (
+                  {isSuperAdmin && (
                     <Button variant="outline" size="sm" onClick={() => handleOpenResponseModal(ticket)}>
                       {ticket.admin_response ? "Editar Respuesta / Estado" : "Responder al Cliente"}
                     </Button>
