@@ -156,14 +156,14 @@ function resolveCoordinates(device: Device, index: number): NodeGeoData {
     };
   }
 
-  // DESKTOP-V99OT5O -> San Miguel
+  // DESKTOP-V99OT5O -> Los Olivos (Laptop Móvil)
   if (host.includes("desktop") || host.includes("v99")) {
     return {
       device,
-      lat: -12.0772,
-      lng: -77.0867,
-      city: "San Miguel, Lima",
-      region: "Estación de Trabajo TI (San Miguel)",
+      lat: -11.9611,
+      lng: -77.0706,
+      city: "Los Olivos, Lima",
+      region: "Estación Laptop TI (Los Olivos)",
     };
   }
 
