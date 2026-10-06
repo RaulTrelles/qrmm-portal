@@ -17,6 +17,7 @@ import {
   Terminal,
 } from "lucide-react";
 import { copyToClipboard } from "../utils/clipboard";
+import "../components/DataTable/DataTable.css";
 import "./ClientsView.css";
 
 interface ClientsViewProps {
