@@ -32,14 +32,14 @@ interface NodeGeoData {
   isDatacenterHub?: boolean;
 }
 
-// Map styles (100% Free, No API Keys, Zero Cost to Client/Solution)
+// Capas de mapas 100% Públicas y Gratuitas (Sin API Key, Sin Marcas de Agua, $0 Costo)
 const TILE_LAYERS = {
   commercial: {
     name: "Comercial Pro",
-    url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-    subdomains: "abcd",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+    subdomains: "",
     maxZoom: 19,
-    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap',
+    attribution: "&copy; Esri &copy; OpenStreetMap",
   },
   satellite: {
     name: "Satelital HD",
@@ -50,10 +50,10 @@ const TILE_LAYERS = {
   },
   nocDark: {
     name: "NOC Dark",
-    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-    subdomains: "abcd",
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap',
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+    subdomains: "",
+    maxZoom: 16,
+    attribution: "&copy; Esri &copy; HERE, Garmin",
   },
 };
 
