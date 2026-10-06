@@ -293,7 +293,18 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
     polylinesLayerRef.current = L.layerGroup().addTo(map);
     mapInstanceRef.current = map;
 
+    // Auto-ajustar tiles al tamaño expandido del contenedor y cambios de viewport
+    const resizeObserver = new ResizeObserver(() => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.invalidateSize();
+      }
+    });
+    if (mapContainerRef.current) {
+      resizeObserver.observe(mapContainerRef.current);
+    }
+
     return () => {
+      resizeObserver.disconnect();
       map.remove();
       mapInstanceRef.current = null;
     };

@@ -26,6 +26,30 @@ button, input, select, textarea {
   line-height: inherit;
 }
 
+/* Accessible Select & Option Contrast (WCAG 2.2 AA compliant in Light and Dark mode) */
+select {
+  background-color: var(--color-surface-default);
+  color: var(--color-text-primary);
+}
+
+select option {
+  background-color: var(--color-surface-default);
+  color: var(--color-text-primary);
+  padding: 6px 10px;
+}
+
+[data-theme="dark"] select,
+[data-theme="dark"] select option {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="light"] select,
+[data-theme="light"] select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
 a {
   color: var(--color-text-link);
   text-decoration: none;
