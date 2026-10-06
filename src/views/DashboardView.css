@@ -962,6 +962,15 @@
   align-items: start;
 }
 
+.q-it-operations-grid--fullwidth {
+  display: block;
+  width: 100%;
+}
+
+.q-it-operations-grid--fullwidth .q-it-right-stack {
+  width: 100%;
+}
+
 .q-it-panel {
   background-color: var(--color-surface-default);
   border: 1px solid var(--color-border-default);

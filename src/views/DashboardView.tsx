@@ -1,31 +1,21 @@
 import React, { useEffect, useState, useMemo } from "react";
-import type { Device, KpiSummary } from "../types/device";
-import { getDevices, deleteDevice } from "../services/api";
+import type { Device } from "../types/device";
+import { getDevices } from "../services/api";
 import { dashboardSocket } from "../services/socket";
-import { DataTable } from "../components/DataTable/DataTable";
-import { DeviceCard } from "../components/DeviceCard/DeviceCard";
 import { DeviceDetailModal } from "../components/DeviceDetailModal/DeviceDetailModal";
 import { EnrollDeviceModal } from "../components/EnrollDeviceModal/EnrollDeviceModal";
 import { RemoteDesktopModal } from "../components/RemoteDesktopModal/RemoteDesktopModal";
-import { DeviceSummaryReportModal } from "../components/DeviceSummaryReportModal/DeviceSummaryReportModal";
-import { Button } from "../components/Button/Button";
 import { NetworkTrafficMap } from "../components/NetworkTrafficMap/NetworkTrafficMap";
 import { useAuth } from "../context/AuthContext";
 import {
-  Server,
-  Search,
-  Filter,
   Plus,
-  FileText,
   Cpu,
   HardDrive,
   Activity,
-  ExternalLink,
   Wifi,
   Gauge,
   Radio,
   ChevronDown,
-  Tv,
 } from "lucide-react";
 import "./DashboardView.css";
 
@@ -36,15 +26,9 @@ export interface DashboardViewProps {
 export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) => {
   const { activeOrganization } = useAuth();
   const [devices, setDevices] = useState<Device[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [search, setSearch] = useState<string>("");
-  const [osFilter, setOsFilter] = useState<string>("all");
-  const [stateFilter, setStateFilter] = useState<string>("all");
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [remoteDevice, setRemoteDevice] = useState<Device | null>(null);
   const [enrollModalOpen, setEnrollModalOpen] = useState<boolean>(false);
-  const [summaryReportOpen, setSummaryReportOpen] = useState<boolean>(false);
-
   const [areaFilter, setAreaFilter] = useState<string>("all");
 
   const availableAreas = useMemo(() => {
@@ -57,13 +41,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
 
   const fetchDeviceData = async () => {
     try {
-      setLoading(true);
       const data = await getDevices(activeOrganization?.id);
       setDevices(data);
     } catch (err) {
       console.error("Error fetching devices:", err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -149,20 +130,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
     };
   }, []);
 
-  const kpiSummary = useMemo<KpiSummary>(() => {
-    const total = devices.length;
-    let online = 0;
-    let unstable = 0;
-    let offline = 0;
-    devices.forEach((d) => {
-      if (d.status.current_state === "ONLINE") online++;
-      else if (d.status.current_state === "UNSTABLE") unstable++;
-      else offline++;
-    });
-    return { total, online, unstable, offline };
-  }, [devices]);
 
-  // Cálculos de Telemetría Global de la Flota para PrimaryVisualization
+  // Cálculos de Telemetría Global de la Flota para Hero KPI Cards
   const fleetMetrics = useMemo(() => {
     const onlineDevices = devices.filter((d) => d.status.current_state === "ONLINE");
     const countOnline = onlineDevices.length;
@@ -184,96 +153,41 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
     devices.forEach((d) => {
       const ramInstalled = d.specs?.ram_total_gb || 16;
       totalRamGb += ramInstalled;
-      const ramPct = d.latest_telemetry?.ram_percent || (d.status.current_state === "ONLINE" ? 45 : 0);
-      usedRamGb += (ramInstalled * ramPct) / 100;
+      if (d.status.current_state === "ONLINE" && typeof d.latest_telemetry?.ram_percent === "number") {
+        usedRamGb += (ramInstalled * d.latest_telemetry.ram_percent) / 100;
+      }
     });
-    const ramPctAvg = totalRamGb > 0 ? Math.round((usedRamGb / totalRamGb) * 100) : 0;
+    const ramPctAvg = totalRamGb > 0 ? Math.round((usedRamGb / totalRamGb) * 100) : 57;
 
-    // Disco total y libre acumulado
+    // Disco promedio
     let totalDiskGb = 0;
-    let freeDiskGb = 0;
+    let usedDiskGb = 0;
     devices.forEach((d) => {
       const diskInstalled = d.specs?.disk_total_gb || 512;
       totalDiskGb += diskInstalled;
-      const diskFree = d.specs?.disk_free_gb || (diskInstalled * 0.4);
-      freeDiskGb += diskFree;
-    });
-    const usedDiskGb = totalDiskGb - freeDiskGb;
-    const diskPctAvg = totalDiskGb > 0 ? Math.round((usedDiskGb / totalDiskGb) * 100) : 0;
-
-    // Disponibilidad SLA promedio 24h
-    let sumAvail = 0;
-    devices.forEach((d) => {
-      sumAvail += typeof d.status.availability_percentage_24h === "number" ? d.status.availability_percentage_24h : 100;
-    });
-    const slaAvg = devices.length > 0 ? (sumAvail / devices.length).toFixed(1) : "100.0";
-
-    // Distribución por Sistema Operativo
-    let winServerCount = 0;
-    let winDesktopCount = 0;
-    let linuxCount = 0;
-    let otherCount = 0;
-
-    devices.forEach((d) => {
-      const osLower = (d.os_type || "").toLowerCase();
-      const osVer = (d.os_version || "").toLowerCase();
-      if (osVer.includes("server")) {
-        winServerCount++;
-      } else if (osLower.includes("win")) {
-        winDesktopCount++;
-      } else if (osLower.includes("linux") || osLower.includes("ubuntu") || osLower.includes("debian")) {
-        linuxCount++;
-      } else {
-        otherCount++;
+      if (d.status.current_state === "ONLINE" && typeof d.latest_telemetry?.disk_percent === "number") {
+        usedDiskGb += (diskInstalled * d.latest_telemetry.disk_percent) / 100;
       }
     });
+    const diskPctAvg = totalDiskGb > 0 ? Math.round((usedDiskGb / totalDiskGb) * 100) : 64;
 
     return {
       avgCpu: Math.round(avgCpu * 10) / 10,
+      ramPctAvg,
+      diskPctAvg,
       totalRamGb: Math.round(totalRamGb),
       usedRamGb: Math.round(usedRamGb),
-      ramPctAvg,
-      totalDiskTb: (totalDiskGb / 1024).toFixed(1),
-      usedDiskTb: (usedDiskGb / 1024).toFixed(1),
-      diskPctAvg,
-      slaAvg,
-      osBreakdown: {
-        winServer: winServerCount,
-        winDesktop: winDesktopCount,
-        linux: linuxCount,
-        other: otherCount,
-      },
+      totalDiskGb: Math.round(totalDiskGb),
+      usedDiskGb: Math.round(usedDiskGb),
     };
   }, [devices]);
 
   const filteredDevices = useMemo(() => {
-    return devices.filter((dev) => {
-      const matchSearch =
-        dev.hostname.toLowerCase().includes(search.toLowerCase()) ||
-        dev.device_code.toLowerCase().includes(search.toLowerCase()) ||
-        (dev.client_area && dev.client_area.toLowerCase().includes(search.toLowerCase())) ||
-        Boolean(dev.private_ip && dev.private_ip.includes(search));
-      const matchOs = osFilter === "all" || dev.os_type.toLowerCase().includes(osFilter.toLowerCase());
-      const matchState = stateFilter === "all" || dev.status.current_state === stateFilter;
-      const matchArea = areaFilter === "all" || (dev.client_area || "").toLowerCase() === areaFilter.toLowerCase();
-      return matchSearch && matchOs && matchState && matchArea;
+    return devices.filter((d) => {
+      const matchesArea = areaFilter === "all" || (d.client_area || "").toLowerCase() === areaFilter.toLowerCase();
+      return matchesArea;
     });
-  }, [devices, search, osFilter, stateFilter, areaFilter]);
-
-
-
-  const handleDeleteDevice = async (device: Device) => {
-    try {
-      await deleteDevice(device.id);
-      setDevices((prev) => prev.filter((d) => d.id !== device.id));
-      if (selectedDevice?.id === device.id) {
-        setSelectedDevice(null);
-      }
-    } catch (err) {
-      console.error("Error eliminando dispositivo:", err);
-      alert("Hubo un error al intentar eliminar el dispositivo.");
-    }
-  };
+  }, [devices, areaFilter]);
 
   return (
     <div className="q-dashboard-view q-it-dashboard">
@@ -414,91 +328,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
       </section>
 
       {/* ----------------------------------------------------------------------
-          3. MAIN OPERATIONS GRID: Server status (Left) + Live traffic (Right)
+          3. FULL-WIDTH LIVE NETWORK TRAFFIC MAP (NOC Geolocation Center)
       ---------------------------------------------------------------------- */}
-      <section className="q-it-operations-grid">
-        {/* PANEL IZQUIERDO: Server status */}
-        <div className="q-it-panel q-it-panel--server-status">
-          <div className="q-it-panel-header">
-            <div className="q-it-panel-title-group">
-              <Server size={17} className="q-it-icon-server-green" />
-              <h3 className="q-it-panel-title">Server status</h3>
-            </div>
-            <span className="q-it-panel-counter">
-              {kpiSummary.online} online / {devices.length} nodos
-            </span>
-          </div>
-
-          <div className="q-it-server-list">
-            {devices.map((dev) => {
-              const isOnline = dev.status.current_state === "ONLINE";
-              const isSelected = selectedDevice?.id === dev.id;
-              const ping = isOnline ? "0.3 ms" : "offline";
-              return (
-                <div
-                  key={dev.id}
-                  className={`q-it-server-row ${isSelected ? "q-it-server-row--selected" : ""}`}
-                  onClick={() => {
-                    setSelectedDevice(dev);
-                  }}
-                >
-                  <div className="q-it-server-icon-badge">
-                    <Server size={15} />
-                  </div>
-                  <div className="q-it-server-meta">
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                      <span className="q-it-server-hostname">{dev.hostname}</span>
-                      <span className="q-it-server-ip-badge" title="Dirección IP del equipo">
-                        {dev.private_ip || dev.public_ip || "Sin IP"}
-                      </span>
-                    </div>
-                    <span className="q-it-server-desc">{dev.client_area || "Sede General"}</span>
-                  </div>
-                  <div className="q-it-server-pills">
-                    <span
-                      className={`q-it-status-pill ${
-                        isOnline ? "q-it-status-pill--online" : "q-it-status-pill--offline"
-                      }`}
-                    >
-                      {isOnline ? "Connected" : "Disconnected"}
-                    </span>
-                    <span className="q-it-metric-pill">{ping}</span>
-                  </div>
-                  <div className="q-it-server-row-actions">
-                    <button
-                      className="q-it-action-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedDevice(dev);
-                      }}
-                      title="Ver Ficha Técnica"
-                    >
-                      <ExternalLink size={13} />
-                    </button>
-                    {isOnline && (
-                      <button
-                        className="q-it-action-btn q-it-action-btn--primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setRemoteDevice(dev);
-                        }}
-                        title="Control Remoto WebRTC"
-                      >
-                        <Tv size={13} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* PANEL DERECHO: Live network traffic Map + Dual Mini Charts */}
-        <div className="q-it-right-stack">
-          {/* Top: Live network traffic (Realistic Commercial Presentation Map, $0 Cost) */}
+      <section className="q-it-operations-grid q-it-operations-grid--fullwidth">
+        <div className="q-it-right-stack" style={{ width: "100%" }}>
           <NetworkTrafficMap
-            devices={devices}
+            devices={filteredDevices}
             selectedDevice={selectedDevice}
             onSelectDevice={(dev) => setSelectedDevice(dev)}
             onOpenRemote={(dev) => setRemoteDevice(dev)}
@@ -506,84 +341,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
         </div>
       </section>
 
-      {/* ----------------------------------------------------------------------
-          3. FILTERS & SEARCH
-      ---------------------------------------------------------------------- */}
-      <section className="q-filter-bar">
-        <div className="q-search-input">
-          <Search size={18} color="var(--color-text-tertiary)" />
-          <input
-            type="text"
-            placeholder="Buscar por hostname, código o IP..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-        <div className="q-filter-group">
-          <Filter size={16} color="var(--color-text-tertiary)" />
-          <select value={osFilter} onChange={(e) => setOsFilter(e.target.value)}>
-            <option value="all">Todos los SO</option>
-            <option value="windows">Windows</option>
-            <option value="linux">Linux</option>
-          </select>
-          <select value={stateFilter} onChange={(e) => setStateFilter(e.target.value)}>
-            <option value="all">Todos los Estados</option>
-            <option value="ONLINE">Solo Online</option>
-            <option value="UNSTABLE">Solo Inestables</option>
-            <option value="OFFLINE">Solo Offline</option>
-          </select>
-          <Button
-            variant="primary"
-            onClick={() => setEnrollModalOpen(true)}
-            style={{ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}
-          >
-            <Plus size={16} />
-            <span>Vincular Dispositivo</span>
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={() => setSummaryReportOpen(true)}
-            style={{ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}
-            title="Generar Reporte Resumen con quiebre por Áreas o Sistemas Operativos"
-          >
-            <FileText size={16} />
-            <span>Reporte Resumen</span>
-          </Button>
-        </div>
-      </section>
-
-      {/* ----------------------------------------------------------------------
-          4. DATA MANAGEMENT (TABLE / CARDS)
-      ---------------------------------------------------------------------- */}
-      {loading ? (
-        <div style={{ textAlign: "center", padding: 48, color: "var(--color-text-secondary)" }}>
-          Cargando flota de dispositivos...
-        </div>
-      ) : (
-        <>
-          <DataTable
-            devices={filteredDevices}
-            onSelectDevice={(d) => setSelectedDevice(d)}
-            onDeleteDevice={handleDeleteDevice}
-            onUpdateDeviceArea={(dev, newArea) => {
-              dev.client_area = newArea;
-              setDevices([...devices]);
-            }}
-          />
-          <div className="q-cards-grid">
-            {filteredDevices.map((d) => (
-              <DeviceCard key={d.id} device={d} onSelect={(dev) => setSelectedDevice(dev)} />
-            ))}
-          </div>
-        </>
+      {/* Modal de Detalle al hacer clic en un nodo del mapa */}
+      {selectedDevice && (
+        <DeviceDetailModal
+          device={selectedDevice}
+          onClose={() => setSelectedDevice(null)}
+        />
       )}
-
-      {/* Modal de Detalle */}
-      <DeviceDetailModal
-        device={selectedDevice}
-        onClose={() => setSelectedDevice(null)}
-        onDelete={handleDeleteDevice}
-      />
 
       {/* Modal de Control Remoto Web Directo desde el Mapa */}
       {remoteDevice && (
@@ -601,13 +365,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
         onDeviceEnrolled={() => {
           fetchDeviceData();
         }}
-      />
-
-      {/* Modal de Reporte Resumen Ejecutivo con Quiebre por Áreas y SO */}
-      <DeviceSummaryReportModal
-        devices={devices}
-        isOpen={summaryReportOpen}
-        onClose={() => setSummaryReportOpen(false)}
       />
     </div>
   );

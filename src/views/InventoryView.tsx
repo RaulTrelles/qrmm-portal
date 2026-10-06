@@ -7,6 +7,7 @@ import { Button } from "../components/Button/Button";
 import { DeviceDetailModal } from "../components/DeviceDetailModal/DeviceDetailModal";
 import { EnrollDeviceModal } from "../components/EnrollDeviceModal/EnrollDeviceModal";
 import { InventoryReportModal } from "../components/InventoryReportModal/InventoryReportModal";
+import { DeviceSummaryReportModal } from "../components/DeviceSummaryReportModal/DeviceSummaryReportModal";
 import { useAuth } from "../context/AuthContext";
 import {
   Server,
@@ -20,6 +21,9 @@ import {
   FileText,
   Tag,
   Edit2,
+  Trash2,
+  AlertTriangle,
+  X,
 } from "lucide-react";
 import { getClientAreas, updateDeviceArea } from "../services/api";
 import "./InventoryView.css";
@@ -41,6 +45,12 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [enrollModalOpen, setEnrollModalOpen] = useState<boolean>(false);
   const [reportModalOpen, setReportModalOpen] = useState<boolean>(false);
+  const [summaryReportOpen, setSummaryReportOpen] = useState<boolean>(false);
+
+  // Modal para Retirar Equipo
+  const [deviceToRetire, setDeviceToRetire] = useState<Device | null>(null);
+  const [retireModalOpen, setRetireModalOpen] = useState<boolean>(false);
+  const [isRetiring, setIsRetiring] = useState<boolean>(false);
 
   const fetchDevices = async () => {
     try {
@@ -273,13 +283,40 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
         </div>
 
         <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+          {/* Botón Reporte Resumen trasladado desde el Dashboard */}
+          <Button
+            variant="secondary"
+            onClick={() => setSummaryReportOpen(true)}
+            style={{ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}
+            title="Generar Reporte Resumen con quiebre por Áreas o Sistemas Operativos"
+          >
+            <FileText size={15} color="var(--color-brand-primary)" />
+            Reporte Resumen
+          </Button>
+
+          {/* Botón Retirar Equipo */}
+          <Button
+            variant="danger"
+            onClick={() => {
+              if (devices.length > 0) {
+                setDeviceToRetire(devices[0]);
+              }
+              setRetireModalOpen(true);
+            }}
+            style={{ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}
+            title="Retirar o desvincular un equipo de la flota"
+          >
+            <Trash2 size={15} />
+            Retirar Equipo
+          </Button>
+
           <Button
             variant="secondary"
             onClick={() => setReportModalOpen(true)}
             style={{ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}
           >
-            <FileText size={15} color="var(--color-brand-primary)" />
-            Informe Técnico Ejecutivo (PDF)
+            <FileText size={15} />
+            Informe Técnico (PDF)
           </Button>
           <button className="q-export-btn" onClick={handleExportCSV}>
             <Download size={15} />
@@ -352,7 +389,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>Filtrar SO:</span>
+          <span style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>Sistema:</span>
           <select
             value={osFilter}
             onChange={(e) => setOsFilter(e.target.value)}
@@ -365,7 +402,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
               fontSize: 13,
             }}
           >
-            <option value="all">Todos los SO</option>
+            <option value="all">Todos los Sistemas</option>
             <option value="windows">Windows</option>
             <option value="linux">Linux</option>
           </select>
@@ -409,7 +446,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
               <th>Sistema Operativo</th>
               <th>Dirección IP</th>
               <th>Agente</th>
-              <th>Acción</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -452,29 +489,26 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
                             ))}
                           </select>
                         ) : (
-                          <button
-                            type="button"
+                          <div
                             className="q-table-area-badge"
                             onClick={() => setEditingAreaDeviceId(d.id)}
-                            title="Haz clic para cambiar Área / Cliente"
+                            title="Haz clic para reasignar área"
                           >
-                            <Tag size={12} style={{ opacity: 0.7 }} />
-                            <span>{d.client_area || "General"}</span>
-                            <Edit2 size={11} className="q-table-area-edit-icon" />
-                          </button>
+                            <Tag size={11} />
+                            <span>{d.client_area || "Sin Asignar"}</span>
+                            <Edit2 size={10} className="q-table-area-edit-icon" />
+                          </div>
                         )}
                       </div>
                     </td>
                     <td>
                       <Badge variant={isOnline ? "success" : "danger"} pulse={isOnline}>
-                        {d.status?.current_state || "UNKNOWN"}
+                        {d.status?.current_state || "OFFLINE"}
                       </Badge>
                     </td>
                     <td>
-                      <div style={{ fontWeight: 500 }}>{d.specs?.cpu_model || "N/A"}</div>
-                      <div className="q-asset-meta">
-                        {d.specs?.cpu_cores ? `${d.specs.cpu_cores} Núcleos` : ""} {d.specs?.cpu_mhz ? `@ ${(d.specs.cpu_mhz / 1000).toFixed(2)} GHz` : ""}
-                      </div>
+                      <div style={{ fontWeight: 500 }}>{d.specs?.cpu_model || "Genérico"}</div>
+                      <div className="q-asset-meta">{d.specs?.cpu_cores ? `${d.specs.cpu_cores} núcleos` : ""}</div>
                     </td>
                     <td>
                       <div style={{ fontWeight: 500 }}>{d.specs?.ram_total_gb ? `${d.specs.ram_total_gb} GB` : "N/A"}</div>
@@ -500,24 +534,50 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
                       <span className="q-asset-meta">{d.agent_version || "1.0.0"}</span>
                     </td>
                     <td>
-                      <button
-                        onClick={() => setSelectedDevice(d)}
-                        style={{
-                          background: "transparent",
-                          border: "1px solid var(--color-border-default)",
-                          color: "var(--color-brand-primary)",
-                          borderRadius: "var(--radius-sm)",
-                          padding: "5px 10px",
-                          fontSize: 12,
-                          cursor: "pointer",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: 4,
-                          fontWeight: 500,
-                        }}
-                      >
-                        <ExternalLink size={12} /> Detalle
-                      </button>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <button
+                          onClick={() => setSelectedDevice(d)}
+                          style={{
+                            background: "transparent",
+                            border: "1px solid var(--color-border-default)",
+                            color: "var(--color-brand-primary)",
+                            borderRadius: "var(--radius-sm)",
+                            padding: "5px 10px",
+                            fontSize: 12,
+                            cursor: "pointer",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4,
+                            fontWeight: 500,
+                          }}
+                          title="Ver Ficha Técnica"
+                        >
+                          <ExternalLink size={12} /> Detalle
+                        </button>
+                        <button
+                          onClick={() => {
+                            setDeviceToRetire(d);
+                            setRetireModalOpen(true);
+                          }}
+                          style={{
+                            background: "rgba(239, 68, 68, 0.08)",
+                            border: "1px solid rgba(239, 68, 68, 0.25)",
+                            color: "#ef4444",
+                            borderRadius: "var(--radius-sm)",
+                            padding: "5px 10px",
+                            fontSize: 12,
+                            cursor: "pointer",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4,
+                            fontWeight: 600,
+                            transition: "all var(--motion-fast)",
+                          }}
+                          title="Retirar o desvincular este equipo"
+                        >
+                          <Trash2 size={12} /> Retirar
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -536,6 +596,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
         />
       )}
 
+      {/* Modal de Vinculación */}
       <EnrollDeviceModal
         isOpen={enrollModalOpen}
         onClose={() => setEnrollModalOpen(false)}
@@ -544,11 +605,161 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
         }}
       />
 
+      {/* Modal de Reporte Técnico Ejecutivo (PDF) */}
       {reportModalOpen && (
         <InventoryReportModal
           devices={devices}
           onClose={() => setReportModalOpen(false)}
         />
+      )}
+
+      {/* Modal de Reporte Resumen Ejecutivo trasladado desde Dashboard */}
+      <DeviceSummaryReportModal
+        devices={devices}
+        isOpen={summaryReportOpen}
+        onClose={() => setSummaryReportOpen(false)}
+      />
+
+      {/* Modal de Retiro / Desvinculación de Equipo */}
+      {retireModalOpen && (
+        <div
+          className="q-checkout-modal-overlay"
+          onClick={() => !isRetiring && setRetireModalOpen(false)}
+        >
+          <div
+            className="q-checkout-modal"
+            style={{ maxWidth: "500px" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="q-modal-close"
+              onClick={() => !isRetiring && setRetireModalOpen(false)}
+              disabled={isRetiring}
+            >
+              <X size={20} />
+            </button>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  background: "rgba(239, 68, 68, 0.12)",
+                  border: "1px solid rgba(239, 68, 68, 0.25)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#ef4444",
+                  flexShrink: 0,
+                }}
+              >
+                <AlertTriangle size={22} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "var(--color-text-primary)" }}>
+                  Retirar Equipo de la Flota
+                </h3>
+                <p style={{ margin: "2px 0 0", fontSize: 13, color: "var(--color-text-secondary)" }}>
+                  Confirmación de baja o desvinculación de activo
+                </p>
+              </div>
+            </div>
+
+            <div className="q-form-group" style={{ marginBottom: 16 }}>
+              <label className="q-form-label">Seleccionar Equipo a Retirar:</label>
+              <select
+                className="q-filter-select"
+                style={{ width: "100%" }}
+                value={deviceToRetire ? deviceToRetire.id : (devices[0]?.id || "")}
+                onChange={(e) => {
+                  const found = devices.find((d) => d.id === e.target.value);
+                  setDeviceToRetire(found || null);
+                }}
+                disabled={isRetiring}
+              >
+                {devices.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.hostname} — {d.device_code} ({d.client_area || "Sede General"})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {deviceToRetire && (
+              <div
+                style={{
+                  background: "var(--color-surface-hover)",
+                  borderRadius: 10,
+                  padding: 14,
+                  marginBottom: 16,
+                  border: "1px solid var(--color-border-default)",
+                  fontSize: 13,
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <span style={{ color: "var(--color-text-tertiary)" }}>Hostname:</span>
+                  <strong style={{ color: "var(--color-text-primary)" }}>{deviceToRetire.hostname}</strong>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <span style={{ color: "var(--color-text-tertiary)" }}>Código Activo:</span>
+                  <code style={{ color: "var(--color-brand-primary)" }}>{deviceToRetire.device_code}</code>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <span style={{ color: "var(--color-text-tertiary)" }}>IP:</span>
+                  <span>{deviceToRetire.private_ip || deviceToRetire.public_ip || "N/A"}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "var(--color-text-tertiary)" }}>Área / Sede:</span>
+                  <span>{deviceToRetire.client_area || "Sede General"}</span>
+                </div>
+              </div>
+            )}
+
+            <div
+              style={{
+                background: "rgba(239, 68, 68, 0.06)",
+                border: "1px solid rgba(239, 68, 68, 0.2)",
+                borderRadius: 8,
+                padding: "10px 14px",
+                marginBottom: 20,
+                fontSize: 12,
+                color: "var(--color-text-secondary)",
+                lineHeight: 1.5,
+              }}
+            >
+              ⚠️ <strong>Advertencia:</strong> Esta acción revocará de inmediato el token del agente del equipo y lo eliminará del inventario, mapa NOC y paneles de supervisión.
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+              <Button
+                variant="ghost"
+                disabled={isRetiring}
+                onClick={() => {
+                  setRetireModalOpen(false);
+                  setDeviceToRetire(null);
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="danger"
+                loading={isRetiring}
+                onClick={async () => {
+                  const target = deviceToRetire || devices[0];
+                  if (!target) return;
+                  setIsRetiring(true);
+                  await handleDeleteDevice(target);
+                  setIsRetiring(false);
+                  setRetireModalOpen(false);
+                  setDeviceToRetire(null);
+                }}
+              >
+                Confirmar y Retirar Equipo
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
