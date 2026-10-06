@@ -59,46 +59,129 @@ const TILE_LAYERS = {
 
 type TileLayerKey = keyof typeof TILE_LAYERS;
 
-// Realistic Coordinates in Metropolitan Lima / Callao Network
-const PRESET_COORDINATES: Array<{ lat: number; lng: number; city: string; region: string }> = [
-  { lat: -12.0464, lng: -77.0428, city: "Lima Centro", region: "Datacenter Central (Tier III)" },
-  { lat: -12.0565, lng: -77.1181, city: "Callao Puerto", region: "Hub Puerto & Distribución" },
-  { lat: -12.0967, lng: -77.0353, city: "San Isidro", region: "Sede Financiera Las Begonias" },
-  { lat: -12.1217, lng: -77.0298, city: "Miraflores", region: "Oficina Corporativa Larco" },
-  { lat: -12.1389, lng: -76.9944, city: "Surco", region: "Nodo IPN Fibra Óptica" },
-  { lat: -12.0264, lng: -76.9189, city: "Ate", region: "Sede Facturación & Logística" },
-  { lat: -11.9611, lng: -77.0706, city: "Los Olivos", region: "Hub Lima Cono Norte" },
-  { lat: -12.0772, lng: -77.0867, city: "San Miguel", region: "Sucursal Av. La Marina" },
-  { lat: -12.0833, lng: -76.9333, city: "La Molina", region: "Campus Tecnológico Este" },
-  { lat: -12.1633, lng: -77.0189, city: "Chorrillos", region: "Estación Terrena Sur" },
-];
+// Catálogo de Coordenadas Geográficas Oficiales (Lima Metropolitana y Callao)
+const DISTRICT_COORDINATES: Record<string, { lat: number; lng: number; city: string; region: string }> = {
+  callao: { lat: -12.0565, lng: -77.1181, city: "Callao", region: "Provincia Constitucional del Callao" },
+  san_isidro: { lat: -12.0967, lng: -77.0353, city: "San Isidro", region: "Centro Financiero Las Begonias" },
+  los_olivos: { lat: -11.9611, lng: -77.0706, city: "Los Olivos", region: "Cono Norte - Av. Antúnez de Mayolo" },
+  surco: { lat: -12.1389, lng: -76.9944, city: "Santiago de Surco", region: "Surco / Chacarilla del Estanque" },
+  san_miguel: { lat: -12.0772, lng: -77.0867, city: "San Miguel", region: "Av. La Marina / Circuito de Playas" },
+  miraflores: { lat: -12.1217, lng: -77.0298, city: "Miraflores", region: "Distrito Turístico y Comercial" },
+  ate: { lat: -12.0264, lng: -76.9189, city: "Ate", region: "Zona Industrial Lima Este" },
+  lima_centro: { lat: -12.0464, lng: -77.0428, city: "Cercado de Lima", region: "Centro Histórico / Corporativo" },
+  la_molina: { lat: -12.0833, lng: -76.9333, city: "La Molina", region: "Zona Residencial y Universitaria" },
+  chorrillos: { lat: -12.1633, lng: -77.0189, city: "Chorrillos", region: "Sede Costa Sur" },
+  independencia: { lat: -11.9936, lng: -77.0544, city: "Independencia", region: "MegaPlaza / Eje Panamericana Norte" },
+  san_borja: { lat: -12.0911, lng: -77.0019, city: "San Borja", region: "Javier Prado / Aviación" },
+  lince: { lat: -12.0833, lng: -77.0333, city: "Lince", region: "Arenales / Petit Thouars" },
+  jesus_maria: { lat: -12.0736, lng: -77.0478, city: "Jesús María", region: "Salaverry / San Felipe" },
+  magdalena: { lat: -12.0894, lng: -77.0708, city: "Magdalena del Mar", region: "Brasil / Sucre" },
+  pueblo_libre: { lat: -12.0786, lng: -77.0658, city: "Pueblo Libre", region: "Sucre / La Marina" },
+};
 
 function resolveCoordinates(device: Device, index: number): NodeGeoData {
-  const host = (device.hostname || "").toLowerCase();
-  const area = (device.client_area || "").toLowerCase();
+  const host = (device.hostname || "").toLowerCase().trim();
+  const area = (device.client_area || "").toLowerCase().trim();
 
-  if (host.includes("kraken") || area.includes("kraken")) {
-    return { device, lat: -12.0464, lng: -77.0428, city: "Lima Centro", region: "Datacenter Central (Tier III)", isDatacenterHub: true };
-  }
-  if (host.includes("factura") || area.includes("factura")) {
-    return { device, lat: -12.0264, lng: -76.9189, city: "Ate, Lima Este", region: "Sede Facturación & Logística" };
-  }
-  if (host.includes("concar") || area.includes("concar")) {
-    return { device, lat: -12.0967, lng: -77.0353, city: "San Isidro, Lima", region: "Sede Financiera Las Begonias" };
-  }
-  if (host.includes("finanza") || area.includes("finanza")) {
-    return { device, lat: -12.1217, lng: -77.0298, city: "Miraflores, Lima", region: "Oficina Corporativa Larco" };
-  }
-  if (host.includes("ipn") || area.includes("fibra")) {
-    return { device, lat: -12.1389, lng: -76.9944, city: "Surco, Lima", region: "Nodo IPN Fibra Óptica" };
-  }
-  if (host.includes("desktop") || host.includes("v99") || area.includes("callao")) {
-    return { device, lat: -12.0565, lng: -77.1181, city: "Callao, Lima", region: "Hub Puerto & Distribución" };
+  // 1. Coordenadas explícitas si vienen en specs (latitud/longitud directas de GPS)
+  if (device.specs && (device.specs as any).latitude && (device.specs as any).longitude) {
+    const lat = Number((device.specs as any).latitude);
+    const lng = Number((device.specs as any).longitude);
+    if (!isNaN(lat) && !isNaN(lng)) {
+      return { device, lat, lng, city: device.client_area || "Ubicación Personalizada", region: "Coordenadas GPS fijadas" };
+    }
   }
 
-  // Fallback to preset spots with safe modulo
-  const coord = PRESET_COORDINATES[Math.abs(index) % PRESET_COORDINATES.length];
-  return { device, ...coord };
+  // 2. Mapeo explícito por equipo especificado por el usuario:
+  // SRVKRAKEN -> Callao (Hub Principal)
+  if (host.includes("kraken") && !host.includes("factura")) {
+    return {
+      device,
+      lat: -12.0565,
+      lng: -77.1181,
+      city: "Callao",
+      region: "Sede Central Kraken (Callao)",
+      isDatacenterHub: true,
+    };
+  }
+
+  // FacturadorII -> Callao (Nodo Facturación, con micro-offset para visualización independiente)
+  if (host.includes("factura")) {
+    return {
+      device,
+      lat: -12.0515,
+      lng: -77.1285,
+      city: "Callao",
+      region: "Nodo Facturación Kraken (Callao)",
+    };
+  }
+
+  // IPN -> San Isidro
+  if (host.includes("ipn")) {
+    return {
+      device,
+      lat: -12.0967,
+      lng: -77.0353,
+      city: "San Isidro, Lima",
+      region: "Sede Corporativa IPN (San Isidro)",
+    };
+  }
+
+  // finanzasadm -> Los Olivos
+  if (host.includes("finanza")) {
+    return {
+      device,
+      lat: -11.9611,
+      lng: -77.0706,
+      city: "Los Olivos, Lima",
+      region: "Sede Administrativa y Finanzas (Los Olivos)",
+    };
+  }
+
+  // concar -> Surco
+  if (host.includes("concar") || area.includes("perkons")) {
+    return {
+      device,
+      lat: -12.1389,
+      lng: -76.9944,
+      city: "Santiago de Surco, Lima",
+      region: "Sede Operaciones Perkons (Surco)",
+    };
+  }
+
+  // DESKTOP-V99OT5O -> San Miguel
+  if (host.includes("desktop") || host.includes("v99")) {
+    return {
+      device,
+      lat: -12.0772,
+      lng: -77.0867,
+      city: "San Miguel, Lima",
+      region: "Estación de Trabajo TI (San Miguel)",
+    };
+  }
+
+  // 3. Resolución dinámica por Distrito declarado en Área o Hostname
+  const searchTarget = `${area} ${host}`;
+  if (searchTarget.includes("callao")) return { device, ...DISTRICT_COORDINATES.callao };
+  if (searchTarget.includes("isidro")) return { device, ...DISTRICT_COORDINATES.san_isidro };
+  if (searchTarget.includes("olivo")) return { device, ...DISTRICT_COORDINATES.los_olivos };
+  if (searchTarget.includes("surco")) return { device, ...DISTRICT_COORDINATES.surco };
+  if (searchTarget.includes("miguel")) return { device, ...DISTRICT_COORDINATES.san_miguel };
+  if (searchTarget.includes("miraflor")) return { device, ...DISTRICT_COORDINATES.miraflores };
+  if (searchTarget.includes("ate") || searchTarget.includes("vitarte")) return { device, ...DISTRICT_COORDINATES.ate };
+  if (searchTarget.includes("molina")) return { device, ...DISTRICT_COORDINATES.la_molina };
+  if (searchTarget.includes("chorrillo")) return { device, ...DISTRICT_COORDINATES.chorrillos };
+  if (searchTarget.includes("independencia")) return { device, ...DISTRICT_COORDINATES.independencia };
+  if (searchTarget.includes("borja")) return { device, ...DISTRICT_COORDINATES.san_borja };
+  if (searchTarget.includes("lince")) return { device, ...DISTRICT_COORDINATES.lince };
+  if (searchTarget.includes("maria") || searchTarget.includes("maría")) return { device, ...DISTRICT_COORDINATES.jesus_maria };
+  if (searchTarget.includes("magdalena")) return { device, ...DISTRICT_COORDINATES.magdalena };
+  if (searchTarget.includes("pueblo libre")) return { device, ...DISTRICT_COORDINATES.pueblo_libre };
+
+  // 4. Fallback determinista distribuido en Lima
+  const presets = Object.values(DISTRICT_COORDINATES);
+  const fallback = presets[Math.abs(index) % presets.length];
+  return { device, ...fallback };
 }
 
 export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
