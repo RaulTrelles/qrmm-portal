@@ -7,6 +7,7 @@ import { DeviceCard } from "../components/DeviceCard/DeviceCard";
 import { DeviceDetailModal } from "../components/DeviceDetailModal/DeviceDetailModal";
 import { EnrollDeviceModal } from "../components/EnrollDeviceModal/EnrollDeviceModal";
 import { RemoteDesktopModal } from "../components/RemoteDesktopModal/RemoteDesktopModal";
+import { DeviceSummaryReportModal } from "../components/DeviceSummaryReportModal/DeviceSummaryReportModal";
 import { Button } from "../components/Button/Button";
 import { NetworkTrafficMap } from "../components/NetworkTrafficMap/NetworkTrafficMap";
 import { useAuth } from "../context/AuthContext";
@@ -15,6 +16,7 @@ import {
   Search,
   Filter,
   Plus,
+  FileText,
   Cpu,
   HardDrive,
   Activity,
@@ -41,6 +43,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [remoteDevice, setRemoteDevice] = useState<Device | null>(null);
   const [enrollModalOpen, setEnrollModalOpen] = useState<boolean>(false);
+  const [summaryReportOpen, setSummaryReportOpen] = useState<boolean>(false);
 
   const [areaFilter, setAreaFilter] = useState<string>("all");
 
@@ -507,6 +510,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
             <Plus size={16} />
             <span>Vincular Dispositivo</span>
           </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setSummaryReportOpen(true)}
+            style={{ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}
+            title="Generar Reporte Resumen con quiebre por Áreas o Sistemas Operativos"
+          >
+            <FileText size={16} />
+            <span>Reporte Resumen</span>
+          </Button>
         </div>
       </section>
 
@@ -559,6 +571,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
         onDeviceEnrolled={() => {
           fetchDeviceData();
         }}
+      />
+
+      {/* Modal de Reporte Resumen Ejecutivo con Quiebre por Áreas y SO */}
+      <DeviceSummaryReportModal
+        devices={devices}
+        isOpen={summaryReportOpen}
+        onClose={() => setSummaryReportOpen(false)}
       />
     </div>
   );
