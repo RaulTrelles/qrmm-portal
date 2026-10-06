@@ -355,10 +355,51 @@ export const PRICING_CONFIG = {
     },
   },
   paymentMethods: [
-    { id: "CARD", name: "Tarjeta de Crédito / Débito Internacional", detail: "Visa, Mastercard, Amex" },
-    { id: "STRIPE", name: "Stripe Checkout", detail: "Pasarela global segura" },
-    { id: "WIRE", name: "Transferencia Bancaria B2B", detail: "Facturación para empresas" },
+    {
+      id: "LEMON_SQUEEZY",
+      name: "Lemon Squeezy (Tarjeta, PayPal, Apple Pay)",
+      detail: "Pasarela oficial con activación automática instantánea",
+    },
+    {
+      id: "WIRE",
+      name: "Transferencia Bancaria B2B",
+      detail: "Facturación para empresas (Emisión de factura y activación manual)",
+    },
   ],
+};
+
+// -----------------------------------------------------------------------------
+// MAPEO OFICIAL DE VARIANTES DE LEMON SQUEEZY (PRODUCCIÓN / TEST)
+// -----------------------------------------------------------------------------
+export const LEMON_SQUEEZY_VARIANTS: Record<string, { monthly: string; yearly: string }> = {
+  STARTER: { monthly: "2198401", yearly: "2198372" },
+  PRO: { monthly: "2211274", yearly: "2211285" },
+  BUSINESS: { monthly: "2211293", yearly: "2211291" },
+  CORPORATE: { monthly: "2211301", yearly: "2211297" },
+  ENTERPRISE: { monthly: "2211301", yearly: "2211297" },
+};
+
+export const LEMON_SQUEEZY_SLUGS: Record<string, { monthly: string; yearly: string }> = {
+  STARTER: {
+    monthly: "4e9df3bb-7ba0-4cd0-8ac2-effe131f2392",
+    yearly: "6cdcba8d-5322-4c8a-a614-b8af532cfa6a",
+  },
+  PRO: {
+    monthly: "83e0b5d2-1eff-4d6e-b99c-88b364a25c86",
+    yearly: "d910c7e0-8ce0-4428-9f30-3fc96c08a1f6",
+  },
+  BUSINESS: {
+    monthly: "f77629f0-9bcf-46be-8da3-d10a0956e6e3",
+    yearly: "7d7ed32c-28c3-47c9-8ff2-ad7c23c70615",
+  },
+  CORPORATE: {
+    monthly: "25fcada0-21b9-4c8d-bcd0-d11cff2c7ada",
+    yearly: "b4a6d957-4262-4557-aeb7-8164ec64b5b1",
+  },
+  ENTERPRISE: {
+    monthly: "25fcada0-21b9-4c8d-bcd0-d11cff2c7ada",
+    yearly: "b4a6d957-4262-4557-aeb7-8164ec64b5b1",
+  },
 };
 
 // -----------------------------------------------------------------------------

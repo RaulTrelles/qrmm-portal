@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { Button } from "../components/Button/Button";
 import { useAuth } from "../context/AuthContext";
-import { processCheckout, verifyPromoCode } from "../services/api";
+import { processCheckout, verifyPromoCode, getLemonSqueezyCheckoutUrl } from "../services/api";
 import type { PlanTier } from "../types/payment";
 import {
   PRICING_CONFIG,
@@ -32,6 +32,7 @@ import {
   FAQS_CONFIG,
   getMonthlyEquivalent,
   formatPrice,
+  LEMON_SQUEEZY_SLUGS,
 } from "../config/pricing";
 import "./PortalView.css";
 
@@ -60,7 +61,7 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly");
   const [selectedPlan, setSelectedPlan] = useState<PlanTier | null>(null);
   const [checkoutModalOpen, setCheckoutModalOpen] = useState<boolean>(false);
-  const [checkoutMethod, setCheckoutMethod] = useState<string>("CARD");
+  const [checkoutMethod, setCheckoutMethod] = useState<string>("LEMON_SQUEEZY");
   const [customerName, setCustomerName] = useState<string>(user?.full_name || "");
   const [customerEmail, setCustomerEmail] = useState<string>(user?.email || "");
   const [customerPassword, setCustomerPassword] = useState<string>("");
@@ -169,7 +170,36 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
         return;
       }
 
-      // Si es PRO o CORPORATIVO, se procesa la orden
+      // Si el método seleccionado es Lemon Squeezy, redirigir a la pasarela oficial
+      if (checkoutMethod === "LEMON_SQUEEZY") {
+        try {
+          const lsData = await getLemonSqueezyCheckoutUrl({
+            plan_tier: selectedPlan,
+            billing_cycle: billingCycle,
+            customer_email: customerEmail.trim(),
+            customer_name: customerName.trim() || customerEmail.split("@")[0],
+            organization_name: orgName.trim() || `${customerName || "Empresa"} Workspace`,
+          });
+
+          let checkoutUrl = lsData?.checkout_url;
+          const variantSlug = LEMON_SQUEEZY_SLUGS[selectedPlan]?.[billingCycle] || "83e0b5d2-1eff-4d6e-b99c-88b364a25c86";
+
+          // Si el backend en VPS aún no ha sido redeployado con las nuevas credenciales de Coolify o devuelve URLs incompletas
+          if (!checkoutUrl || checkoutUrl.includes("pro-yearly") || checkoutUrl.includes("pro-monthly") || checkoutUrl.includes("/buy/221") || checkoutUrl.includes("/buy/219")) {
+            checkoutUrl = `https://qrmm-qhapana.lemonsqueezy.com/buy/${variantSlug}?checkout[email]=${encodeURIComponent(customerEmail.trim())}&checkout[name]=${encodeURIComponent(customerName.trim() || customerEmail.split("@")[0])}&checkout[custom][org_name]=${encodeURIComponent(orgName.trim() || "Empresa")}&checkout[custom][plan_tier]=${selectedPlan}&checkout[custom][billing_cycle]=${billingCycle}&embed=1`;
+          }
+
+          window.location.href = checkoutUrl;
+          return;
+        } catch (lsErr: any) {
+          console.warn("Fallo al contactar endpoint de checkout, usando pasarela directa:", lsErr);
+          const variantSlug = LEMON_SQUEEZY_SLUGS[selectedPlan]?.[billingCycle] || "83e0b5d2-1eff-4d6e-b99c-88b364a25c86";
+          window.location.href = `https://qrmm-qhapana.lemonsqueezy.com/buy/${variantSlug}?checkout[email]=${encodeURIComponent(customerEmail.trim())}&checkout[name]=${encodeURIComponent(customerName.trim() || customerEmail.split("@")[0])}&checkout[custom][org_name]=${encodeURIComponent(orgName.trim() || "Empresa")}&checkout[custom][plan_tier]=${selectedPlan}&checkout[custom][billing_cycle]=${billingCycle}&embed=1`;
+          return;
+        }
+      }
+
+      // Si es Transferencia Bancaria B2B
       const amount = getCurrentPlanAmount(selectedPlan, billingCycle);
       const res = await processCheckout({
         full_name: customerName.trim() || customerEmail.split("@")[0],
@@ -1788,6 +1818,21 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
                             </option>
                           ))}
                         </select>
+                        <div className="q-checkout-method-hint">
+                          {checkoutMethod === "LEMON_SQUEEZY" ? (
+                            <span>
+                              {lang === "es"
+                                ? "🔒 Serás redirigido a la pasarela segura de Lemon Squeezy (MoR) para pagar con Tarjeta (Visa, Mastercard, Amex), Apple Pay o PayPal. Activación instantánea."
+                                : "🔒 You will be redirected to Lemon Squeezy (MoR) secure checkout to pay with Card, Apple Pay, or PayPal. Instant account activation."}
+                            </span>
+                          ) : (
+                            <span>
+                              {lang === "es"
+                                ? "🏦 Emitiremos una factura comercial para tu empresa con los datos de cuenta bancaria. Tu cuenta se activará al verificar el abono."
+                                : "🏦 We will issue a commercial invoice for your company with bank details. Account will be activated upon transfer receipt."}
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {/* Cupón de descuento */}
