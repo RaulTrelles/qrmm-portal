@@ -98,9 +98,9 @@ export const PRICING_CONFIG = {
       requiresPaymentMethod: false,
       featured: false,
       limits: {
-        maxDevices: 5,
-        deviceLabelEs: "Hasta 5 equipos",
-        deviceLabelEn: "Up to 5 endpoints",
+        maxDevices: 3,
+        deviceLabelEs: "Hasta 3 equipos",
+        deviceLabelEn: "Up to 3 endpoints",
         retentionDays: 1,
         multiClient: false,
         networkDiscovery: "basic" as const,
@@ -129,7 +129,7 @@ export const PRICING_CONFIG = {
         labelEn: "Save $10 per year",
       },
       featuresEs: [
-        "Hasta 5 equipos enrolados",
+        "Hasta 3 equipos enrolados",
         "Control remoto web desde navegador (sin visor)",
         "Acceso desatendido 24/7 con credenciales",
         "Telemetría básica en vivo (CPU, RAM, Disco)",
@@ -139,7 +139,7 @@ export const PRICING_CONFIG = {
         "Consola web centralizada",
       ],
       featuresEn: [
-        "Up to 5 enrolled endpoints",
+        "Up to 3 enrolled endpoints",
         "In-browser remote desktop (no local viewer)",
         "24/7 unattended access with credentials",
         "Live basic telemetry (CPU, RAM, Disk)",
@@ -648,14 +648,14 @@ export const FAQS_CONFIG: FaqItem[] = [
   {
     qEs: "¿Cuántos equipos puedo administrar?",
     qEn: "How many endpoints can I manage?",
-    aEs: "El plan Starter permite administrar hasta 5 equipos. El plan Profesional cubre hasta 50 equipos, el plan Business/MSP hasta 250 equipos y el plan Enterprise está diseñado para organizaciones con más de 250 equipos o flotas ilimitadas.",
-    aEn: "The Starter plan covers up to 5 endpoints. The Professional plan covers up to 50 endpoints, Business/MSP covers up to 250 endpoints, and Enterprise is tailored for 250+ endpoints or custom unlimited fleets.",
+    aEs: "El plan Starter permite administrar hasta 3 equipos. El plan Profesional cubre hasta 50 equipos, el plan Business/MSP hasta 250 equipos y el plan Enterprise está diseñado para organizaciones con más de 250 equipos o flotas ilimitadas.",
+    aEn: "The Starter plan covers up to 3 endpoints. The Professional plan covers up to 50 endpoints, Business/MSP covers up to 250 endpoints, and Enterprise is tailored for 250+ endpoints or custom unlimited fleets.",
   },
   {
     qEs: "¿Puedo usar QRMM gratis?",
     qEn: "Can I try QRMM for free?",
-    aEs: "Sí. Ofrecemos 14 días de prueba gratuita completa en el plan Starter (hasta 5 equipos) sin solicitar tarjeta de crédito. Después del periodo de prueba, puedes continuar con Starter por solo $5 USD/mes o actualizar a Profesional.",
-    aEn: "Yes. We offer a full 14-day free trial on the Starter plan (up to 5 endpoints) with no credit card required. After the trial, continue with Starter for just $5 USD/month or upgrade to Professional.",
+    aEs: "Sí. Ofrecemos 14 días de prueba gratuita completa en el plan Starter (hasta 3 equipos) sin solicitar tarjeta de crédito. Después del periodo de prueba, puedes continuar con Starter por solo $5 USD/mes o actualizar a Profesional.",
+    aEn: "Yes. We offer a full 14-day free trial on the Starter plan (up to 3 endpoints) with no credit card required. After the trial, continue with Starter for just $5 USD/month or upgrade to Professional.",
   },
   {
     qEs: "¿Puedo cambiar de mensual a anual?",

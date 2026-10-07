@@ -1068,7 +1068,7 @@ export const AdminFinOpsView: React.FC = () => {
                   value={overridePlanCode}
                   onChange={(e) => setOverridePlanCode(e.target.value)}
                 >
-                  <option value="starter">Starter (5 equipos)</option>
+                  <option value="starter">Starter (3 equipos)</option>
                   <option value="professional">Professional (25 equipos)</option>
                   <option value="business">Business (250 equipos)</option>
                   <option value="enterprise">Enterprise (Personalizado)</option>

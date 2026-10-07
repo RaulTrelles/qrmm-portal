@@ -427,8 +427,8 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
           <p className="q-portal-hero-microcopy">
             <ShieldCheck size={15} style={{ verticalAlign: "middle", marginRight: 6, color: "var(--portal-accent-teal)" }} />
             {lang === "es"
-              ? "Sin tarjeta de crédito requerida • Hasta 5 equipos gratis para siempre • Agente ligero (~8.5 MB)"
-              : "No credit card required • Up to 5 endpoints free forever • Lightweight agent (~8.5 MB)"}
+              ? "Sin tarjeta de crédito requerida • Hasta 3 equipos gratis para siempre • Agente ligero (~8.5 MB)"
+              : "No credit card required • Up to 3 endpoints free forever • Lightweight agent (~8.5 MB)"}
           </p>
         </div>
 
@@ -1585,7 +1585,7 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
                       <div>
                         <span className="q-checkout-main-price">$0 USD</span>
                         <span className="q-checkout-cycle-label">
-                          {lang === "es" ? "Gratis para siempre • Hasta 5 equipos" : "Free forever • Up to 5 endpoints"}
+                          {lang === "es" ? "Gratis para siempre • Hasta 3 equipos" : "Free forever • Up to 3 endpoints"}
                         </span>
                       </div>
                       <span className="q-checkout-badge-nocard">
