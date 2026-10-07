@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Cpu,
   CheckCircle2,
   Sparkles,
   X,
@@ -16,7 +15,6 @@ import {
   XCircle,
   Globe,
   ShieldCheck,
-  Network,
 } from "lucide-react";
 import { Button } from "../components/Button/Button";
 import { useAuth } from "../context/AuthContext";
