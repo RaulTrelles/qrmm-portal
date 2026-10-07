@@ -788,11 +788,11 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
                 <span>{lang === "es" ? "ANTES (HERRAMIENTAS DISPERSAS)" : "BEFORE (FRAGMENTED)"}</span>
               </div>
               <ul className="q-portal-diff-checklist">
-                <li>❌ Licencia de acceso remoto por usuario/sesión</li>
-                <li>❌ Plataforma RMM separada con cobro por equipo</li>
-                <li>❌ Software adicional para escanear redes LAN</li>
-                <li>❌ 3 agentes diferentes instalados en cada equipo</li>
-                <li>❌ Múltiples contraseñas y facturas dispersas</li>
+                <li>❌ {lang === "es" ? "Licencia de acceso remoto por usuario/sesión" : "Per-user/session remote access license"}</li>
+                <li>❌ {lang === "es" ? "Plataforma RMM separada con cobro por equipo" : "Separate RMM platform with per-endpoint pricing"}</li>
+                <li>❌ {lang === "es" ? "Software adicional para escanear redes LAN" : "Additional software to scan LAN networks"}</li>
+                <li>❌ {lang === "es" ? "3 agentes diferentes instalados en cada equipo" : "3 different agents installed on each endpoint"}</li>
+                <li>❌ {lang === "es" ? "Múltiples contraseñas y facturas dispersas" : "Multiple passwords and scattered invoices"}</li>
               </ul>
             </div>
 
@@ -802,11 +802,11 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
                 <span>{lang === "es" ? "AHORA (QRMM UNIFICADO)" : "NOW (UNIFIED QRMM)"}</span>
               </div>
               <ul className="q-portal-diff-checklist">
-                <li>✔ Remote Desktop web sin visor local instalado</li>
-                <li>✔ Telemetría RMM continua y alertas de salud</li>
-                <li>✔ Sonda de red LAN (Network Discovery) integrada</li>
-                <li>✔ Un solo agente ultra ligero (~8.5 MB)</li>
-                <li>✔ Una sola consola web y una cuota transparente</li>
+                <li>✔ {lang === "es" ? "Remote Desktop web sin visor local instalado" : "Web-based Remote Desktop without local viewer"}</li>
+                <li>✔ {lang === "es" ? "Telemetría RMM continua y alertas de salud" : "Continuous RMM telemetry and health alerts"}</li>
+                <li>✔ {lang === "es" ? "Sonda de red LAN (Network Discovery) integrada" : "Built-in LAN probe (Network Discovery)"}</li>
+                <li>✔ {lang === "es" ? "Un solo agente ultra ligero (~8.5 MB)" : "A single ultra-lightweight agent (~8.5 MB)"}</li>
+                <li>✔ {lang === "es" ? "Una sola consola web y una cuota transparente" : "One web console and one transparent fee"}</li>
               </ul>
             </div>
           </div>
