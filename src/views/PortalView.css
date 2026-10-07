@@ -1116,28 +1116,53 @@
   border: 1px solid var(--portal-card-border);
   box-shadow: var(--portal-card-shadow);
   border-radius: 14px;
-  padding: 28px;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .q-portal-pillar-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   border-color: var(--portal-brand);
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.1);
 }
 
-.q-portal-pillar-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  background: var(--portal-brand-subtle);
-  color: var(--portal-brand);
+.q-portal-pillar-img-wrap {
+  width: 100%;
+  height: 180px;
+  position: relative;
+  overflow: hidden;
+  background: var(--portal-mockup-bg);
+}
+
+.q-portal-pillar-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  transition: transform 0.3s ease;
+}
+
+.q-portal-pillar-card:hover .q-portal-pillar-img-wrap img {
+  transform: scale(1.05);
+}
+
+.q-portal-pillar-img-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.4) 100%);
+  pointer-events: none;
+}
+
+.q-portal-pillar-content {
+  padding: 28px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
-.q-portal-pillar-card h3 {
+.q-portal-pillar-content h3 {
   font-size: 18px;
   font-weight: 800;
   margin-bottom: 10px;
@@ -1401,13 +1426,44 @@
   border: 1px solid var(--portal-card-border);
   box-shadow: var(--portal-card-shadow);
   border-radius: 16px;
-  padding: 32px;
+  overflow: hidden;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .q-portal-cap-group-card:hover {
   border-color: rgba(103, 61, 230, 0.4);
   box-shadow: 0 10px 30px -5px rgba(103, 61, 230, 0.1);
+}
+
+.q-portal-cap-group-img-wrap {
+  width: 100%;
+  height: 240px;
+  position: relative;
+  overflow: hidden;
+  background: var(--portal-mockup-bg);
+}
+
+.q-portal-cap-group-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  transition: transform 0.3s ease;
+}
+
+.q-portal-cap-group-card:hover .q-portal-cap-group-img-wrap img {
+  transform: scale(1.03);
+}
+
+.q-portal-cap-group-img-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(0,0,0,0.3) 100%);
+  pointer-events: none;
+}
+
+.q-portal-cap-group-content {
+  padding: 32px;
 }
 
 .q-portal-cap-group-header {

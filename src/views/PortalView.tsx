@@ -668,79 +668,91 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
 
         <div className="q-portal-pillars-grid">
           {/* Pilar A: REMOTE DESKTOP */}
-          <div className="q-portal-pillar-card">
-            <div className="q-portal-pillar-icon">
-              <Monitor size={28} />
+          <div className="q-portal-pillar-card q-portal-pillar-card--img">
+            <div className="q-portal-pillar-img-wrap">
+              <img src="/showcase/soporte_time_real.png" alt="Remote Desktop" />
+              <div className="q-portal-pillar-img-overlay"></div>
             </div>
-            <h3>A. Remote Desktop</h3>
-            <p className="q-portal-pillar-desc">
-              {lang === "es"
-                ? "Escritorio remoto ágil operado directamente desde el navegador, sin instalar visores locales pesados."
-                : "Agile remote desktop running in browser with zero operator viewer installation."}
-            </p>
-            <ul className="q-portal-pillar-list">
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Escritorio remoto web sin software visor" : "Web remote desktop with no client viewer"}</li>
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Acceso asistido y desatendido 24/7" : "Attended & 24/7 unattended access"}</li>
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Control fluido de teclado, ratón y Ctrl+Alt+Del" : "Keyboard, mouse & Ctrl+Alt+Del control"}</li>
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Transferencia de archivos y terminal en segundo plano" : "File transfer & background shell terminal"}</li>
-            </ul>
+            <div className="q-portal-pillar-content">
+              <h3>A. Remote Desktop</h3>
+              <p className="q-portal-pillar-desc">
+                {lang === "es"
+                  ? "Escritorio remoto ágil operado directamente desde el navegador, sin instalar visores locales pesados."
+                  : "Agile remote desktop running in browser with zero operator viewer installation."}
+              </p>
+              <ul className="q-portal-pillar-list">
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Escritorio remoto web sin software visor" : "Web remote desktop with no client viewer"}</li>
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Acceso asistido y desatendido 24/7" : "Attended & 24/7 unattended access"}</li>
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Control fluido de teclado, ratón y Ctrl+Alt+Del" : "Keyboard, mouse & Ctrl+Alt+Del control"}</li>
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Transferencia de archivos y terminal en segundo plano" : "File transfer & background shell terminal"}</li>
+              </ul>
+            </div>
           </div>
 
           {/* Pilar B: RMM */}
-          <div className="q-portal-pillar-card">
-            <div className="q-portal-pillar-icon">
-              <Cpu size={28} />
+          <div className="q-portal-pillar-card q-portal-pillar-card--img">
+            <div className="q-portal-pillar-img-wrap">
+              <img src="/showcase/real-dashboard.png" alt="RMM Monitoring" />
+              <div className="q-portal-pillar-img-overlay"></div>
             </div>
-            <h3>B. RMM & Telemetría</h3>
-            <p className="q-portal-pillar-desc">
-              {lang === "es"
-                ? "Observabilidad profunda de hardware, software, servicios y procesos en tiempo real."
-                : "Deep hardware, software, services, and live processes fleet telemetry."}
-            </p>
-            <ul className="q-portal-pillar-list">
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Telemetría de CPU, RAM, discos y adaptadores de red" : "CPU, RAM, storage disk & network telemetry"}</li>
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Estado de conexión online/offline continuo" : "Continuous live online/offline heartbeat"}</li>
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Supervisión de procesos y servicios del sistema" : "OS process & system service supervision"}</li>
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Alertas automáticas por correo electrónico" : "Automated email notifications on issues"}</li>
-            </ul>
+            <div className="q-portal-pillar-content">
+              <h3>B. RMM & Telemetría</h3>
+              <p className="q-portal-pillar-desc">
+                {lang === "es"
+                  ? "Observabilidad profunda de hardware, software, servicios y procesos en tiempo real."
+                  : "Deep hardware, software, services, and live processes fleet telemetry."}
+              </p>
+              <ul className="q-portal-pillar-list">
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Telemetría de CPU, RAM, discos y adaptadores de red" : "CPU, RAM, storage disk & network telemetry"}</li>
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Estado de conexión online/offline continuo" : "Continuous live online/offline heartbeat"}</li>
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Supervisión de procesos y servicios del sistema" : "OS process & system service supervision"}</li>
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Alertas automáticas por correo electrónico" : "Automated email notifications on issues"}</li>
+              </ul>
+            </div>
           </div>
 
           {/* Pilar C: NETWORK DISCOVERY */}
-          <div className="q-portal-pillar-card">
-            <div className="q-portal-pillar-icon">
-              <Network size={28} />
+          <div className="q-portal-pillar-card q-portal-pillar-card--img">
+            <div className="q-portal-pillar-img-wrap">
+              <img src="/showcase/real-discovery.png" alt="Network Discovery" />
+              <div className="q-portal-pillar-img-overlay"></div>
             </div>
-            <h3>C. Network Discovery</h3>
-            <p className="q-portal-pillar-desc">
-              {lang === "es"
-                ? "Sondas inteligentes que auditan la subred local y descubren equipos no gestionados."
-                : "Smart probes that scan local subnets and map unmanaged network endpoints."}
-            </p>
-            <ul className="q-portal-pillar-list">
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Escaneo automatizado de subredes corporativas" : "Automated corporate LAN subnet scan"}</li>
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Mapeo de IP, Hostname, MAC y fabricante" : "IP, Hostname, MAC & vendor identification"}</li>
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Sonda LAN ligera ejecutada por cualquier agente" : "Lightweight LAN probe run by any agent"}</li>
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Detección de equipos no registrados en la red" : "Discovery of rogue or unmanaged hardware"}</li>
-            </ul>
+            <div className="q-portal-pillar-content">
+              <h3>C. Network Discovery</h3>
+              <p className="q-portal-pillar-desc">
+                {lang === "es"
+                  ? "Sondas inteligentes que auditan la subred local y descubren equipos no gestionados."
+                  : "Smart probes that scan local subnets and map unmanaged network endpoints."}
+              </p>
+              <ul className="q-portal-pillar-list">
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Escaneo automatizado de subredes corporativas" : "Automated corporate LAN subnet scan"}</li>
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Mapeo de IP, Hostname, MAC y fabricante" : "IP, Hostname, MAC & vendor identification"}</li>
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Sonda LAN ligera ejecutada por cualquier agente" : "Lightweight LAN probe run by any agent"}</li>
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Detección de equipos no registrados en la red" : "Discovery of rogue or unmanaged hardware"}</li>
+              </ul>
+            </div>
           </div>
 
           {/* Pilar D: WEB CONSOLE */}
-          <div className="q-portal-pillar-card">
-            <div className="q-portal-pillar-icon">
-              <Globe size={28} />
+          <div className="q-portal-pillar-card q-portal-pillar-card--img">
+            <div className="q-portal-pillar-img-wrap">
+              <img src="/showcase/real-os-distribution.png" alt="Web Console" />
+              <div className="q-portal-pillar-img-overlay"></div>
             </div>
-            <h3>D. Web Console</h3>
-            <p className="q-portal-pillar-desc">
-              {lang === "es"
-                ? "Consola centralizada multi-cliente para gestionar todas tus operaciones desde cualquier lugar."
-                : "Centralized multi-tenant console to manage operations from anywhere."}
-            </p>
-            <ul className="q-portal-pillar-list">
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Acceso universal desde navegadores modernos" : "Universal access on modern browsers"}</li>
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Organización jerárquica por clientes y sedes" : "Client, site, and department hierarchy"}</li>
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Roles y permisos para equipos técnicos" : "Technician roles, scopes & permission policies"}</li>
-              <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Dashboard de métricas y auditoría de eventos" : "Central metrics dashboard & event audit trail"}</li>
-            </ul>
+            <div className="q-portal-pillar-content">
+              <h3>D. Web Console</h3>
+              <p className="q-portal-pillar-desc">
+                {lang === "es"
+                  ? "Consola centralizada multi-cliente para gestionar todas tus operaciones desde cualquier lugar."
+                  : "Centralized multi-tenant console to manage operations from anywhere."}
+              </p>
+              <ul className="q-portal-pillar-list">
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Acceso universal desde navegadores modernos" : "Universal access on modern browsers"}</li>
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Organización jerárquica por clientes y sedes" : "Client, site, and department hierarchy"}</li>
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Roles y permisos para equipos técnicos" : "Technician roles, scopes & permission policies"}</li>
+                <li><Check size={15} color="var(--portal-accent-teal)" /> {lang === "es" ? "Dashboard de métricas y auditoría de eventos" : "Central metrics dashboard & event audit trail"}</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -974,30 +986,30 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
 
         <div className="q-portal-cap-groups-container">
           {QRMM_CAPABILITY_GROUPS.map((group) => {
-            const IconComponent =
-              group.icon === "monitor"
-                ? Monitor
-                : group.icon === "activity"
-                ? Activity
-                : group.icon === "network"
-                ? Network
-                : ShieldCheck;
+            let imgSource = "";
+            if (group.icon === "monitor") imgSource = "/showcase/soporte_time_real.png";
+            else if (group.icon === "activity") imgSource = "/showcase/real-dashboard.png";
+            else if (group.icon === "network") imgSource = "/showcase/real-discovery.png";
+            else imgSource = "/showcase/real-os-distribution.png";
 
             return (
-              <div key={group.id} className="q-portal-cap-group-card">
-                <div className="q-portal-cap-group-header">
-                  <div className="q-portal-cap-icon-box">
-                    <IconComponent size={26} />
-                  </div>
-                  <div>
-                    <span className="q-portal-cap-category-tag">
-                      {lang === "es" ? group.categoryEs : group.categoryEn}
-                    </span>
-                    <h3 className="q-portal-cap-group-title">
-                      {lang === "es" ? group.titleEs : group.titleEn}
-                    </h3>
-                  </div>
+              <div key={group.id} className="q-portal-cap-group-card q-portal-cap-group-card--img">
+                <div className="q-portal-cap-group-img-wrap">
+                  <img src={imgSource} alt={group.titleEn} />
+                  <div className="q-portal-cap-group-img-overlay"></div>
                 </div>
+                
+                <div className="q-portal-cap-group-content">
+                  <div className="q-portal-cap-group-header">
+                    <div>
+                      <span className="q-portal-cap-category-tag">
+                        {lang === "es" ? group.categoryEs : group.categoryEn}
+                      </span>
+                      <h3 className="q-portal-cap-group-title">
+                        {lang === "es" ? group.titleEs : group.titleEn}
+                      </h3>
+                    </div>
+                  </div>
 
                 <p className="q-portal-cap-group-desc">
                   {lang === "es" ? group.descEs : group.descEn}
@@ -1024,6 +1036,7 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
                       </p>
                     </div>
                   ))}
+                </div>
                 </div>
               </div>
             );
