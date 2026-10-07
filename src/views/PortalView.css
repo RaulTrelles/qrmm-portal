@@ -2284,4 +2284,10 @@
   .q-mockup-view-files {
     grid-template-columns: 1fr;
   }
+  .q-portal-diff-section {
+    padding: 40px 16px;
+  }
+  .q-portal-cap-group-content, .q-portal-pillar-content, .q-portal-audience-content {
+    padding: 24px 16px;
+  }
 }
