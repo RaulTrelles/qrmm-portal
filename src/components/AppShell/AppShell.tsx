@@ -283,7 +283,7 @@ export const AppShell: React.FC<AppShellProps> = ({
 
       <div className="q-main">
         <header className="q-header">
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
             <div className="q-header-title">{getHeaderTitle()}</div>
 
             {/* Tenant Selector: Solo Superadmin puede alternar empresas; los clientes ven solo su propia organización fija */}

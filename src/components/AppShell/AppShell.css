@@ -443,6 +443,15 @@
 }
 
 @media (max-width: 768px) {
+  .q-header {
+    flex-wrap: wrap;
+    height: auto;
+    padding: var(--space-4) var(--space-4);
+    gap: var(--space-3);
+  }
+  .q-header-title {
+    font-size: 16px;
+  }
   .q-footer {
     padding: 14px var(--space-4);
   }
