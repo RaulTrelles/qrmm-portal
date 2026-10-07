@@ -8,17 +8,13 @@ import {
   Sun,
   Moon,
   Monitor,
-  Radio,
   ChevronDown,
   Activity,
   Laptop,
   ArrowRight,
-  LayoutDashboard,
   AlertTriangle,
   XCircle,
   Globe,
-  Building,
-  Users,
   ShieldCheck,
   Network,
 } from "lucide-react";
@@ -35,6 +31,7 @@ import {
   LEMON_SQUEEZY_SLUGS,
 } from "../config/pricing";
 import "./PortalView.css";
+import { QRMMFeatureCarousel } from "../components/QRMMFeatureCarousel/QRMMFeatureCarousel";
 
 type Language = "es" | "en";
 
@@ -54,7 +51,6 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
   });
 
   // Estados de Navegación & Showcase Interactivo del Producto Real
-  const [mockupTab, setMockupTab] = useState<"dashboard" | "desktop" | "aihealth" | "discovery" | "specs" | "os">("dashboard");
   const [openFaq, setOpenFaq] = useState<Record<number, boolean>>({ 0: true, 1: true });
 
   // Estados de Precios & Checkout
@@ -471,163 +467,9 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
             </div>
           </div>
 
-          {/* B. Tour de Capturas Reales de la Plataforma */}
-          <div className="q-portal-mockup-window" style={{ marginTop: "40px" }}>
-            {/* Barra superior de la ventana */}
-            <div className="q-portal-mockup-titlebar">
-              <div className="q-portal-window-dots">
-                <span className="q-portal-dot q-portal-dot--red"></span>
-                <span className="q-portal-dot q-portal-dot--yellow"></span>
-                <span className="q-portal-dot q-portal-dot--green"></span>
-              </div>
-              <div className="q-portal-mockup-tab-list">
-                <button
-                  className={`q-portal-mockup-tab-btn ${mockupTab === "dashboard" ? "q-portal-mockup-tab-btn--active" : ""}`}
-                  onClick={() => setMockupTab("dashboard")}
-                >
-                  <LayoutDashboard size={14} />
-                  <span>{lang === "es" ? "1. Dashboard & Mapa de Flota" : "1. Dashboard & Fleet Map"}</span>
-                </button>
-                <button
-                  className={`q-portal-mockup-tab-btn ${mockupTab === "desktop" ? "q-portal-mockup-tab-btn--active" : ""}`}
-                  onClick={() => setMockupTab("desktop")}
-                >
-                  <Monitor size={14} />
-                  <span>{lang === "es" ? "2. Control Remoto & Terminal" : "2. Remote Desktop"}</span>
-                </button>
-                <button
-                  className={`q-portal-mockup-tab-btn ${mockupTab === "aihealth" ? "q-portal-mockup-tab-btn--active" : ""}`}
-                  onClick={() => setMockupTab("aihealth")}
-                >
-                  <Sparkles size={14} />
-                  <span>{lang === "es" ? "3. AI Health Predictivo" : "3. Predictive AI Health"}</span>
-                </button>
-                <button
-                  className={`q-portal-mockup-tab-btn ${mockupTab === "discovery" ? "q-portal-mockup-tab-btn--active" : ""}`}
-                  onClick={() => setMockupTab("discovery")}
-                >
-                  <Radio size={14} />
-                  <span>{lang === "es" ? "4. Sonda LAN Discovery" : "4. LAN Probe"}</span>
-                </button>
-                <button
-                  className={`q-portal-mockup-tab-btn ${mockupTab === "specs" ? "q-portal-mockup-tab-btn--active" : ""}`}
-                  onClick={() => setMockupTab("specs")}
-                >
-                  <Cpu size={14} />
-                  <span>{lang === "es" ? "5. Ficha Hardware & Ubicación" : "5. Hardware Specs"}</span>
-                </button>
-                <button
-                  className={`q-portal-mockup-tab-btn ${mockupTab === "os" ? "q-portal-mockup-tab-btn--active" : ""}`}
-                  onClick={() => setMockupTab("os")}
-                >
-                  <Activity size={14} />
-                  <span>{lang === "es" ? "6. Distribución por SO" : "6. OS Breakdown"}</span>
-                </button>
-              </div>
-              <div className="q-portal-mockup-status-indicator">
-                <span className="q-portal-live-beacon"></span>
-                <span>{lang === "es" ? "PRODUCCIÓN EN VIVO" : "LIVE PLATFORM"}</span>
-              </div>
-            </div>
-
-            {/* Contenido con Capturas Reales */}
-            <div className="q-portal-real-capture-view">
-              {mockupTab === "dashboard" && (
-                <div className="q-portal-capture-wrapper">
-                  <img
-                    src="/showcase/real-dashboard.png"
-                    alt="Dashboard Real con Indicadores y Mapa de Ubicación"
-                    className="q-portal-capture-img"
-                  />
-                  <div className="q-portal-capture-caption">
-                    <strong>{lang === "es" ? "Panel Central Unificado:" : "Central Unified Panel:"}</strong>{" "}
-                    {lang === "es"
-                      ? "Monitorea CPU promedio, consumo de RAM, discos y mapa de geolocalización de equipos activos con actualización por WebSockets en milisegundos."
-                      : "Monitor fleet CPU, RAM usage, storage gauges, and geographic fleet map with sub-second WebSocket updates."}
-                  </div>
-                </div>
-              )}
-
-              {mockupTab === "desktop" && (
-                <div className="q-portal-capture-wrapper">
-                  <img
-                    src="/showcase/remote-control-mockup.jpg"
-                    alt="Control Remoto Web y Terminal"
-                    className="q-portal-capture-img"
-                  />
-                  <div className="q-portal-capture-caption">
-                    <strong>{lang === "es" ? "Control Remoto Sin Clientes Pesados:" : "Browser-based Remote Control:"}</strong>{" "}
-                    {lang === "es"
-                      ? "Conéctate por escritorio remoto o abre una terminal PowerShell/SSH sin interrumpir la sesión del usuario final y sin costos por canal."
-                      : "Connect via WebRTC remote desktop or remote shell without disrupting the user session and with zero channel licensing fees."}
-                  </div>
-                </div>
-              )}
-
-              {mockupTab === "aihealth" && (
-                <div className="q-portal-capture-wrapper">
-                  <img
-                    src="/showcase/real-ai-health.png"
-                    alt="AI Health y Diagnósticos Predictivos"
-                    className="q-portal-capture-img"
-                  />
-                  <div className="q-portal-capture-caption">
-                    <strong>{lang === "es" ? "Inteligencia Artificial Proactiva:" : "Proactive AI Health:"}</strong>{" "}
-                    {lang === "es"
-                      ? "Detección de anomalías correlacionadas, puntuación de salud de flota (91/100) y generación automática de informes ejecutivos."
-                      : "Correlated anomaly detection, fleet health index (91/100), and automated executive diagnostic reporting."}
-                  </div>
-                </div>
-              )}
-
-              {mockupTab === "discovery" && (
-                <div className="q-portal-capture-wrapper">
-                  <img
-                    src="/showcase/real-discovery.png"
-                    alt="Sonda de Red LAN y Detección de Puertos"
-                    className="q-portal-capture-img"
-                  />
-                  <div className="q-portal-capture-caption">
-                    <strong>{lang === "es" ? "Descubrimiento de Red Automático:" : "Automated Network Discovery:"}</strong>{" "}
-                    {lang === "es"
-                      ? "Escanea la subred local mediante agentes telemétricos, detecta dispositivos no gestionados, impresoras y puertos abiertos (SMB 445, RDP 3389)."
-                      : "Scans local LAN subnets via lightweight agent probes, identifying unmanaged endpoints, network printers, and open ports."}
-                  </div>
-                </div>
-              )}
-
-              {mockupTab === "specs" && (
-                <div className="q-portal-capture-wrapper">
-                  <img
-                    src="/showcase/real-device-modal.png"
-                    alt="Ficha Técnica de Hardware y Ubicación"
-                    className="q-portal-capture-img"
-                  />
-                  <div className="q-portal-capture-caption">
-                    <strong>{lang === "es" ? "Auditoría Completa de Hardware & Ubicación:" : "Full Hardware & Geolocation Audit:"}</strong>{" "}
-                    {lang === "es"
-                      ? "Especificaciones exactas de CPU, memoria, particiones de almacenamiento, periféricos conectados y geolocalización de sede física."
-                      : "Exact hardware specs for CPU, RAM, disk partitions, connected peripherals, and physical branch geolocation."}
-                  </div>
-                </div>
-              )}
-
-              {mockupTab === "os" && (
-                <div className="q-portal-capture-wrapper">
-                  <img
-                    src="/showcase/real-os-distribution.png"
-                    alt="Distribución de Sistemas Operativos"
-                    className="q-portal-capture-img"
-                  />
-                  <div className="q-portal-capture-caption">
-                    <strong>{lang === "es" ? "Visibilidad Multiplataforma:" : "Cross-Platform Visibility:"}</strong>{" "}
-                    {lang === "es"
-                      ? "Control unificado para Windows Server (2016-2022), Windows 10/11 Pro y distribuciones Linux (Ubuntu/Debian) en un solo panel."
-                      : "Unified fleet management across Windows Server, Windows 10/11, and Linux distributions from one centralized screen."}
-                  </div>
-                </div>
-              )}
-            </div>
+          {/* B. Tour de Capturas Reales de la Plataforma (QRMM en Acción) */}
+          <div style={{ marginTop: "60px", width: "100%" }}>
+            <QRMMFeatureCarousel lang={lang} />
           </div>
         </div>
       </section>
@@ -1034,57 +876,78 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
 
         <div className="q-portal-audience-grid">
           {/* Perfil 1 */}
-          <div className="q-portal-audience-card">
-            <div className="q-portal-audience-icon">
-              <Laptop size={28} />
+          <div className="q-portal-audience-card q-portal-audience-card--img">
+            <div className="q-portal-audience-img-wrap">
+              <img src="/showcase/remote-control-mockup.jpg" alt="Remote Control" />
+              <div className="q-portal-audience-img-overlay"></div>
             </div>
-            <h3>{lang === "es" ? "Técnicos y Consultores TI" : "IT Consultants & Techs"}</h3>
-            <p className="q-portal-audience-quote">
-              {lang === "es"
-                ? "“Administra tus equipos y clientes desde cualquier navegador.”"
-                : "“Manage your client devices directly from any browser.”"}
-            </p>
-            <p className="q-portal-audience-desc">
-              {lang === "es"
-                ? "Ideal para técnicos independientes que necesitan dar soporte remoto desatendido y conocer el estado de los equipos de sus clientes sin pagar suscripciones prohibitivas por operador."
-                : "Ideal for independent technicians delivering unattended support without expensive per-operator licensing."}
-            </p>
+            <div className="q-portal-audience-content">
+              <h3>{lang === "es" ? "Técnicos y Consultores TI" : "IT Consultants & Techs"}</h3>
+              <p className="q-portal-audience-desc">
+                {lang === "es"
+                  ? "Resuelve incidencias desde cualquier navegador sin fricción."
+                  : "Resolve issues from any browser without friction."}
+              </p>
+              {onGoToLogin ? (
+                <button onClick={() => onGoToLogin("register")} className="q-portal-audience-cta">
+                  {lang === "es" ? "Prueba gratis" : "Start free"} <ArrowRight size={14} />
+                </button>
+              ) : (
+                <a href="#pricing" className="q-portal-audience-cta">
+                  {lang === "es" ? "Prueba gratis" : "Start free"} <ArrowRight size={14} />
+                </a>
+              )}
+            </div>
           </div>
 
           {/* Perfil 2 */}
-          <div className="q-portal-audience-card q-portal-audience-card--highlight">
-            <div className="q-portal-audience-icon">
-              <Building size={28} />
+          <div className="q-portal-audience-card q-portal-audience-card--img q-portal-audience-card--highlight">
+            <div className="q-portal-audience-img-wrap">
+              <img src="/showcase/real-os-distribution.png" alt="Multi Tenant" />
+              <div className="q-portal-audience-img-overlay"></div>
             </div>
-            <h3>{lang === "es" ? "MSPs y Proveedores de Servicios TI" : "MSPs & IT Service Providers"}</h3>
-            <p className="q-portal-audience-quote">
-              {lang === "es"
-                ? "“Gestiona múltiples clientes y equipos desde una sola consola.”"
-                : "“Manage multiple clients and fleets from a single pane of glass.”"}
-            </p>
-            <p className="q-portal-audience-desc">
-              {lang === "es"
-                ? "Estructura tus clientes en organizaciones separadas, asigna técnicos con permisos específicos, recibe alertas de salud automatizadas y descubre dispositivos en sus redes LAN."
-                : "Organize clients in distinct organizations, assign technician roles, receive proactive alerts, and discover unmanaged LAN devices."}
-            </p>
+            <div className="q-portal-audience-content">
+              <h3>{lang === "es" ? "MSPs y Proveedores TI" : "MSPs & IT Service Providers"}</h3>
+              <p className="q-portal-audience-desc">
+                {lang === "es"
+                  ? "Gestiona múltiples organizaciones desde una sola consola."
+                  : "Manage multiple organizations from a single console."}
+              </p>
+              {onGoToLogin ? (
+                <button onClick={() => onGoToLogin("register")} className="q-portal-audience-cta">
+                  {lang === "es" ? "Escala tu negocio" : "Scale your business"} <ArrowRight size={14} />
+                </button>
+              ) : (
+                <a href="#pricing" className="q-portal-audience-cta">
+                  {lang === "es" ? "Escala tu negocio" : "Scale your business"} <ArrowRight size={14} />
+                </a>
+              )}
+            </div>
           </div>
 
           {/* Perfil 3 */}
-          <div className="q-portal-audience-card">
-            <div className="q-portal-audience-icon">
-              <Users size={28} />
+          <div className="q-portal-audience-card q-portal-audience-card--img">
+            <div className="q-portal-audience-img-wrap">
+              <img src="/showcase/real-dashboard.png" alt="Dashboard" />
+              <div className="q-portal-audience-img-overlay"></div>
             </div>
-            <h3>{lang === "es" ? "PyMEs y Equipos Internos de TI" : "SMBs & In-House IT Teams"}</h3>
-            <p className="q-portal-audience-quote">
-              {lang === "es"
-                ? "“Monitorea y administra tu infraestructura sin montar una plataforma RMM propia.”"
-                : "“Monitor and control your fleet without hosting complex RMM servers.”"}
-            </p>
-            <p className="q-portal-audience-desc">
-              {lang === "es"
-                ? "Centraliza el soporte de las computadoras de tu empresa, servidores locales y sedes remotas en un servicio seguro en la nube sin requerir personal dedicado a mantener servidores."
-                : "Centralize corporate workstations and remote office servers on a turn-key cloud platform without dedicated maintenance staff."}
-            </p>
+            <div className="q-portal-audience-content">
+              <h3>{lang === "es" ? "PyMEs y Equipos TI Internos" : "SMBs & In-House IT"}</h3>
+              <p className="q-portal-audience-desc">
+                {lang === "es"
+                  ? "Monitorea tu infraestructura sin montar un RMM complejo."
+                  : "Monitor your infrastructure without deploying a complex RMM."}
+              </p>
+              {onGoToLogin ? (
+                <button onClick={() => onGoToLogin("register")} className="q-portal-audience-cta">
+                  {lang === "es" ? "Centraliza tu TI" : "Centralize your IT"} <ArrowRight size={14} />
+                </button>
+              ) : (
+                <a href="#pricing" className="q-portal-audience-cta">
+                  {lang === "es" ? "Centraliza tu TI" : "Centralize your IT"} <ArrowRight size={14} />
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </section>
