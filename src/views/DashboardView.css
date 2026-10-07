@@ -1322,7 +1322,7 @@
    RESPONSIVE LAYOUT
 ------------------------------------------------------------------------- */
 @media (max-width: 1200px) {
-  .q-kpi-grid {
+  .q-kpi-grid, .q-it-kpi-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -1337,7 +1337,7 @@
 }
 
 @media (max-width: 768px) {
-  .q-kpi-grid {
+  .q-kpi-grid, .q-it-kpi-grid {
     grid-template-columns: 1fr 1fr;
   }
   .q-filter-bar {
@@ -1353,7 +1353,7 @@
 }
 
 @media (max-width: 480px) {
-  .q-kpi-grid {
+  .q-kpi-grid, .q-it-kpi-grid {
     grid-template-columns: 1fr;
   }
   .q-it-mini-charts-grid {
