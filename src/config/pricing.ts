@@ -299,8 +299,8 @@ export const PRICING_CONFIG = {
       featured: false,
       limits: {
         maxDevices: "unlimited",
-        deviceLabelEs: "300+ equipos / Ilimitado",
-        deviceLabelEn: "300+ endpoints / Custom",
+        deviceLabelEs: "250+ equipos / Ilimitado",
+        deviceLabelEn: "250+ endpoints / Custom",
         retentionDays: 365,
         multiClient: true,
         networkDiscovery: "enterprise" as const,
@@ -329,7 +329,7 @@ export const PRICING_CONFIG = {
         labelEn: "Save $298 per year",
       },
       featuresEs: [
-        "300+ equipos y técnicos ilimitados",
+        "250+ equipos y técnicos ilimitados",
         "Multi-organización ilimitada y RBAC corporativo",
         "AIOps DeepSeek: Diagnósticos de causa raíz",
         "Informes diarios ejecutivos automáticos (07:00 AM)",
@@ -341,7 +341,7 @@ export const PRICING_CONFIG = {
         "SLA 99.9% contractual con soporte dedicado",
       ],
       featuresEn: [
-        "300+ endpoints and unlimited technicians",
+        "250+ endpoints and unlimited technicians",
         "Unlimited multi-organization & corporate RBAC",
         "DeepSeek AIOps: Root Cause Analysis diagnostics",
         "Automated daily executive reports (07:00 AM)",
@@ -648,8 +648,8 @@ export const FAQS_CONFIG: FaqItem[] = [
   {
     qEs: "¿Cuántos equipos puedo administrar?",
     qEn: "How many endpoints can I manage?",
-    aEs: "El plan Starter permite administrar hasta 5 equipos. El plan Profesional cubre hasta 50 equipos, el plan Business/MSP hasta 250 equipos y el plan Enterprise está diseñado para organizaciones con más de 300 equipos o flotas ilimitadas.",
-    aEn: "The Starter plan covers up to 5 endpoints. The Professional plan covers up to 50 endpoints, Business/MSP covers up to 250 endpoints, and Enterprise is tailored for 300+ endpoints or custom unlimited fleets.",
+    aEs: "El plan Starter permite administrar hasta 5 equipos. El plan Profesional cubre hasta 50 equipos, el plan Business/MSP hasta 250 equipos y el plan Enterprise está diseñado para organizaciones con más de 250 equipos o flotas ilimitadas.",
+    aEn: "The Starter plan covers up to 5 endpoints. The Professional plan covers up to 50 endpoints, Business/MSP covers up to 250 endpoints, and Enterprise is tailored for 250+ endpoints or custom unlimited fleets.",
   },
   {
     qEs: "¿Puedo usar QRMM gratis?",

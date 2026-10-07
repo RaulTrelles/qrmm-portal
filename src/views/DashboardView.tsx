@@ -24,7 +24,7 @@ export interface DashboardViewProps {
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) => {
-  const { activeOrganization } = useAuth();
+  const { activeOrganization, language } = useAuth();
   const [devices, setDevices] = useState<Device[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [remoteDevice, setRemoteDevice] = useState<Device | null>(null);
@@ -210,10 +210,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
       ---------------------------------------------------------------------- */}
       <header className="q-it-header">
         <div className="q-it-header-left">
-          <h1 className="q-it-title">IT dashboard</h1>
+          <h1 className="q-it-title">{language === "es" ? "Panel de TI" : "IT Dashboard"}</h1>
           <span className="q-it-header-badge">
             <span className="q-it-dot-pulse"></span>
-            Centro de Control NOC
+            {language === "es" ? "Centro de Control NOC" : "NOC Control Center"}
           </span>
         </div>
         <div className="q-it-header-actions">
@@ -223,7 +223,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
               value={areaFilter}
               onChange={(e) => setAreaFilter(e.target.value)}
             >
-              <option value="all">IT management (Todos)</option>
+              <option value="all">{language === "es" ? "Gestión TI (Todos)" : "IT Management (All)"}</option>
               {availableAreas.map((area) => (
                 <option key={area} value={area}>
                   {area}
@@ -234,7 +234,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
           </div>
           <button className="q-it-btn-new-device" onClick={() => setEnrollModalOpen(true)}>
             <Plus size={16} />
-            <span>New device</span>
+            <span>{language === "es" ? "Nuevo equipo" : "New device"}</span>
           </button>
         </div>
       </header>
@@ -246,7 +246,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
         {/* Card 1: Network latency (Purple 1) */}
         <div className="q-it-kpi-card q-it-kpi-card--purple1">
           <div className="q-it-kpi-top">
-            <span className="q-it-kpi-title">Network latency</span>
+            <span className="q-it-kpi-title">{language === "es" ? "Latencia de red" : "Network latency"}</span>
             <span className="q-it-kpi-action-icon">
               <Radio size={13} />
             </span>
@@ -256,7 +256,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
             <span className="q-it-kpi-num">{fleetMetrics.latencyPct}%</span>
           </div>
           <div className="q-it-kpi-foot">
-            <span className="q-it-kpi-sub">Network/IOs</span>
+            <span className="q-it-kpi-sub">{language === "es" ? "Red/E/S" : "Network/IOs"}</span>
             <div className="q-it-kpi-track">
               <div className="q-it-kpi-fill" style={{ width: `${fleetMetrics.latencyPct}%` }}></div>
             </div>
@@ -266,7 +266,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
         {/* Card 2: CPU usage (Purple 2 con Donut Radial Ring) */}
         <div className="q-it-kpi-card q-it-kpi-card--purple2">
           <div className="q-it-kpi-top">
-            <span className="q-it-kpi-title">CPU usage</span>
+            <span className="q-it-kpi-title">{language === "es" ? "Uso de CPU" : "CPU usage"}</span>
             <span className="q-it-kpi-action-icon">
               <Cpu size={13} />
             </span>
@@ -290,7 +290,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
             <span className="q-it-kpi-num">{fleetMetrics.avgCpu}%</span>
           </div>
           <div className="q-it-kpi-foot">
-            <span className="q-it-kpi-sub">CPU usage</span>
+            <span className="q-it-kpi-sub">{language === "es" ? "Uso de CPU" : "CPU usage"}</span>
             <div className="q-it-kpi-track">
               <div
                 className="q-it-kpi-fill"
@@ -303,7 +303,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
         {/* Card 3: Bandwidth / RAM (Teal 1 con Speedometer) */}
         <div className="q-it-kpi-card q-it-kpi-card--teal1">
           <div className="q-it-kpi-top">
-            <span className="q-it-kpi-title">Bandwidth</span>
+            <span className="q-it-kpi-title">{language === "es" ? "Memoria" : "Memory"}</span>
             <span className="q-it-kpi-action-icon">
               <Activity size={13} />
             </span>
@@ -313,7 +313,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
             <span className="q-it-kpi-num">{fleetMetrics.ramPctAvg}%</span>
           </div>
           <div className="q-it-kpi-foot">
-            <span className="q-it-kpi-sub">RAM usage</span>
+            <span className="q-it-kpi-sub">{language === "es" ? "Uso de RAM" : "RAM usage"}</span>
             <div className="q-it-kpi-track">
               <div className="q-it-kpi-fill" style={{ width: `${fleetMetrics.ramPctAvg}%` }}></div>
             </div>
@@ -323,7 +323,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
         {/* Card 4: Bandwidth / Almacenamiento & SLA (Cyan / Teal 2) */}
         <div className="q-it-kpi-card q-it-kpi-card--teal2">
           <div className="q-it-kpi-top">
-            <span className="q-it-kpi-title">Bandwidth</span>
+            <span className="q-it-kpi-title">{language === "es" ? "Almacenamiento" : "Storage"}</span>
             <span className="q-it-kpi-action-icon">
               <HardDrive size={13} />
             </span>
@@ -333,7 +333,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
             <span className="q-it-kpi-num">{fleetMetrics.diskPctAvg}%</span>
           </div>
           <div className="q-it-kpi-foot">
-            <span className="q-it-kpi-sub">Storage / IOs</span>
+            <span className="q-it-kpi-sub">{language === "es" ? "Disco / E/S" : "Storage / IOs"}</span>
             <div className="q-it-kpi-track">
               <div className="q-it-kpi-fill" style={{ width: `${fleetMetrics.diskPctAvg}%` }}></div>
             </div>

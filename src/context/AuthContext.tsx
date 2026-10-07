@@ -25,6 +25,8 @@ interface AuthContextType {
   loginWithCustomToken: (newToken: string, newUser?: any, newOrg?: any) => void;
   logout: () => void;
   refreshOrganizations: () => Promise<void>;
+  language: "es" | "en";
+  setLanguage: (lang: "es" | "en") => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,6 +41,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return saved ? JSON.parse(saved) : null;
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [language, setLanguageState] = useState<"es" | "en">(() => {
+    return (localStorage.getItem("q_language") as "es" | "en") || "es";
+  });
+
+  const setLanguage = (lang: "es" | "en") => {
+    setLanguageState(lang);
+    localStorage.setItem("q_language", lang);
+  };
 
   const setActiveOrganization = (org: OrganizationItem | null) => {
     if (user && user.role !== "SUPERADMIN") {
@@ -225,6 +235,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginWithCustomToken,
         logout,
         refreshOrganizations,
+        language,
+        setLanguage,
       }}
     >
       {children}

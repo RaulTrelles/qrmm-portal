@@ -62,7 +62,7 @@ export const AppShell: React.FC<AppShellProps> = ({
   onReportTabChange,
   onOpenPortal,
 }) => {
-  const { user, logout, organizationsList, activeOrganization, setActiveOrganization } = useAuth();
+  const { user, logout, organizationsList, activeOrganization, setActiveOrganization, language } = useAuth();
   const [reportsOpen, setReportsOpen] = React.useState<boolean>(true);
 
   const getHeaderTitle = () => {
@@ -70,31 +70,31 @@ export const AppShell: React.FC<AppShellProps> = ({
       case "dashboard":
         return activeOrganization
           ? `Dashboard — ${activeOrganization.name}`
-          : "Panel de Supervisión (Global)";
+          : language === "es" ? "Panel de Supervisión (Global)" : "Global Supervision Dashboard";
       case "inventory":
         return activeOrganization
-          ? `Inventario — ${activeOrganization.name}`
-          : "Inventario de Activos y Equipos";
+          ? `${language === "es" ? "Inventario" : "Inventory"} — ${activeOrganization.name}`
+          : language === "es" ? "Inventario de Activos y Equipos" : "Asset & Device Inventory";
       case "reports":
         return activeOrganization
-          ? `Centro de Reportes & Incidencias — ${activeOrganization.name}`
-          : "Centro de Reportes & Análisis Operativo";
+          ? `${language === "es" ? "Centro de Reportes & Incidencias" : "Reports & Incidents Center"} — ${activeOrganization.name}`
+          : language === "es" ? "Centro de Reportes & Análisis Operativo" : "Reports & Operational Analysis Center";
       case "ai-health":
         return activeOrganization
-          ? `AI Health & Diagnóstico Predictivo — ${activeOrganization.name}`
-          : "AI Health & Diagnóstico Predictivo (AIOps)";
+          ? `AI Health & ${language === "es" ? "Diagnóstico Predictivo" : "Predictive Diagnostics"} — ${activeOrganization.name}`
+          : language === "es" ? "AI Health & Diagnóstico Predictivo (AIOps)" : "AI Health & Predictive Diagnostics (AIOps)";
       case "clients":
-        return "Gestión de Clientes SaaS";
+        return language === "es" ? "Gestión de Clientes SaaS" : "SaaS Client Management";
       case "users":
-        return "Administración de Usuarios y Presencia en Vivo";
+        return language === "es" ? "Administración de Usuarios y Presencia en Vivo" : "User Administration & Live Presence";
       case "payments":
-        return "Historial de Pagos y Facturación SaaS";
+        return language === "es" ? "Historial de Pagos y Facturación SaaS" : "Payment History & SaaS Billing";
       case "discovery":
-        return "Descubrimiento de Red (Network Discovery)";
+        return language === "es" ? "Descubrimiento de Red (Network Discovery)" : "Network Discovery";
       case "settings":
-        return "Configuración del Sistema y Alertas";
+        return language === "es" ? "Configuración del Sistema y Alertas" : "System Settings & Alerts";
       case "support":
-        return "Mesa de Ayuda, Soporte & Sugerencias";
+        return language === "es" ? "Mesa de Ayuda, Soporte & Sugerencias" : "Help Desk, Support & Suggestions";
       default:
         return "Qhapana RMM";
     }
@@ -109,11 +109,11 @@ export const AppShell: React.FC<AppShellProps> = ({
           <div className="q-logo-badge">Q</div>
           <div className="q-brand-info">
             <span className="q-brand-name">Qhapana RMM</span>
-            <span className="q-brand-sub">SaaS Platform</span>
+            <span className="q-brand-sub">{language === "es" ? "Plataforma Tecnológica" : "SaaS Platform"}</span>
           </div>
         </div>
         <nav className="q-sidebar-nav">
-          <div className="q-nav-section-title">Operaciones</div>
+          <div className="q-nav-section-title">{language === "es" ? "Operaciones" : "Operations"}</div>
           <div
             className={`q-nav-item ${activeView === "dashboard" ? "q-nav-item--active" : ""}`}
             onClick={() => onViewChange("dashboard")}
@@ -128,7 +128,7 @@ export const AppShell: React.FC<AppShellProps> = ({
             style={{ cursor: "pointer" }}
           >
             <Server size={18} />
-            <span>Inventario de Equipos</span>
+            <span>{language === "es" ? "Inventario de Equipos" : "Device Inventory"}</span>
           </div>
 
           {/* Módulo Primer Nivel: Reportes con Subniveles */}
@@ -142,7 +142,7 @@ export const AppShell: React.FC<AppShellProps> = ({
               style={{ cursor: "pointer" }}
             >
               <BarChart3 size={18} />
-              <span>Reportes</span>
+              <span>{language === "es" ? "Reportes" : "Reports"}</span>
               <ChevronDown
                 size={14}
                 style={{
@@ -168,7 +168,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                   style={{ cursor: "pointer" }}
                 >
                   <AlertTriangle size={14} />
-                  <span>Incidencias y Fallas</span>
+                  <span>{language === "es" ? "Incidencias y Fallas" : "Incidents & Failures"}</span>
                 </div>
                 <div
                   className={`q-nav-subitem ${
@@ -183,7 +183,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                   style={{ cursor: "pointer" }}
                 >
                   <Server size={14} />
-                  <span>Inventario y Flota</span>
+                  <span>{language === "es" ? "Inventario y Flota" : "Inventory & Fleet"}</span>
                 </div>
                 <div
                   className={`q-nav-subitem ${
@@ -198,7 +198,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                   style={{ cursor: "pointer" }}
                 >
                   <Layers size={14} />
-                  <span>Resumen por Áreas</span>
+                  <span>{language === "es" ? "Resumen por Áreas" : "Summary by Area"}</span>
                 </div>
               </div>
             )}
@@ -209,7 +209,7 @@ export const AppShell: React.FC<AppShellProps> = ({
             style={{ cursor: "pointer" }}
           >
             <Sparkles size={18} color="var(--color-brand-primary)" />
-            <span>AI Health & Predictivo</span>
+            <span>{language === "es" ? "AI Health & Predictivo" : "AI Health & Predictive"}</span>
           </div>
           <div
             className={`q-nav-item ${activeView === "discovery" ? "q-nav-item--active" : ""}`}
@@ -217,10 +217,10 @@ export const AppShell: React.FC<AppShellProps> = ({
             style={{ cursor: "pointer" }}
           >
             <Radio size={18} />
-            <span>Descubrimiento de Red</span>
+            <span>{language === "es" ? "Descubrimiento de Red" : "Network Discovery"}</span>
           </div>
 
-          <div className="q-nav-section-title">Administración SaaS</div>
+          <div className="q-nav-section-title">{language === "es" ? "Administración SaaS" : "SaaS Administration"}</div>
           {user?.role === "SUPERADMIN" && (
             <div
               className={`q-nav-item ${activeView === "clients" ? "q-nav-item--active" : ""}`}
@@ -228,7 +228,7 @@ export const AppShell: React.FC<AppShellProps> = ({
               style={{ cursor: "pointer" }}
             >
               <Building2 size={18} />
-              <span>Gestión de Clientes</span>
+              <span>{language === "es" ? "Gestión de Clientes" : "Client Management"}</span>
             </div>
           )}
           <div
@@ -237,7 +237,7 @@ export const AppShell: React.FC<AppShellProps> = ({
             style={{ cursor: "pointer" }}
           >
             <Users size={18} />
-            <span>Usuarios y En Línea</span>
+            <span>{language === "es" ? "Usuarios y En Línea" : "Users & Online"}</span>
           </div>
           <div
             className={`q-nav-item ${activeView === "payments" ? "q-nav-item--active" : ""}`}
@@ -245,7 +245,7 @@ export const AppShell: React.FC<AppShellProps> = ({
             style={{ cursor: "pointer" }}
           >
             <CreditCard size={18} />
-            <span>Pagos y Facturación</span>
+            <span>{language === "es" ? "Pagos y Facturación" : "Payments & Billing"}</span>
           </div>
           <div
             className={`q-nav-item ${activeView === "settings" ? "q-nav-item--active" : ""}`}
@@ -253,17 +253,17 @@ export const AppShell: React.FC<AppShellProps> = ({
             style={{ cursor: "pointer" }}
           >
             <Bell size={18} />
-            <span>Configuración y Alertas</span>
+            <span>{language === "es" ? "Configuración y Alertas" : "Settings & Alerts"}</span>
           </div>
 
-          <div className="q-nav-section-title">Atención y Experiencia</div>
+          <div className="q-nav-section-title">{language === "es" ? "Atención y Experiencia" : "Support & Experience"}</div>
           <div
             className={`q-nav-item ${activeView === "support" ? "q-nav-item--active" : ""}`}
             onClick={() => onViewChange("support")}
             style={{ cursor: "pointer" }}
           >
             <LifeBuoy size={18} />
-            <span>Soporte & Sugerencias</span>
+            <span>{language === "es" ? "Soporte & Sugerencias" : "Help Desk & Suggestions"}</span>
           </div>
 
           {onOpenPortal && (
@@ -274,7 +274,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                 style={{ cursor: "pointer", color: "var(--color-brand-primary)" }}
               >
                 <Globe size={18} />
-                <span>Portal Público & Ofertas</span>
+                <span>{language === "es" ? "Portal Público & Ofertas" : "Public Portal & Offers"}</span>
               </div>
             </div>
           )}
@@ -301,9 +301,9 @@ export const AppShell: React.FC<AppShellProps> = ({
                     }
                   }}
                   className="q-tenant-select"
-                  title="Filtrar consola por cliente/organización (Acceso Superadmin)"
+                  title={language === "es" ? "Filtrar consola por cliente/organización (Acceso Superadmin)" : "Filter console by client/org (Superadmin access)"}
                 >
-                  <option value="all">🏢 Todos los Clientes</option>
+                  <option value="all">🏢 {language === "es" ? "Todos los Clientes" : "All Clients"}</option>
                   {organizationsList.map((org) => (
                     <option key={org.id} value={org.id}>
                       {org.name} ({org.stats?.total_devices ?? 0} eq.)
@@ -340,15 +340,15 @@ export const AppShell: React.FC<AppShellProps> = ({
 
           <div className="q-header-actions">
             <Badge variant={isLiveConnected ? "success" : "danger"} pulse={isLiveConnected}>
-              {isLiveConnected ? "Socket En vivo" : "Desconectado"}
+              {isLiveConnected ? (language === "es" ? "Socket En vivo" : "Live Socket") : (language === "es" ? "Desconectado" : "Disconnected")}
             </Badge>
 
-            <Button variant="outline" icon={<RefreshCw size={16} />} onClick={onRefresh} title="Refrescar" />
+            <Button variant="outline" icon={<RefreshCw size={16} />} onClick={onRefresh} title={language === "es" ? "Refrescar" : "Refresh"} />
             <Button
               variant="ghost"
               icon={theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
               onClick={onToggleTheme}
-              title="Cambiar tema"
+              title={language === "es" ? "Cambiar tema" : "Toggle theme"}
             />
 
             {/* User Chip */}
@@ -397,7 +397,7 @@ export const AppShell: React.FC<AppShellProps> = ({
             <div className="q-footer-center">
               <span className={`q-footer-status ${isLiveConnected ? "q-footer-status--online" : "q-footer-status--offline"}`}>
                 <span className="q-footer-dot" />
-                {isLiveConnected ? "Telemetría en vivo & NOC Operativo" : "Reconectando telemetría..."}
+                {isLiveConnected ? (language === "es" ? "Telemetría en vivo & NOC Operativo" : "Live Telemetry & NOC Operational") : (language === "es" ? "Reconectando telemetría..." : "Reconnecting telemetry...")}
               </span>
             </div>
 
@@ -407,29 +407,29 @@ export const AppShell: React.FC<AppShellProps> = ({
                   type="button"
                   className="q-footer-link"
                   onClick={onOpenPortal}
-                  title="Abrir Portal Público de Ofertas"
+                  title={language === "es" ? "Abrir Portal Público de Ofertas" : "Open Public Portal"}
                 >
                   <Globe size={13} />
-                  <span>Portal Público</span>
+                  <span>{language === "es" ? "Portal Público" : "Public Portal"}</span>
                 </button>
               )}
               <button
                 type="button"
                 className="q-footer-link"
                 onClick={() => onViewChange("support")}
-                title="Mesa de ayuda, soporte y sugerencias"
+                title={language === "es" ? "Mesa de ayuda, soporte y sugerencias" : "Help desk and support"}
               >
                 <LifeBuoy size={13} />
-                <span>Soporte</span>
+                <span>{language === "es" ? "Soporte" : "Support"}</span>
               </button>
               <button
                 type="button"
                 className="q-footer-link"
                 onClick={() => onViewChange("reports")}
-                title="Centro de reportes y análisis operativo"
+                title={language === "es" ? "Centro de reportes y análisis operativo" : "Reports and operational analysis"}
               >
                 <BarChart3 size={13} />
-                <span>Reportes</span>
+                <span>{language === "es" ? "Reportes" : "Reports"}</span>
               </button>
               <span className="q-footer-time">Lima, PE (UTC-5)</span>
             </div>

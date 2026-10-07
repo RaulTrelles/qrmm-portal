@@ -41,7 +41,7 @@ import "./SettingsView.css";
 
 
 export const SettingsView: React.FC = () => {
-  const { user } = useAuth();
+  const { user, language, setLanguage } = useAuth();
   const [activeTab, setActiveTab] = useState<"alerts" | "billing" | "payments" | "maintenance">("alerts");
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
@@ -370,7 +370,24 @@ export const SettingsView: React.FC = () => {
             Configure los disparadores automáticos de caída de equipos y microservicios, asigne destinatarios y canales de mensajería.
           </p>
         </div>
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value as "es" | "en")}
+            style={{
+              padding: "4px 8px",
+              borderRadius: "6px",
+              fontSize: "12px",
+              border: "1px solid var(--color-border)",
+              background: "var(--color-surface)",
+              color: "var(--color-text-primary)",
+              cursor: "pointer"
+            }}
+            title={language === "es" ? "Cambiar idioma" : "Change language"}
+          >
+            <option value="es">🇪🇸 Español</option>
+            <option value="en">🇺🇸 English</option>
+          </select>
           <Badge variant={emailAlertsEnabled ? "success" : "neutral"} pulse={emailAlertsEnabled}>
             {emailAlertsEnabled ? "Alertas Activas" : "Alertas Pausadas"}
           </Badge>

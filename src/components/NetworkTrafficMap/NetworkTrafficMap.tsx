@@ -6,6 +6,7 @@ import type { Device } from "../../types/device";
 import { Button } from "../Button/Button";
 import { Badge } from "../Badge/Badge";
 import "./NetworkTrafficMap.css";
+import { useAuth } from "../../context/AuthContext";
 
 // Fix standard Leaflet default icon paths in bundlers
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -209,6 +210,8 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
   const [activeLayer, setActiveLayer] = useState<TileLayerKey>("commercial");
   const [activeSelectedDevice, setActiveSelectedDevice] = useState<Device | null>(null);
   const [activeGeoInfo, setActiveGeoInfo] = useState<{ city: string; region: string; lat: number; lng: number } | null>(null);
+
+  const { language } = useAuth();
 
   // Sync selectedDevice prop with local state (solo vuela si cambia el id del equipo seleccionado)
   useEffect(() => {
@@ -502,10 +505,10 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
       <div className="q-commercial-map-header">
         <div className="q-commercial-map-title-group">
           <Radio size={16} className="q-map-pulse-icon" />
-          <h3 className="q-commercial-map-title">Live network traffic</h3>
+          <h3 className="q-commercial-map-title">{language === "es" ? "Tráfico de red en vivo" : "Live network traffic"}</h3>
           <Badge variant="success" className="q-commercial-live-badge">
             <span className="q-commercial-pulse-dot"></span>
-            {onlineCount}/{nodes.length} ONLINE
+            {onlineCount}/{nodes.length} {language === "es" ? "EN LÍNEA" : "ONLINE"}
           </Badge>
         </div>
 
@@ -518,10 +521,10 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
                 type="button"
                 className={`q-map-style-btn ${activeLayer === key ? "q-map-style-btn--active" : ""}`}
                 onClick={() => setActiveLayer(key)}
-                title={`Cambiar a estilo ${TILE_LAYERS[key].name}`}
+                title={language === "es" ? `Cambiar a estilo ${TILE_LAYERS[key].name}` : `Switch to ${TILE_LAYERS[key].name} style`}
               >
-                {key === "commercial" && "🗺️ Comercial"}
-                {key === "satellite" && "🛰️ Satelital"}
+                {key === "commercial" && (language === "es" ? "🗺️ Comercial" : "🗺️ Commercial")}
+                {key === "satellite" && (language === "es" ? "🛰️ Satelital" : "🛰️ Satellite")}
                 {key === "nocDark" && "🌙 NOC Dark"}
               </button>
             ))}
@@ -547,7 +550,7 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
         <div className="q-commercial-map-hud-top">
           <div className="q-commercial-hud-chip">
             <Zap size={12} className="q-commercial-hud-chip-icon" />
-            <span>Telemetría en Vivo • Lima Metropolitana</span>
+            <span>{language === "es" ? "Telemetría en Vivo • Lima Metropolitana" : "Live Telemetry • Lima Metropolitana"}</span>
           </div>
           <div className="q-commercial-hud-coords">
             GPS: {currentHubGeo ? `${Math.abs(currentHubGeo.lat).toFixed(4)}° S, ${Math.abs(currentHubGeo.lng).toFixed(4)}° W` : "12.0464° S, 77.0428° W"}
@@ -590,7 +593,7 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
               icon={<ExternalLink size={13} />}
               onClick={() => onSelectDevice && onSelectDevice(activeSelectedDevice)}
             >
-              Detalle
+              {language === "es" ? "Detalle" : "Details"}
             </Button>
             {onOpenRemote && (
               <Button
@@ -599,7 +602,7 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
                 icon={<Terminal size={13} />}
                 onClick={() => onOpenRemote(activeSelectedDevice)}
               >
-                Conectar
+                {language === "es" ? "Conectar" : "Connect"}
               </Button>
             )}
           </div>
@@ -608,10 +611,10 @@ export const NetworkTrafficMap: React.FC<NetworkTrafficMapProps> = ({
         <div className="q-commercial-map-footer q-commercial-map-footer--empty">
           <div className="q-map-footer-node-meta">
             <MapPin size={13} style={{ color: "var(--color-brand-primary)" }} />
-            <span>Haz clic en cualquier nodo o equipo en el mapa para inspeccionar telemetría y conexión remota.</span>
+            <span>{language === "es" ? "Haz clic en cualquier nodo o equipo en el mapa para inspeccionar telemetría y conexión remota." : "Click on any node or device on the map to inspect telemetry and remote connection."}</span>
           </div>
           <Badge variant="neutral">
-            Topología NOC Activa
+            {language === "es" ? "Topología NOC Activa" : "Active NOC Topology"}
           </Badge>
         </div>
       )}
