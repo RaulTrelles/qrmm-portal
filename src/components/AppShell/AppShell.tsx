@@ -21,6 +21,8 @@ import {
   ChevronDown,
   AlertTriangle,
   Layers,
+  Menu,
+  X,
 } from "lucide-react";
 import { FeedbackFAB, FeedbackModal } from "../FeedbackModal/FeedbackModal";
 import "./AppShell.css";
@@ -64,6 +66,12 @@ export const AppShell: React.FC<AppShellProps> = ({
 }) => {
   const { user, logout, organizationsList, activeOrganization, setActiveOrganization, language } = useAuth();
   const [reportsOpen, setReportsOpen] = React.useState<boolean>(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState<boolean>(false);
+
+  const handleViewChange = (view: ViewType) => {
+    onViewChange(view);
+    setMobileSidebarOpen(false);
+  };
 
   const getHeaderTitle = () => {
     switch (activeView) {
@@ -104,19 +112,30 @@ export const AppShell: React.FC<AppShellProps> = ({
 
   return (
     <div className="q-shell">
-      <aside className="q-sidebar">
+      <aside className={`q-sidebar ${mobileSidebarOpen ? "q-sidebar--mobile-open" : ""}`}>
         <div className="q-sidebar-header">
-          <div className="q-logo-badge">Q</div>
-          <div className="q-brand-info">
-            <span className="q-brand-name">Qhapana RMM</span>
-            <span className="q-brand-sub">{language === "es" ? "Plataforma Tecnológica" : "SaaS Platform"}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div className="q-logo-badge">Q</div>
+            <div className="q-brand-info">
+              <span className="q-brand-name">Qhapana RMM</span>
+              <span className="q-brand-sub">{language === "es" ? "Plataforma Tecnológica" : "SaaS Platform"}</span>
+            </div>
           </div>
+          {mobileSidebarOpen && (
+            <button
+              className="q-mobile-close-btn"
+              onClick={() => setMobileSidebarOpen(false)}
+              aria-label="Close menu"
+            >
+              <X size={20} />
+            </button>
+          )}
         </div>
         <nav className="q-sidebar-nav">
           <div className="q-nav-section-title">{language === "es" ? "Operaciones" : "Operations"}</div>
           <div
             className={`q-nav-item ${activeView === "dashboard" ? "q-nav-item--active" : ""}`}
-            onClick={() => onViewChange("dashboard")}
+            onClick={() => handleViewChange("dashboard")}
             style={{ cursor: "pointer" }}
           >
             <LayoutDashboard size={18} />
@@ -124,7 +143,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           </div>
           <div
             className={`q-nav-item ${activeView === "inventory" ? "q-nav-item--active" : ""}`}
-            onClick={() => onViewChange("inventory")}
+            onClick={() => handleViewChange("inventory")}
             style={{ cursor: "pointer" }}
           >
             <Server size={18} />
@@ -136,7 +155,7 @@ export const AppShell: React.FC<AppShellProps> = ({
             <div
               className={`q-nav-item ${activeView === "reports" ? "q-nav-item--active" : ""}`}
               onClick={() => {
-                onViewChange("reports");
+                handleViewChange("reports");
                 setReportsOpen((prev) => !prev);
               }}
               style={{ cursor: "pointer" }}
@@ -162,7 +181,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                       : ""
                   }`}
                   onClick={() => {
-                    onViewChange("reports");
+                    handleViewChange("reports");
                     onReportTabChange?.("incidents");
                   }}
                   style={{ cursor: "pointer" }}
@@ -177,7 +196,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                       : ""
                   }`}
                   onClick={() => {
-                    onViewChange("reports");
+                    handleViewChange("reports");
                     onReportTabChange?.("fleet");
                   }}
                   style={{ cursor: "pointer" }}
@@ -192,7 +211,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                       : ""
                   }`}
                   onClick={() => {
-                    onViewChange("reports");
+                    handleViewChange("reports");
                     onReportTabChange?.("summary");
                   }}
                   style={{ cursor: "pointer" }}
@@ -205,7 +224,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           </div>
           <div
             className={`q-nav-item ${activeView === "ai-health" ? "q-nav-item--active" : ""}`}
-            onClick={() => onViewChange("ai-health")}
+            onClick={() => handleViewChange("ai-health")}
             style={{ cursor: "pointer" }}
           >
             <Sparkles size={18} color="var(--color-brand-primary)" />
@@ -213,7 +232,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           </div>
           <div
             className={`q-nav-item ${activeView === "discovery" ? "q-nav-item--active" : ""}`}
-            onClick={() => onViewChange("discovery")}
+            onClick={() => handleViewChange("discovery")}
             style={{ cursor: "pointer" }}
           >
             <Radio size={18} />
@@ -224,7 +243,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           {user?.role === "SUPERADMIN" && (
             <div
               className={`q-nav-item ${activeView === "clients" ? "q-nav-item--active" : ""}`}
-              onClick={() => onViewChange("clients")}
+              onClick={() => handleViewChange("clients")}
               style={{ cursor: "pointer" }}
             >
               <Building2 size={18} />
@@ -233,7 +252,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           )}
           <div
             className={`q-nav-item ${activeView === "users" ? "q-nav-item--active" : ""}`}
-            onClick={() => onViewChange("users")}
+            onClick={() => handleViewChange("users")}
             style={{ cursor: "pointer" }}
           >
             <Users size={18} />
@@ -241,7 +260,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           </div>
           <div
             className={`q-nav-item ${activeView === "payments" ? "q-nav-item--active" : ""}`}
-            onClick={() => onViewChange("payments")}
+            onClick={() => handleViewChange("payments")}
             style={{ cursor: "pointer" }}
           >
             <CreditCard size={18} />
@@ -249,7 +268,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           </div>
           <div
             className={`q-nav-item ${activeView === "settings" ? "q-nav-item--active" : ""}`}
-            onClick={() => onViewChange("settings")}
+            onClick={() => handleViewChange("settings")}
             style={{ cursor: "pointer" }}
           >
             <Bell size={18} />
@@ -259,7 +278,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           <div className="q-nav-section-title">{language === "es" ? "Atención y Experiencia" : "Support & Experience"}</div>
           <div
             className={`q-nav-item ${activeView === "support" ? "q-nav-item--active" : ""}`}
-            onClick={() => onViewChange("support")}
+            onClick={() => handleViewChange("support")}
             style={{ cursor: "pointer" }}
           >
             <LifeBuoy size={18} />
@@ -284,6 +303,13 @@ export const AppShell: React.FC<AppShellProps> = ({
       <div className="q-main">
         <header className="q-header">
           <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+            <button
+              className="q-mobile-menu-btn"
+              onClick={() => setMobileSidebarOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu size={20} />
+            </button>
             <div className="q-header-title">{getHeaderTitle()}</div>
 
             {/* Tenant Selector: Solo Superadmin puede alternar empresas; los clientes ven solo su propia organización fija */}
@@ -416,7 +442,7 @@ export const AppShell: React.FC<AppShellProps> = ({
               <button
                 type="button"
                 className="q-footer-link"
-                onClick={() => onViewChange("support")}
+                onClick={() => handleViewChange("support")}
                 title={language === "es" ? "Mesa de ayuda, soporte y sugerencias" : "Help desk and support"}
               >
                 <LifeBuoy size={13} />
@@ -425,7 +451,7 @@ export const AppShell: React.FC<AppShellProps> = ({
               <button
                 type="button"
                 className="q-footer-link"
-                onClick={() => onViewChange("reports")}
+                onClick={() => handleViewChange("reports")}
                 title={language === "es" ? "Centro de reportes y análisis operativo" : "Reports and operational analysis"}
               >
                 <BarChart3 size={13} />
