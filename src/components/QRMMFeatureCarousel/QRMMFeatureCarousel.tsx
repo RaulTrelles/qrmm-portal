@@ -15,6 +15,26 @@ interface Slide {
 
 const slides: Slide[] = [
   {
+    id: "silent-support",
+    img: "/showcase/analisis_soporte_sin_interrupciones.png",
+    tagEs: "SOPORTE SILENCIOSO",
+    tagEn: "SILENT SUPPORT",
+    titleEs: "Soporte sin interrupciones",
+    titleEn: "Uninterrupted Support",
+    descEs: "Audita, repara y diagnostica en segundo plano sin interrumpir al usuario final.",
+    descEn: "Audit, repair, and diagnose in the background without disrupting the end user.",
+  },
+  {
+    id: "real-time-support",
+    img: "/showcase/soporte_time_real.png",
+    tagEs: "SOPORTE EN TIEMPO REAL",
+    tagEn: "REAL-TIME SUPPORT",
+    titleEs: "Soporte en tiempo real",
+    titleEn: "Real-Time Support",
+    descEs: "Controla escritorios remotos y asiste a tus usuarios de manera inmediata.",
+    descEn: "Take over remote desktops and assist your users instantly.",
+  },
+  {
     id: "remote-desktop",
     img: "/showcase/remote-control-mockup.jpg",
     tagEs: "REMOTE DESKTOP",

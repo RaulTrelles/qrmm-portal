@@ -442,7 +442,7 @@ export const PortalView: React.FC<PortalViewProps> = ({ onGoToLogin }) => {
           <div className="q-portal-device-stage">
             <div className="q-portal-device-canvas">
               <img
-                src="/showcase/hero-workspace-mockup.jpg"
+                src="/showcase/soporte_time_real.png"
                 alt="Qhapana RMM en PC y Móvil"
                 className="q-portal-device-img"
               />
