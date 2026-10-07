@@ -12,23 +12,44 @@ import { AIHealthView } from "./views/AIHealthView";
 import { SupportView } from "./views/SupportView";
 import { PortalView } from "./views/PortalView";
 import { LoginView } from "./views/LoginView";
+import { MaintenanceView } from "./views/MaintenanceView";
+import { ReportsView, type ReportTabType } from "./views/ReportsView";
 import { DeviceDetailModal } from "./components/DeviceDetailModal/DeviceDetailModal";
 import { dashboardSocket } from "./services/socket";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import { getDeviceById } from "./services/api";
+import {
+  getDeviceById,
+  getMaintenanceStatus,
+  updateMaintenanceStatus,
+  type MaintenanceSettings,
+} from "./services/api";
 import { trackPageView, trackEvent } from "./services/analytics";
 import type { Device } from "./types/device";
 
 function AppContent() {
-  const { token, isLoading } = useAuth();
+  const { token, user, isLoading } = useAuth();
   const [theme, setTheme] = useState<"light" | "dark">(() => {
     return (localStorage.getItem("q_theme") as "light" | "dark") || "dark";
   });
+  const [maintenanceConfig, setMaintenanceConfig] = useState<MaintenanceSettings | null>(null);
+  const [isMaintenanceActive, setIsMaintenanceActive] = useState<boolean>(false);
+  const [forceMaintenanceView, setForceMaintenanceView] = useState<boolean>(() => {
+    const p = window.location.pathname.toLowerCase();
+    const h = window.location.hash.toLowerCase();
+    return (
+      p.includes("maintenance") ||
+      p.includes("mantenimiento") ||
+      h.includes("maintenance") ||
+      h.includes("mantenimiento")
+    );
+  });
+  const [activeReportTab, setActiveReportTab] = useState<ReportTabType>("incidents");
   const [activeView, setActiveView] = useState<ViewType>(() => {
     const path = window.location.pathname.replace(/^\//, "");
     const validViews: ViewType[] = [
       "dashboard",
       "inventory",
+      "reports",
       "ai-health",
       "discovery",
       "clients",
@@ -53,6 +74,31 @@ function AppContent() {
   const [isLiveConnected, setIsLiveConnected] = useState<boolean>(false);
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
+
+  const checkMaintenance = async () => {
+    try {
+      const data = await getMaintenanceStatus();
+      setMaintenanceConfig(data);
+      setIsMaintenanceActive(Boolean(data.maintenance_mode));
+    } catch (err) {
+      console.error("Error checking maintenance status:", err);
+    }
+  };
+
+  useEffect(() => {
+    checkMaintenance();
+    const timer = setInterval(checkMaintenance, 30000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleDisableMaintenance = async () => {
+    try {
+      await updateMaintenanceStatus({ maintenance_mode: false });
+      await checkMaintenance();
+    } catch (err: any) {
+      alert(err.message || "Error al desactivar el mantenimiento.");
+    }
+  };
 
   const handleOpenDeviceById = async (deviceId: string) => {
     try {
@@ -89,6 +135,7 @@ function AppContent() {
     const viewMeta: Record<ViewType, { title: string; path: string }> = {
       dashboard: { title: "Panel de Monitoreo RMM", path: "/dashboard" },
       inventory: { title: "Inventario de Dispositivos", path: "/inventory" },
+      reports: { title: "Centro de Reportes & Incidencias", path: "/reports" },
       "ai-health": { title: "Salud y Diagnóstico Predictivo IA", path: "/ai-health" },
       discovery: { title: "Descubrimiento de Red", path: "/discovery" },
       clients: { title: "Gestión de Clientes y Áreas", path: "/clients" },
@@ -157,6 +204,41 @@ function AppContent() {
     );
   }
 
+  // Vista de mantenimiento si se solicita directamente por URL (/maintenance o /mantenimiento)
+  if (forceMaintenanceView) {
+    return (
+      <MaintenanceView
+        initialSettings={maintenanceConfig}
+        isSuperAdmin={user?.role === "SUPERADMIN"}
+        onBackToConsole={() => setForceMaintenanceView(false)}
+        onStatusRestored={() => {
+          setForceMaintenanceView(false);
+          checkMaintenance();
+        }}
+        onBypassSuccess={() => {
+          setForceMaintenanceView(false);
+          checkMaintenance();
+        }}
+      />
+    );
+  }
+
+  // Vista de mantenimiento automática si está activado y el usuario no es SUPERADMIN
+  if (isMaintenanceActive && user?.role !== "SUPERADMIN") {
+    return (
+      <MaintenanceView
+        initialSettings={maintenanceConfig}
+        isSuperAdmin={false}
+        onBypassSuccess={() => {
+          checkMaintenance();
+        }}
+        onStatusRestored={() => {
+          checkMaintenance();
+        }}
+      />
+    );
+  }
+
   // Vista para visitantes no autenticados (Portal de Productos & Ofertas por defecto, o Login)
   if (!token) {
     if (visitorView === "portal") {
@@ -217,6 +299,61 @@ function AppContent() {
 
   return (
     <>
+      {isMaintenanceActive && user?.role === "SUPERADMIN" && (
+        <div style={{
+          backgroundColor: "#b45309",
+          color: "#ffffff",
+          padding: "8px 20px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          fontWeight: 600,
+          fontSize: "13px",
+          zIndex: 9999,
+          position: "sticky",
+          top: 0,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.2)"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span style={{ fontSize: "16px" }}>🛠️</span>
+            <span>
+              <strong>MODO MANTENIMIENTO ACTIVO:</strong> El portal y la consola están fuera de línea para clientes y usuarios generales. Solo Superadministradores tienen acceso técnico.
+            </span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <button
+              onClick={() => setForceMaintenanceView(true)}
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                border: "1px solid rgba(255,255,255,0.4)",
+                color: "#ffffff",
+                padding: "5px 12px",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "12px",
+                fontWeight: 600,
+              }}
+            >
+              👁️ Previsualizar Pantalla
+            </button>
+            <button
+              onClick={handleDisableMaintenance}
+              style={{
+                background: "#ffffff",
+                border: "none",
+                color: "#92400e",
+                padding: "5px 14px",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "12px",
+                fontWeight: 700,
+              }}
+            >
+              Desactivar Mantenimiento
+            </button>
+          </div>
+        </div>
+      )}
       <AppShell
         theme={theme}
         onToggleTheme={toggleTheme}
@@ -224,12 +361,19 @@ function AppContent() {
         onRefresh={handleRefresh}
         activeView={activeView}
         onViewChange={setActiveView}
+        activeReportTab={activeReportTab}
+        onReportTabChange={setActiveReportTab}
         onOpenPortal={() => setShowPortalPreview(true)}
       >
         {activeView === "dashboard" ? (
           <DashboardView refreshTrigger={refreshKey} />
         ) : activeView === "inventory" ? (
           <InventoryView refreshTrigger={refreshKey} />
+        ) : activeView === "reports" ? (
+          <ReportsView
+            initialTab={activeReportTab}
+            onOpenDeviceDetail={handleOpenDeviceById}
+          />
         ) : activeView === "ai-health" ? (
           <AIHealthView onSelectDevice={handleOpenDeviceById} />
         ) : activeView === "discovery" ? (

@@ -1206,5 +1206,402 @@
   cursor: not-allowed;
 }
 
+/* -------------------------------------------------------------------------
+   Vibrant Hero KPI Cards inside Device Overview / Resumen
+------------------------------------------------------------------------- */
+.q-modal-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 6px;
+}
+
+.q-modal-kpi-card {
+  position: relative;
+  border-radius: 14px;
+  padding: 16px 18px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140px;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  transition: transform var(--motion-fast), box-shadow var(--motion-fast);
+}
+
+.q-modal-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.45);
+}
+
+.q-modal-kpi-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+}
+
+.q-modal-kpi-card--purple1 {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+}
+
+.q-modal-kpi-card--purple2 {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+}
+
+.q-modal-kpi-card--teal1 {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+}
+
+.q-modal-kpi-card--teal2 {
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+}
+
+.q-modal-kpi-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.q-modal-kpi-title {
+  font-size: 13.5px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  opacity: 0.95;
+}
+
+.q-modal-kpi-action-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+}
+
+.q-modal-kpi-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0 8px 0;
+}
+
+.q-modal-kpi-icon-svg {
+  width: 32px;
+  height: 32px;
+  opacity: 0.95;
+}
+
+.q-modal-donut-ring {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.q-modal-donut-ring circle {
+  transition: stroke-dashoffset 0.8s ease;
+}
+
+.q-modal-kpi-num {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.q-modal-kpi-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.q-modal-kpi-sub {
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.88;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.q-modal-kpi-track {
+  width: 100%;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.24);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.q-modal-kpi-fill {
+  height: 100%;
+  background-color: #ffffff;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.65);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* -------------------------------------------------------------------------
+   Unified Hardware Specifications + Real-Time Telemetry Master Cards
+------------------------------------------------------------------------- */
+.q-modal-unified-card {
+  position: relative;
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border-default);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 154px;
+  transition: transform var(--motion-fast), border-color var(--motion-fast), box-shadow var(--motion-fast);
+  overflow: hidden;
+}
+
+.q-modal-unified-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-border-hover);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.28);
+}
+
+.q-modal-unified-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  opacity: 0.9;
+}
+
+.q-modal-unified-card--cpu::before {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+}
+
+.q-modal-unified-card--ram::before {
+  background: linear-gradient(90deg, #0284c7, #06b6d4);
+}
+
+.q-modal-unified-card--storage::before {
+  background: linear-gradient(90deg, #0d9488, #10b981);
+}
+
+.q-modal-unified-card--site::before {
+  background: linear-gradient(90deg, #8b5cf6, #10b981);
+}
+
+.q-modal-unified-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.q-modal-unified-badge-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.q-modal-unified-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.q-modal-unified-icon--cpu {
+  background: rgba(99, 102, 241, 0.16);
+  color: #818cf8;
+}
+
+.q-modal-unified-icon--ram {
+  background: rgba(2, 132, 199, 0.16);
+  color: #38bdf8;
+}
+
+.q-modal-unified-icon--storage {
+  background: rgba(13, 148, 136, 0.16);
+  color: #2dd4bf;
+}
+
+.q-modal-unified-icon--site {
+  background: rgba(139, 92, 246, 0.16);
+  color: #a78bfa;
+}
+
+.q-modal-unified-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.q-modal-unified-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-family-mono);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.q-modal-unified-pill--cpu {
+  background: rgba(99, 102, 241, 0.14);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.q-modal-unified-pill--ram {
+  background: rgba(2, 132, 199, 0.14);
+  color: #38bdf8;
+  border: 1px solid rgba(2, 132, 199, 0.3);
+}
+
+.q-modal-unified-pill--storage {
+  background: rgba(13, 148, 136, 0.14);
+  color: #2dd4bf;
+  border: 1px solid rgba(13, 148, 136, 0.3);
+}
+
+.q-modal-unified-pill--online {
+  background: rgba(16, 185, 129, 0.14);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.q-modal-unified-pill--offline {
+  background: rgba(239, 68, 68, 0.14);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.q-modal-unified-dot-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 6px #34d399;
+}
+
+.q-modal-unified-body {
+  margin-bottom: 12px;
+}
+
+.q-modal-unified-value {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.q-modal-unified-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+}
+
+.q-modal-unified-sub {
+  font-size: 11.5px;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.q-modal-unified-dot {
+  opacity: 0.5;
+  font-size: 10px;
+}
+
+.q-modal-unified-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.q-modal-unified-track {
+  width: 100%;
+  height: 5px;
+  background-color: var(--color-border-default);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.q-modal-unified-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.q-modal-unified-fill--cpu {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  box-shadow: 0 0 6px rgba(139, 92, 246, 0.5);
+}
+
+.q-modal-unified-fill--ram {
+  background: linear-gradient(90deg, #0284c7, #06b6d4);
+  box-shadow: 0 0 6px rgba(6, 182, 212, 0.5);
+}
+
+.q-modal-unified-fill--storage {
+  background: linear-gradient(90deg, #0d9488, #10b981);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+.q-modal-unified-fill--site {
+  background: linear-gradient(90deg, #10b981, #059669);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+.q-modal-unified-foot-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+@media (max-width: 1024px) {
+  .q-modal-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 580px) {
+  .q-modal-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 
 

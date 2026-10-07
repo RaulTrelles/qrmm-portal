@@ -9,13 +9,13 @@ import { NetworkTrafficMap } from "../components/NetworkTrafficMap/NetworkTraffi
 import { useAuth } from "../context/AuthContext";
 import {
   Plus,
-  Cpu,
-  HardDrive,
-  Activity,
-  Wifi,
-  Gauge,
-  Radio,
   ChevronDown,
+  Radio,
+  Wifi,
+  Cpu,
+  Gauge,
+  Activity,
+  HardDrive,
 } from "lucide-react";
 import "./DashboardView.css";
 
@@ -131,6 +131,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
   }, []);
 
 
+
+  const filteredDevices = useMemo(() => {
+    return devices.filter((d) => {
+      const matchesArea = areaFilter === "all" || (d.client_area || "").toLowerCase() === areaFilter.toLowerCase();
+      return matchesArea;
+    });
+  }, [devices, areaFilter]);
+
   // Cálculos de Telemetría Global de la Flota para Hero KPI Cards
   const fleetMetrics = useMemo(() => {
     const onlineDevices = devices.filter((d) => d.status.current_state === "ONLINE");
@@ -157,7 +165,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
         usedRamGb += (ramInstalled * d.latest_telemetry.ram_percent) / 100;
       }
     });
-    const ramPctAvg = totalRamGb > 0 ? Math.round((usedRamGb / totalRamGb) * 100) : 57;
+    const ramPctAvg = totalRamGb > 0 ? Math.round((usedRamGb / totalRamGb) * 100) : 51;
 
     // Disco promedio
     let totalDiskGb = 0;
@@ -169,25 +177,31 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
         usedDiskGb += (diskInstalled * d.latest_telemetry.disk_percent) / 100;
       }
     });
-    const diskPctAvg = totalDiskGb > 0 ? Math.round((usedDiskGb / totalDiskGb) * 100) : 64;
+    const diskPctAvg = totalDiskGb > 0 ? Math.round((usedDiskGb / totalDiskGb) * 100) : 79;
+
+    // Latencia / IOs red
+    let totalLatency = 0;
+    let latencyCount = 0;
+    onlineDevices.forEach((d) => {
+      const ping = (d.latest_telemetry as any)?.telemetry?.ping_ms;
+      if (typeof ping === "number") {
+        totalLatency += ping;
+        latencyCount++;
+      }
+    });
+    const latencyPct = latencyCount > 0 ? Math.min(100, Math.max(15, Math.round((totalLatency / latencyCount / 50) * 100))) : 38;
 
     return {
       avgCpu: Math.round(avgCpu * 10) / 10,
       ramPctAvg,
       diskPctAvg,
+      latencyPct,
       totalRamGb: Math.round(totalRamGb),
       usedRamGb: Math.round(usedRamGb),
       totalDiskGb: Math.round(totalDiskGb),
       usedDiskGb: Math.round(usedDiskGb),
     };
   }, [devices]);
-
-  const filteredDevices = useMemo(() => {
-    return devices.filter((d) => {
-      const matchesArea = areaFilter === "all" || (d.client_area || "").toLowerCase() === areaFilter.toLowerCase();
-      return matchesArea;
-    });
-  }, [devices, areaFilter]);
 
   return (
     <div className="q-dashboard-view q-it-dashboard">
@@ -234,17 +248,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
           <div className="q-it-kpi-top">
             <span className="q-it-kpi-title">Network latency</span>
             <span className="q-it-kpi-action-icon">
-              <Radio size={14} />
+              <Radio size={13} />
             </span>
           </div>
           <div className="q-it-kpi-body">
-            <Wifi size={32} className="q-it-kpi-icon-svg" />
-            <span className="q-it-kpi-num">38%</span>
+            <Wifi size={26} className="q-it-kpi-icon-svg" />
+            <span className="q-it-kpi-num">{fleetMetrics.latencyPct}%</span>
           </div>
           <div className="q-it-kpi-foot">
             <span className="q-it-kpi-sub">Network/IOs</span>
             <div className="q-it-kpi-track">
-              <div className="q-it-kpi-fill" style={{ width: "38%" }}></div>
+              <div className="q-it-kpi-fill" style={{ width: `${fleetMetrics.latencyPct}%` }}></div>
             </div>
           </div>
         </div>
@@ -254,11 +268,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
           <div className="q-it-kpi-top">
             <span className="q-it-kpi-title">CPU usage</span>
             <span className="q-it-kpi-action-icon">
-              <Cpu size={14} />
+              <Cpu size={13} />
             </span>
           </div>
           <div className="q-it-kpi-body">
-            <svg width="40" height="40" viewBox="0 0 40 40" className="q-it-donut-ring">
+            <svg width="32" height="32" viewBox="0 0 40 40" className="q-it-donut-ring">
               <circle cx="20" cy="20" r="15" fill="none" stroke="rgba(255, 255, 255, 0.22)" strokeWidth="3.5" />
               <circle
                 cx="20"
@@ -291,11 +305,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
           <div className="q-it-kpi-top">
             <span className="q-it-kpi-title">Bandwidth</span>
             <span className="q-it-kpi-action-icon">
-              <Activity size={14} />
+              <Activity size={13} />
             </span>
           </div>
           <div className="q-it-kpi-body">
-            <Gauge size={32} className="q-it-kpi-icon-svg" />
+            <Gauge size={26} className="q-it-kpi-icon-svg" />
             <span className="q-it-kpi-num">{fleetMetrics.ramPctAvg}%</span>
           </div>
           <div className="q-it-kpi-foot">
@@ -311,11 +325,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
           <div className="q-it-kpi-top">
             <span className="q-it-kpi-title">Bandwidth</span>
             <span className="q-it-kpi-action-icon">
-              <HardDrive size={14} />
+              <HardDrive size={13} />
             </span>
           </div>
           <div className="q-it-kpi-body">
-            <HardDrive size={32} className="q-it-kpi-icon-svg" />
+            <HardDrive size={26} className="q-it-kpi-icon-svg" />
             <span className="q-it-kpi-num">{fleetMetrics.diskPctAvg}%</span>
           </div>
           <div className="q-it-kpi-foot">
@@ -326,6 +340,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ refreshTrigger }) 
           </div>
         </div>
       </section>
+
 
       {/* ----------------------------------------------------------------------
           3. FULL-WIDTH LIVE NETWORK TRAFFIC MAP (NOC Geolocation Center)

@@ -1,7 +1,8 @@
 .q-dashboard-view {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: 10px;
+  width: 100%;
 }
 
 .q-kpi-grid {
@@ -700,8 +701,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-4);
-  padding: var(--space-2) 0;
+  margin-bottom: 2px;
+  padding: 0;
   gap: var(--space-4);
   flex-wrap: wrap;
 }
@@ -713,7 +714,7 @@
 }
 
 .q-it-title {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--color-text-primary);
@@ -838,31 +839,31 @@
   box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
 }
 
-/* 4 Vibrant Hero KPI Cards - Expanded dimensions & visual hierarchy */
+/* 4 Vibrant Hero KPI Cards - Compact executive dimensions */
 .q-it-kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-5);
-  margin-bottom: var(--space-6);
+  gap: 12px;
+  margin-bottom: 8px;
 }
 
 .q-it-kpi-card {
   position: relative;
-  border-radius: 16px;
-  padding: 22px 24px;
+  border-radius: 12px;
+  padding: 12px 18px;
   color: #ffffff;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 155px;
-  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.35);
+  min-height: 104px;
+  box-shadow: 0 6px 18px -4px rgba(0, 0, 0, 0.28);
   overflow: hidden;
   transition: transform var(--motion-normal), box-shadow var(--motion-normal);
 }
 
 .q-it-kpi-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 36px -6px rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -4px rgba(0, 0, 0, 0.4);
 }
 
 .q-it-kpi-card::after {
@@ -899,16 +900,16 @@
 
 .q-it-kpi-title,
 .q-it-kpi-label {
-  font-size: 15px;
+  font-size: 13.5px;
   font-weight: 650;
   letter-spacing: -0.01em;
   opacity: 0.95;
 }
 
 .q-it-kpi-action-icon {
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
   background-color: rgba(255, 255, 255, 0.16);
   display: flex;
   align-items: center;
@@ -925,13 +926,13 @@
 .q-it-kpi-body {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin: 14px 0 10px 0;
+  gap: 12px;
+  margin: 6px 0 6px 0;
 }
 
 .q-it-kpi-icon-svg {
-  width: 38px;
-  height: 38px;
+  width: 28px;
+  height: 28px;
   opacity: 0.95;
 }
 
@@ -939,15 +940,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   background-color: rgba(255, 255, 255, 0.14);
 }
 
 .q-it-donut-ring {
-  width: 46px;
-  height: 46px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
 }
 
@@ -962,7 +963,7 @@
 
 .q-it-kpi-num,
 .q-it-kpi-val {
-  font-size: 34px;
+  font-size: 26px;
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -971,12 +972,12 @@
 .q-it-kpi-foot {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-top: 6px;
+  gap: 4px;
+  margin-top: 2px;
 }
 
 .q-it-kpi-sub {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   opacity: 0.85;
 }
@@ -984,7 +985,7 @@
 .q-it-kpi-track,
 .q-it-kpi-progress-track {
   width: 100%;
-  height: 5px;
+  height: 4px;
   background-color: rgba(255, 255, 255, 0.24);
   border-radius: var(--radius-pill);
   overflow: hidden;
@@ -995,7 +996,7 @@
   height: 100%;
   background-color: #ffffff;
   border-radius: var(--radius-pill);
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.65);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.65);
   transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -1004,13 +1005,14 @@
   display: grid;
   grid-template-columns: 430px 1fr;
   gap: var(--space-4);
-  margin-bottom: var(--space-5);
+  margin-bottom: 0;
   align-items: start;
 }
 
 .q-it-operations-grid--fullwidth {
   display: block;
   width: 100%;
+  margin-bottom: 0;
 }
 
 .q-it-operations-grid--fullwidth .q-it-right-stack {

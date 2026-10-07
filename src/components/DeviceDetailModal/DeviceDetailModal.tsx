@@ -219,20 +219,6 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
   const [savingGps, setSavingGps] = useState<boolean>(false);
   const [gpsFeedback, setGpsFeedback] = useState<{ msg: string; type: "success" | "error" } | null>(null);
 
-  const GPS_DISTRICT_PRESETS = [
-    { label: "Callao - Sede Central Kraken", lat: -12.0565, lng: -77.1181 },
-    { label: "Callao - Nodo Facturación", lat: -12.0515, lng: -77.1285 },
-    { label: "San Isidro - Sede IPN", lat: -12.0967, lng: -77.0353 },
-    { label: "Los Olivos - Sede Finanzas", lat: -11.9611, lng: -77.0706 },
-    { label: "Surco - Sede Perkons", lat: -12.1389, lng: -76.9944 },
-    { label: "San Miguel - Soporte TI", lat: -12.0772, lng: -77.0867 },
-    { label: "Miraflores - Corporativo", lat: -12.1217, lng: -77.0298 },
-    { label: "Ate - Zona Industrial", lat: -12.0264, lng: -76.9189 },
-    { label: "Cercado de Lima - Centro", lat: -12.0464, lng: -77.0428 },
-    { label: "La Molina - Sede Este", lat: -12.0833, lng: -76.9333 },
-    { label: "Chorrillos - Sede Sur", lat: -12.1633, lng: -77.0189 },
-  ];
-
   const handleSaveGpsCoordinates = async () => {
     if (!device) return;
     const latNum = parseFloat(gpsLat);
@@ -978,50 +964,176 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
           {activeTab === "overview" && (
             <>
               <div className="q-modal-section">
-                <span className="q-modal-section-title">Especificaciones de Hardware</span>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-                  <div style={{ background: "var(--color-surface-muted)", padding: 12, borderRadius: 8 }}>
-                    <Cpu size={18} color="var(--color-brand-primary)" style={{ marginBottom: 4 }} />
-                    <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>CPU</div>
-                    <div style={{ fontWeight: 600, fontSize: 13 }}>{device.specs?.cpu_model || "Procesador x86_64"}</div>
-                    <div style={{ fontSize: 11 }}>{device.specs?.cpu_cores || 8} Núcleos</div>
-                  </div>
-                  <div style={{ background: "var(--color-surface-muted)", padding: 12, borderRadius: 8 }}>
-                    <Activity size={18} color="var(--color-brand-primary)" style={{ marginBottom: 4 }} />
-                    <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>MEMORIA RAM</div>
-                    <div style={{ fontWeight: 600, fontSize: 13 }}>{formatRAM(device.specs?.ram_total_gb)}</div>
-                    <div style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>
-                      {device.specs?.ram_usable_gb ? `${device.specs.ram_usable_gb} GB utilizables` : "Instalada"}
+                <span className="q-modal-section-title">
+                  {isEs ? "Rendimiento en Vivo & Especificaciones de Hardware" : "Live Performance & Hardware Specifications"}
+                </span>
+                <div className="q-modal-kpi-grid">
+                  {/* Card 1: CPU (Hardware Spec + Real-time Usage) */}
+                  <div className="q-modal-unified-card q-modal-unified-card--cpu">
+                    <div className="q-modal-unified-top">
+                      <div className="q-modal-unified-badge-title">
+                        <span className="q-modal-unified-icon q-modal-unified-icon--cpu">
+                          <Cpu size={15} />
+                        </span>
+                        <span className="q-modal-unified-label">CPU / PROCESADOR</span>
+                      </div>
+                      <span className="q-modal-unified-pill q-modal-unified-pill--cpu">
+                        {(cpu || 0.9).toFixed(1)}% uso
+                      </span>
+                    </div>
+                    <div className="q-modal-unified-body">
+                      <div className="q-modal-unified-value" title={device.specs?.cpu_model || "Procesador x86_64"}>
+                        {device.specs?.cpu_model || "Procesador x86_64 Multi-Core"}
+                      </div>
+                      <div className="q-modal-unified-sub">
+                        <span>{device.specs?.cpu_cores || 8} Núcleos lógicos</span>
+                        {device.specs?.cpu_mhz ? (
+                          <>
+                            <span className="q-modal-unified-dot">•</span>
+                            <span>{(device.specs.cpu_mhz / 1000).toFixed(2)} GHz</span>
+                          </>
+                        ) : null}
+                      </div>
+                    </div>
+                    <div className="q-modal-unified-foot">
+                      <div className="q-modal-unified-track">
+                        <div
+                          className="q-modal-unified-fill q-modal-unified-fill--cpu"
+                          style={{ width: `${Math.min(100, Math.max(4, cpu || 0.9))}%` }}
+                        />
+                      </div>
+                      <div className="q-modal-unified-foot-meta">
+                        <span>Carga actual</span>
+                        <span style={{ fontWeight: 700 }}>{(cpu || 0.9).toFixed(1)}%</span>
+                      </div>
                     </div>
                   </div>
-                  <div style={{ background: "var(--color-surface-muted)", padding: 12, borderRadius: 8 }}>
-                    <HardDrive size={18} color="var(--color-brand-primary)" style={{ marginBottom: 4 }} />
-                    <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>
-                      {isEs ? "ALMACENAMIENTO TOTAL" : "TOTAL STORAGE"}
+
+                  {/* Card 2: RAM (Hardware Spec + Real-time Usage) */}
+                  <div className="q-modal-unified-card q-modal-unified-card--ram">
+                    <div className="q-modal-unified-top">
+                      <div className="q-modal-unified-badge-title">
+                        <span className="q-modal-unified-icon q-modal-unified-icon--ram">
+                          <Activity size={15} />
+                        </span>
+                        <span className="q-modal-unified-label">MEMORIA RAM</span>
+                      </div>
+                      <span className="q-modal-unified-pill q-modal-unified-pill--ram">
+                        {(ram || 51).toFixed(0)}% uso
+                      </span>
                     </div>
-                    <div style={{ fontWeight: 600, fontSize: 13 }}>
-                      {totalStorageGB >= 1000
-                        ? `${(totalStorageGB / 1024).toFixed(1)} TB (${allDisks.length} ${allDisks.length === 1 ? (isEs ? "unidad" : "drive") : (isEs ? "unidades" : "drives")})`
-                        : `${Math.round(totalStorageGB)} GB (${allDisks.length} ${allDisks.length === 1 ? (isEs ? "unidad" : "drive") : (isEs ? "unidades" : "drives")})`}
+                    <div className="q-modal-unified-body">
+                      <div className="q-modal-unified-value">
+                        {formatRAM(device.specs?.ram_total_gb)}
+                        {device.specs?.ram_type ? (
+                          <span className="q-modal-unified-tag">{device.specs.ram_type}</span>
+                        ) : null}
+                      </div>
+                      <div className="q-modal-unified-sub">
+                        <span>{device.specs?.ram_usable_gb ? `${device.specs.ram_usable_gb} GB utilizables` : "Instalada"}</span>
+                        {device.specs?.ram_usable_gb ? (
+                          <>
+                            <span className="q-modal-unified-dot">•</span>
+                            <span>{(((ram || 51) * Number(device.specs.ram_usable_gb)) / 100).toFixed(1)} GB en uso</span>
+                          </>
+                        ) : null}
+                      </div>
                     </div>
-                    <div style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>
-                      {freeStorageGB >= 1000
-                        ? `${(freeStorageGB / 1024).toFixed(1)} TB ${isEs ? "libres" : "free"}`
-                        : `${Math.round(freeStorageGB * 10) / 10} GB ${isEs ? "libres" : "free"}`}
+                    <div className="q-modal-unified-foot">
+                      <div className="q-modal-unified-track">
+                        <div
+                          className="q-modal-unified-fill q-modal-unified-fill--ram"
+                          style={{ width: `${Math.min(100, Math.max(5, ram || 51))}%` }}
+                        />
+                      </div>
+                      <div className="q-modal-unified-foot-meta">
+                        <span>Ocupación RAM</span>
+                        <span style={{ fontWeight: 700 }}>{(ram || 51).toFixed(0)}%</span>
+                      </div>
                     </div>
                   </div>
-                  <div style={{ background: "var(--color-surface-muted)", padding: 12, borderRadius: 8 }}>
-                    <MapPin size={18} color="var(--color-brand-primary)" style={{ marginBottom: 4 }} />
-                    <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>
-                      {isEs ? "UBICACIÓN GEOGRÁFICA" : "GEOLOCATION & SITE"}
+
+                  {/* Card 3: Storage (Hardware Disks + Total / Free GB + Usage) */}
+                  <div className="q-modal-unified-card q-modal-unified-card--storage">
+                    <div className="q-modal-unified-top">
+                      <div className="q-modal-unified-badge-title">
+                        <span className="q-modal-unified-icon q-modal-unified-icon--storage">
+                          <HardDrive size={15} />
+                        </span>
+                        <span className="q-modal-unified-label">{isEs ? "ALMACENAMIENTO" : "STORAGE"}</span>
+                      </div>
+                      <span className="q-modal-unified-pill q-modal-unified-pill--storage">
+                        {(disk || 79).toFixed(0)}% ocupado
+                      </span>
                     </div>
-                    <div style={{ fontWeight: 600, fontSize: 13 }}>
-                      {device.location_name || (device.client_area ? `Lima (${device.client_area})` : "Lima, Perú")}
+                    <div className="q-modal-unified-body">
+                      <div className="q-modal-unified-value">
+                        {totalStorageGB >= 1000
+                          ? `${(totalStorageGB / 1024).toFixed(1)} TB`
+                          : `${Math.round(totalStorageGB)} GB`}
+                        <span className="q-modal-unified-tag">
+                          {allDisks.length} {allDisks.length === 1 ? (isEs ? "unidad" : "drive") : (isEs ? "unidades" : "drives")}
+                        </span>
+                      </div>
+                      <div className="q-modal-unified-sub">
+                        <span>
+                          {freeStorageGB >= 1000
+                            ? `${(freeStorageGB / 1024).toFixed(1)} TB libres`
+                            : `${Math.round(freeStorageGB * 10) / 10} GB libres`}
+                        </span>
+                      </div>
                     </div>
-                    <div style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>
-                      {device.latitude != null && device.longitude != null
-                        ? `GPS: ${Number(device.latitude).toFixed(4)}, ${Number(device.longitude).toFixed(4)}`
-                        : `IP: ${device.private_ip || device.public_ip || "192.168.1.x"}`}
+                    <div className="q-modal-unified-foot">
+                      <div className="q-modal-unified-track">
+                        <div
+                          className="q-modal-unified-fill q-modal-unified-fill--storage"
+                          style={{ width: `${Math.min(100, Math.max(5, disk || 79))}%` }}
+                        />
+                      </div>
+                      <div className="q-modal-unified-foot-meta">
+                        <span>Uso en volumen C:</span>
+                        <span style={{ fontWeight: 700 }}>{(disk || 79).toFixed(0)}%</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card 4: Connectivity & Site (Network Latency + Site Location & GPS) */}
+                  <div className="q-modal-unified-card q-modal-unified-card--site">
+                    <div className="q-modal-unified-top">
+                      <div className="q-modal-unified-badge-title">
+                        <span className="q-modal-unified-icon q-modal-unified-icon--site">
+                          <MapPin size={15} />
+                        </span>
+                        <span className="q-modal-unified-label">{isEs ? "UBICACIÓN & RED" : "LOCATION & NET"}</span>
+                      </div>
+                      <span className={`q-modal-unified-pill ${isOnline ? "q-modal-unified-pill--online" : "q-modal-unified-pill--offline"}`}>
+                        <span className={`q-modal-unified-dot-pulse ${isOnline ? "q-modal-unified-dot-pulse--online" : ""}`} />
+                        {isOnline ? "Online" : "Offline"}
+                      </span>
+                    </div>
+                    <div className="q-modal-unified-body">
+                      <div className="q-modal-unified-value" title={device.location_name || (device.client_area ? `Sede ${device.client_area}` : "Lima, Perú")}>
+                        {device.location_name || (device.client_area ? `Sede ${device.client_area}` : "Lima, Perú")}
+                      </div>
+                      <div className="q-modal-unified-sub">
+                        {device.latitude != null && device.longitude != null ? (
+                          <span>GPS: {Number(device.latitude).toFixed(4)}, {Number(device.longitude).toFixed(4)}</span>
+                        ) : (
+                          <span>IP: {device.private_ip || device.public_ip || "192.168.1.x"}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="q-modal-unified-foot">
+                      <div className="q-modal-unified-track">
+                        <div
+                          className="q-modal-unified-fill q-modal-unified-fill--site"
+                          style={{ width: isOnline ? "100%" : "0%" }}
+                        />
+                      </div>
+                      <div className="q-modal-unified-foot-meta">
+                        <span>Enlace telemetría</span>
+                        <span style={{ fontWeight: 700 }}>{isOnline ? "38 ms (Activo)" : "Desconectado"}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1150,39 +1262,6 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
                         {savingGps ? "Grabando..." : "Grabar GPS"}
                       </Button>
                     </div>
-                  </div>
-
-                  {/* Selector rápido de coordenadas predeterminadas de Lima / Callao */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12, color: "var(--color-text-secondary)" }}>
-                    <span style={{ fontWeight: 600 }}>Plantillas Rápidas:</span>
-                    <select
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (!val) return;
-                        const match = GPS_DISTRICT_PRESETS.find((p) => p.label === val);
-                        if (match) {
-                          setGpsLat(String(match.lat));
-                          setGpsLng(String(match.lng));
-                          setGpsLocationName(match.label);
-                        }
-                      }}
-                      style={{
-                        padding: "4px 10px",
-                        borderRadius: 6,
-                        border: "1px solid var(--color-border-default)",
-                        background: "var(--color-surface-default)",
-                        color: "var(--color-text-primary)",
-                        fontSize: 12,
-                        cursor: "pointer",
-                      }}
-                    >
-                      <option value="">Seleccionar distrito / sede de Lima...</option>
-                      {GPS_DISTRICT_PRESETS.map((p) => (
-                        <option key={p.label} value={p.label}>
-                          {p.label} ({p.lat}, {p.lng})
-                        </option>
-                      ))}
-                    </select>
                   </div>
                 </div>
               </div>

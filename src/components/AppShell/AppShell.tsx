@@ -17,11 +17,25 @@ import {
   Globe,
   Sparkles,
   LifeBuoy,
+  BarChart3,
+  ChevronDown,
+  AlertTriangle,
+  Layers,
 } from "lucide-react";
 import { FeedbackFAB, FeedbackModal } from "../FeedbackModal/FeedbackModal";
 import "./AppShell.css";
 
-export type ViewType = "dashboard" | "inventory" | "ai-health" | "discovery" | "clients" | "users" | "payments" | "settings" | "support";
+export type ViewType =
+  | "dashboard"
+  | "inventory"
+  | "reports"
+  | "ai-health"
+  | "discovery"
+  | "clients"
+  | "users"
+  | "payments"
+  | "settings"
+  | "support";
 
 export interface AppShellProps {
   children: React.ReactNode;
@@ -31,6 +45,8 @@ export interface AppShellProps {
   onRefresh: () => void;
   activeView: ViewType;
   onViewChange: (view: ViewType) => void;
+  activeReportTab?: "incidents" | "fleet" | "summary";
+  onReportTabChange?: (tab: "incidents" | "fleet" | "summary") => void;
   onOpenPortal?: () => void;
 }
 
@@ -42,9 +58,12 @@ export const AppShell: React.FC<AppShellProps> = ({
   onRefresh,
   activeView,
   onViewChange,
+  activeReportTab = "incidents",
+  onReportTabChange,
   onOpenPortal,
 }) => {
   const { user, logout, organizationsList, activeOrganization, setActiveOrganization } = useAuth();
+  const [reportsOpen, setReportsOpen] = React.useState<boolean>(true);
 
   const getHeaderTitle = () => {
     switch (activeView) {
@@ -56,6 +75,10 @@ export const AppShell: React.FC<AppShellProps> = ({
         return activeOrganization
           ? `Inventario — ${activeOrganization.name}`
           : "Inventario de Activos y Equipos";
+      case "reports":
+        return activeOrganization
+          ? `Centro de Reportes & Incidencias — ${activeOrganization.name}`
+          : "Centro de Reportes & Análisis Operativo";
       case "ai-health":
         return activeOrganization
           ? `AI Health & Diagnóstico Predictivo — ${activeOrganization.name}`
@@ -106,6 +129,79 @@ export const AppShell: React.FC<AppShellProps> = ({
           >
             <Server size={18} />
             <span>Inventario de Equipos</span>
+          </div>
+
+          {/* Módulo Primer Nivel: Reportes con Subniveles */}
+          <div className="q-nav-item-group">
+            <div
+              className={`q-nav-item ${activeView === "reports" ? "q-nav-item--active" : ""}`}
+              onClick={() => {
+                onViewChange("reports");
+                setReportsOpen((prev) => !prev);
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              <BarChart3 size={18} />
+              <span>Reportes</span>
+              <ChevronDown
+                size={14}
+                style={{
+                  marginLeft: "auto",
+                  transform: reportsOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "transform 0.2s ease",
+                }}
+              />
+            </div>
+
+            {reportsOpen && (
+              <div className="q-nav-subitems">
+                <div
+                  className={`q-nav-subitem ${
+                    activeView === "reports" && activeReportTab === "incidents"
+                      ? "q-nav-subitem--active"
+                      : ""
+                  }`}
+                  onClick={() => {
+                    onViewChange("reports");
+                    onReportTabChange?.("incidents");
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  <AlertTriangle size={14} />
+                  <span>Incidencias y Fallas</span>
+                </div>
+                <div
+                  className={`q-nav-subitem ${
+                    activeView === "reports" && activeReportTab === "fleet"
+                      ? "q-nav-subitem--active"
+                      : ""
+                  }`}
+                  onClick={() => {
+                    onViewChange("reports");
+                    onReportTabChange?.("fleet");
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  <Server size={14} />
+                  <span>Inventario y Flota</span>
+                </div>
+                <div
+                  className={`q-nav-subitem ${
+                    activeView === "reports" && activeReportTab === "summary"
+                      ? "q-nav-subitem--active"
+                      : ""
+                  }`}
+                  onClick={() => {
+                    onViewChange("reports");
+                    onReportTabChange?.("summary");
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  <Layers size={14} />
+                  <span>Resumen por Áreas</span>
+                </div>
+              </div>
+            )}
           </div>
           <div
             className={`q-nav-item ${activeView === "ai-health" ? "q-nav-item--active" : ""}`}
@@ -287,6 +383,58 @@ export const AppShell: React.FC<AppShellProps> = ({
         </header>
 
         <main className="q-content">{children}</main>
+
+        {/* Global Application Footer */}
+        <footer className="q-footer" role="contentinfo">
+          <div className="q-footer-inner">
+            <div className="q-footer-left">
+              <span className="q-footer-brand">Qhapana RMM</span>
+              <span className="q-footer-divider">•</span>
+              <span className="q-footer-copy">© {new Date().getFullYear()} Plataforma SaaS Enterprise</span>
+              <span className="q-footer-tag">v1.2.4</span>
+            </div>
+
+            <div className="q-footer-center">
+              <span className={`q-footer-status ${isLiveConnected ? "q-footer-status--online" : "q-footer-status--offline"}`}>
+                <span className="q-footer-dot" />
+                {isLiveConnected ? "Telemetría en vivo & NOC Operativo" : "Reconectando telemetría..."}
+              </span>
+            </div>
+
+            <div className="q-footer-right">
+              {onOpenPortal && (
+                <button
+                  type="button"
+                  className="q-footer-link"
+                  onClick={onOpenPortal}
+                  title="Abrir Portal Público de Ofertas"
+                >
+                  <Globe size={13} />
+                  <span>Portal Público</span>
+                </button>
+              )}
+              <button
+                type="button"
+                className="q-footer-link"
+                onClick={() => onViewChange("support")}
+                title="Mesa de ayuda, soporte y sugerencias"
+              >
+                <LifeBuoy size={13} />
+                <span>Soporte</span>
+              </button>
+              <button
+                type="button"
+                className="q-footer-link"
+                onClick={() => onViewChange("reports")}
+                title="Centro de reportes y análisis operativo"
+              >
+                <BarChart3 size={13} />
+                <span>Reportes</span>
+              </button>
+              <span className="q-footer-time">Lima, PE (UTC-5)</span>
+            </div>
+          </div>
+        </footer>
       </div>
 
       {/* Botón flotante y modal de soporte accesibles solo para ADMIN y SUPERADMIN */}

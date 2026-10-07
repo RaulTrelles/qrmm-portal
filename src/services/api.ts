@@ -1467,6 +1467,143 @@ export async function respondToTicket(
   return res.json();
 }
 
+export interface MaintenanceSettings {
+  maintenance_mode: boolean;
+  title: string;
+  message: string;
+  estimated_end: string;
+  contact_email: string;
+  updated_at?: string | null;
+}
+
+export async function getMaintenanceStatus(): Promise<MaintenanceSettings> {
+  const res = await fetch(`${API_BASE}/settings/maintenance`, {
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al obtener estado de mantenimiento");
+  }
+  return res.json();
+}
+
+export async function updateMaintenanceStatus(payload: Partial<MaintenanceSettings>): Promise<MaintenanceSettings> {
+  const res = await fetch(`${API_BASE}/settings/maintenance`, {
+    method: "PUT",
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al actualizar estado de mantenimiento");
+  }
+  return res.json();
+}
+
+// ----------------------------------------------------
+// REPORTES E INCIDENCIAS
+// ----------------------------------------------------
+
+export interface IncidentReportItem {
+  id: string;
+  source: string;
+  device_id: string;
+  hostname: string;
+  organization_name: string;
+  organization_id: string;
+  typology: string;
+  typology_label: string;
+  severity: "CRITICAL" | "WARNING" | "INFO";
+  title: string;
+  description: string;
+  status: "OPEN" | "INVESTIGATING" | "RESOLVED" | "MUTED";
+  occurred_at: string;
+  resolved_at: string | null;
+  resolved_by: string | null;
+  risk_score: number;
+}
+
+export interface TypologyMeta {
+  key: string;
+  label: string;
+  description?: string;
+  count: number;
+  color: string;
+  icon: string;
+}
+
+export interface IncidentReportStats {
+  total_incidents: number;
+  disconnections_count: number;
+  critical_active: number;
+  resolved_rate: number;
+  by_typology: Record<string, number>;
+  by_severity: Record<string, number>;
+  top_affected_devices: Array<{ hostname: string; count: number }>;
+}
+
+export interface IncidentsReportResponse {
+  items: IncidentReportItem[];
+  total: number;
+  limit: number;
+  offset: number;
+  stats: IncidentReportStats;
+  typologies: TypologyMeta[];
+}
+
+export interface GetIncidentsParams {
+  organization_id?: string;
+  typology?: string;
+  severity?: string;
+  status?: string;
+  time_range?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export async function getIncidentsReport(params: GetIncidentsParams = {}): Promise<IncidentsReportResponse> {
+  const query = new URLSearchParams();
+  if (params.organization_id) query.append("organization_id", params.organization_id);
+  if (params.typology) query.append("typology", params.typology);
+  if (params.severity) query.append("severity", params.severity);
+  if (params.status) query.append("status", params.status);
+  if (params.time_range) query.append("time_range", params.time_range);
+  if (params.search) query.append("search", params.search);
+  if (params.limit) query.append("limit", String(params.limit));
+  if (params.offset) query.append("offset", String(params.offset));
+
+  const res = await fetch(`${API_BASE}/reports/incidents?${query.toString()}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al obtener reporte de incidencias");
+  }
+  return res.json();
+}
+
+export async function updateIncidentStatus(
+  incidentId: string,
+  status: string,
+  resolutionNotes?: string
+): Promise<{ status: string; message: string }> {
+  const res = await fetch(`${API_BASE}/reports/incidents/${incidentId}/status`, {
+    method: "PATCH",
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({
+      status,
+      resolution_notes: resolutionNotes,
+    }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "Error al actualizar estado de la incidencia");
+  }
+  return res.json();
+}
+
+
 
 
 

@@ -15,6 +15,8 @@ import {
   Calendar,
   FileText,
   CreditCard,
+  Wrench,
+  Eye,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { Card } from "../components/Card/Card";
@@ -29,7 +31,10 @@ import {
   generateExecutiveHealthReport,
   getPaymentSettings,
   updatePaymentSettings,
+  getMaintenanceStatus,
+  updateMaintenanceStatus,
   type PaymentSettings,
+  type MaintenanceSettings,
 } from "../services/api";
 import type { AlertSettings } from "../services/api";
 import "./SettingsView.css";
@@ -37,7 +42,7 @@ import "./SettingsView.css";
 
 export const SettingsView: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<"alerts" | "billing" | "payments">("alerts");
+  const [activeTab, setActiveTab] = useState<"alerts" | "billing" | "payments" | "maintenance">("alerts");
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [testing, setTesting] = useState<boolean>(false);
@@ -52,6 +57,16 @@ export const SettingsView: React.FC = () => {
     beta_description: "",
   });
   const [savingPaymentSettings, setSavingPaymentSettings] = useState<boolean>(false);
+
+  // Estado del Modo Mantenimiento
+  const [maintenanceSettings, setMaintenanceSettings] = useState<MaintenanceSettings>({
+    maintenance_mode: false,
+    title: "Mantenimiento Programado del Sistema",
+    message: "Estamos realizando labores de optimización de infraestructura y actualización de seguridad. Estaremos de vuelta en breve.",
+    estimated_end: "Aproximadamente 45 minutos",
+    contact_email: "soporte@qhapana.com",
+  });
+  const [savingMaintenance, setSavingMaintenance] = useState<boolean>(false);
 
   // Estados del formulario
   const [emailAlertsEnabled, setEmailAlertsEnabled] = useState<boolean>(true);
@@ -119,10 +134,39 @@ export const SettingsView: React.FC = () => {
       } catch (pErr) {
         console.warn("No se pudo cargar payment settings:", pErr);
       }
+
+      try {
+        const mData = await getMaintenanceStatus();
+        setMaintenanceSettings(mData);
+      } catch (mErr) {
+        console.warn("No se pudo cargar maintenance settings:", mErr);
+      }
     } catch (err: any) {
       setFeedback({ type: "error", message: err.message || "Error al cargar la configuración de alertas" });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveMaintenance = async () => {
+    try {
+      setSavingMaintenance(true);
+      setFeedback(null);
+      const updated = await updateMaintenanceStatus(maintenanceSettings);
+      setMaintenanceSettings(updated);
+      setFeedback({
+        type: "success",
+        message: updated.maintenance_mode
+          ? "🚨 ¡Modo Mantenimiento ACTIVADO! El portal regular ha sido dado de baja temporalmente."
+          : "✅ Modo Mantenimiento DESACTIVADO. La plataforma vuelve a operar con normalidad para todos los usuarios.",
+      });
+    } catch (err: any) {
+      setFeedback({
+        type: "error",
+        message: err.message || "Error al actualizar modo de mantenimiento",
+      });
+    } finally {
+      setSavingMaintenance(false);
     }
   };
 
@@ -348,6 +392,14 @@ export const SettingsView: React.FC = () => {
             <CreditCard size={16} /> Modos de Pago & Beta
           </button>
         )}
+        {user?.role === "SUPERADMIN" && (
+          <button
+            className={`q-settings-tab-btn ${activeTab === "maintenance" ? "q-tab-active" : ""}`}
+            onClick={() => setActiveTab("maintenance")}
+          >
+            <Wrench size={16} /> Modo Mantenimiento
+          </button>
+        )}
         <button
           className={`q-settings-tab-btn ${activeTab === "billing" ? "q-tab-active" : ""}`}
           onClick={() => setActiveTab("billing")}
@@ -444,6 +496,146 @@ export const SettingsView: React.FC = () => {
                 disabled={savingPaymentSettings}
               >
                 {savingPaymentSettings ? "Guardando..." : "Guardar Modalidades de Pago"}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      ) : activeTab === "maintenance" ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {feedback && (
+            <div className={`q-feedback-banner q-feedback-banner--${feedback.type}`}>
+              {feedback.type === "success" ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
+              <span>{feedback.message}</span>
+            </div>
+          )}
+
+          <Card className="q-settings-card">
+            <div className="q-card-header-row">
+              <div className="q-card-heading">
+                <Wrench size={22} color="var(--color-brand-primary)" />
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                    <h3>Control de Mantenimiento Global del Sistema</h3>
+                    <Badge
+                      variant={maintenanceSettings.maintenance_mode ? "warning" : "success"}
+                      pulse={maintenanceSettings.maintenance_mode}
+                    >
+                      {maintenanceSettings.maintenance_mode ? "Mantenimiento Activo" : "Plataforma Operativa"}
+                    </Badge>
+                  </div>
+                  <p>
+                    Permite dar de baja temporalmente el portal cuando se requiera realizar trabajos de infraestructura, mantenimiento de bases de datos o despliegues críticos. Cuando está activo, los visitantes y clientes son redirigidos a la pantalla de mantenimiento.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div
+              className="q-toggle-row"
+              style={{
+                backgroundColor: maintenanceSettings.maintenance_mode
+                  ? "rgba(245, 158, 11, 0.08)"
+                  : "var(--color-surface-muted)",
+                padding: "16px 20px",
+                borderRadius: "12px",
+                border: maintenanceSettings.maintenance_mode
+                  ? "1px solid rgba(245, 158, 11, 0.35)"
+                  : "1px solid var(--color-border-default)",
+                transition: "all var(--motion-fast)",
+              }}
+            >
+              <div className="q-toggle-label">
+                <span className="q-toggle-title">
+                  {maintenanceSettings.maintenance_mode
+                    ? "🚨 MODO MANTENIMIENTO ACTIVADO (Portal fuera de servicio)"
+                    : "🛡️ Activar Modo Mantenimiento"}
+                </span>
+                <span className="q-toggle-desc">
+                  Al encender este interruptor, el portal completo mostrará la página de mantenimiento con los tiempos estimados y datos de contacto de soporte a todos los usuarios y visitantes. Solo los Superadministradores podrán acceder a la consola.
+                </span>
+              </div>
+              <label className="q-switch">
+                <input
+                  type="checkbox"
+                  checked={maintenanceSettings.maintenance_mode}
+                  onChange={(e) =>
+                    setMaintenanceSettings({ ...maintenanceSettings, maintenance_mode: e.target.checked })
+                  }
+                />
+                <span className="q-switch-slider"></span>
+              </label>
+            </div>
+
+            <div className="q-form-grid" style={{ marginTop: 24 }}>
+              <div className="q-form-group">
+                <label className="q-form-label">Título del Mantenimiento (Encabezado público)</label>
+                <input
+                  type="text"
+                  className="q-input"
+                  value={maintenanceSettings.title}
+                  onChange={(e) => setMaintenanceSettings({ ...maintenanceSettings, title: e.target.value })}
+                  placeholder="Ej: Mantenimiento Programado del Sistema"
+                />
+              </div>
+
+              <div className="q-form-group">
+                <label className="q-form-label">Tiempo Estimado de Retorno (Duración)</label>
+                <input
+                  type="text"
+                  className="q-input"
+                  value={maintenanceSettings.estimated_end}
+                  onChange={(e) => setMaintenanceSettings({ ...maintenanceSettings, estimated_end: e.target.value })}
+                  placeholder="Ej: Aproximadamente 45 minutos"
+                />
+              </div>
+
+              <div className="q-form-group" style={{ gridColumn: "1 / -1" }}>
+                <label className="q-form-label">Mensaje Explicativo para los Usuarios y Clientes</label>
+                <textarea
+                  className="q-input"
+                  rows={3}
+                  value={maintenanceSettings.message}
+                  onChange={(e) => setMaintenanceSettings({ ...maintenanceSettings, message: e.target.value })}
+                  placeholder="Describe brevemente las tareas en curso..."
+                />
+              </div>
+
+              <div className="q-form-group">
+                <label className="q-form-label">Correo de Soporte de Emergencia</label>
+                <input
+                  type="email"
+                  className="q-input"
+                  value={maintenanceSettings.contact_email}
+                  onChange={(e) => setMaintenanceSettings({ ...maintenanceSettings, contact_email: e.target.value })}
+                  placeholder="soporte@qhapana.com"
+                />
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginTop: 28,
+                flexWrap: "wrap",
+                gap: 12,
+              }}
+            >
+              <a href="/maintenance" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+                <Button variant="outline" size="md" icon={<Eye size={16} />}>
+                  Ver Pantalla de Mantenimiento (Vista Previa)
+                </Button>
+              </a>
+
+              <Button
+                variant={maintenanceSettings.maintenance_mode ? "danger" : "primary"}
+                size="md"
+                icon={<Save size={16} />}
+                onClick={handleSaveMaintenance}
+                loading={savingMaintenance}
+              >
+                {maintenanceSettings.maintenance_mode ? "Guardar y Activar Mantenimiento" : "Guardar Configuración"}
               </Button>
             </div>
           </Card>

@@ -6,8 +6,6 @@ import { Badge } from "../components/Badge/Badge";
 import { Button } from "../components/Button/Button";
 import { DeviceDetailModal } from "../components/DeviceDetailModal/DeviceDetailModal";
 import { EnrollDeviceModal } from "../components/EnrollDeviceModal/EnrollDeviceModal";
-import { InventoryReportModal } from "../components/InventoryReportModal/InventoryReportModal";
-import { DeviceSummaryReportModal } from "../components/DeviceSummaryReportModal/DeviceSummaryReportModal";
 import { useAuth } from "../context/AuthContext";
 import {
   Server,
@@ -18,7 +16,6 @@ import {
   Laptop,
   ExternalLink,
   Plus,
-  FileText,
   Tag,
   Edit2,
   Trash2,
@@ -44,8 +41,6 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
   const [updatingAreaId, setUpdatingAreaId] = useState<string | null>(null);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [enrollModalOpen, setEnrollModalOpen] = useState<boolean>(false);
-  const [reportModalOpen, setReportModalOpen] = useState<boolean>(false);
-  const [summaryReportOpen, setSummaryReportOpen] = useState<boolean>(false);
 
   // Modal para Retirar Equipo
   const [deviceToRetire, setDeviceToRetire] = useState<Device | null>(null);
@@ -283,41 +278,6 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
         </div>
 
         <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          {/* Botón Reporte Resumen trasladado desde el Dashboard */}
-          <Button
-            variant="secondary"
-            onClick={() => setSummaryReportOpen(true)}
-            style={{ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}
-            title="Generar Reporte Resumen con quiebre por Áreas o Sistemas Operativos"
-          >
-            <FileText size={15} color="var(--color-brand-primary)" />
-            Reporte Resumen
-          </Button>
-
-          {/* Botón Retirar Equipo */}
-          <Button
-            variant="danger"
-            onClick={() => {
-              if (devices.length > 0) {
-                setDeviceToRetire(devices[0]);
-              }
-              setRetireModalOpen(true);
-            }}
-            style={{ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}
-            title="Retirar o desvincular un equipo de la flota"
-          >
-            <Trash2 size={15} />
-            Retirar Equipo
-          </Button>
-
-          <Button
-            variant="secondary"
-            onClick={() => setReportModalOpen(true)}
-            style={{ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}
-          >
-            <FileText size={15} />
-            Informe Técnico (PDF)
-          </Button>
           <button className="q-export-btn" onClick={handleExportCSV}>
             <Download size={15} />
             Exportar CSV
@@ -603,21 +563,6 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ refreshTrigger }) 
         onDeviceEnrolled={() => {
           fetchDevices();
         }}
-      />
-
-      {/* Modal de Reporte Técnico Ejecutivo (PDF) */}
-      {reportModalOpen && (
-        <InventoryReportModal
-          devices={devices}
-          onClose={() => setReportModalOpen(false)}
-        />
-      )}
-
-      {/* Modal de Reporte Resumen Ejecutivo trasladado desde Dashboard */}
-      <DeviceSummaryReportModal
-        devices={devices}
-        isOpen={summaryReportOpen}
-        onClose={() => setSummaryReportOpen(false)}
       />
 
       {/* Modal de Retiro / Desvinculación de Equipo */}

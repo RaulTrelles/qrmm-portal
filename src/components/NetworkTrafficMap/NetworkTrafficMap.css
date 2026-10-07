@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 18px;
+  padding: 8px 16px;
   background-color: var(--color-surface-default);
   border-bottom: 1px solid var(--color-border-default);
   z-index: 10;
@@ -137,12 +137,12 @@
   border-color: var(--color-border-strong);
 }
 
-/* Map Body Canvas - Expanded NOC presentation dimensions */
+/* Map Body Canvas - Balanced NOC presentation dimensions */
 .q-commercial-map-body {
   position: relative;
   width: 100%;
-  height: clamp(540px, 58vh, 760px);
-  min-height: 520px;
+  height: clamp(340px, calc(100vh - 365px), 520px);
+  min-height: 320px;
   background-color: #0b1329;
   overflow: hidden;
 }
@@ -468,8 +468,8 @@
 /* Responsive adjustments */
 @media (max-width: 1024px) {
   .q-commercial-map-body {
-    height: 480px;
-    min-height: 440px;
+    height: 420px;
+    min-height: 360px;
   }
 }
 

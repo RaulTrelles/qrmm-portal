@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mantenimiento Programado — Qhapana RMM</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --color-surface-page: #0F172A;
+      --color-surface-default: #1E293B;
+      --color-surface-muted: #1E293B;
+      --color-border-default: #334155;
+      --color-text-primary: #F8FAFC;
+      --color-text-secondary: #CBD5E1;
+      --color-text-tertiary: #94A3B8;
+      --color-brand-primary: #7B57E8;
+      --color-brand-hover: #9877F5;
+      --color-status-success: #22C55E;
+    }
+    [data-theme="light"] {
+      --color-surface-page: #F8F9FA;
+      --color-surface-default: #FFFFFF;
+      --color-surface-muted: #F1F3F5;
+      --color-border-default: #E5E7EB;
+      --color-text-primary: #111827;
+      --color-text-secondary: #4B5563;
+      --color-text-tertiary: #6B7280;
+      --color-brand-primary: #673DE6;
+      --color-brand-hover: #5025D1;
+      --color-status-success: #16A34A;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--color-surface-page);
+      color: var(--color-text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      line-height: 1.5;
+    }
+    .card {
+      max-width: 720px;
+      width: 100%;
+      background-color: var(--color-surface-default);
+      border: 1px solid var(--color-border-default);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #7B57E8, #5025D1);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+    }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      text-align: left;
+    }
+    .brand-sub {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: left;
+    }
+    .icon-box {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #f59e0b;
+      margin-bottom: 20px;
+      font-size: 36px;
+      animation: spin 14s linear infinite;
+    }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: #f59e0b;
+      box-shadow: 0 0 8px #f59e0b;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    p {
+      font-size: 14.5px;
+      color: var(--color-text-secondary);
+      max-width: 560px;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .time-box {
+      background: var(--color-surface-muted);
+      border: 1px solid var(--color-border-default);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      margin-bottom: 28px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: var(--color-brand-primary);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(123, 87, 232, 0.35);
+    }
+    .btn-primary:hover {
+      background: var(--color-brand-hover);
+      transform: translateY(-1px);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--color-border-default);
+      color: var(--color-text-primary);
+    }
+    .btn-outline:hover {
+      border-color: var(--color-text-secondary);
+    }
+    footer {
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--color-text-tertiary);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">
+      <div class="logo">Q</div>
+      <div>
+        <div class="brand-title">Qhapana RMM</div>
+        <div class="brand-sub">Centro de Control NOC</div>
+      </div>
+    </div>
+    <div class="icon-box">⚙️</div>
+    <div class="status-badge">
+      <div class="pulse-dot"></div>
+      Mantenimiento Técnico en Curso
+    </div>
+    <h1>Estamos optimizando la plataforma para ti</h1>
+    <p>Estamos realizando labores programadas de infraestructura, actualización de seguridad y optimización de base de datos. Los agentes en campo continúan operando con normalidad.</p>
+    <div class="time-box">
+      ⏱️ Retorno estimado: ~45 minutos
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="window.location.reload()">🔄 Reintentar Conexión</button>
+      <a href="mailto:soporte@qhapana.com?subject=Mantenimiento%20Qhapana%20RMM" class="btn btn-outline">✉️ Contactar Soporte</a>
+    </div>
+  </div>
+  <footer>Qhapana RMM SaaS Platform © 2026</footer>
+</body>
+</html>

@@ -1,0 +1,419 @@
+/* =============================================================================
+   MaintenanceView - Hostinger Enterprise Design System Specification
+   Fully WCAG 2.2 AA compliant in Light & Dark modes
+   ============================================================================= */
+
+.q-maintenance-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-surface-page);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-primary);
+  padding: var(--space-6) var(--space-4);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Subtle background aura glow */
+.q-maintenance-page::before {
+  content: "";
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(123, 87, 232, 0.12) 0%, rgba(245, 158, 11, 0.06) 40%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(40px);
+}
+
+.q-maintenance-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 740px;
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-2xl, 20px);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: q-maintenance-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes q-maintenance-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Top Header & Logo */
+.q-maintenance-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: var(--space-6);
+}
+
+.q-maintenance-logo-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--color-brand-primary), var(--purple-700));
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 20px;
+  box-shadow: 0 4px 14px rgba(103, 61, 230, 0.35);
+}
+
+.q-maintenance-brand-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.q-maintenance-brand-name {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+.q-maintenance-brand-sub {
+  font-size: 11.5px;
+  color: var(--color-text-tertiary);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Icon Hero with Pulsing Amber Glow */
+.q-maintenance-icon-wrap {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f59e0b;
+  margin-bottom: var(--space-5);
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.2);
+}
+
+.q-maintenance-icon-spinning {
+  animation: q-gear-spin 12s linear infinite;
+}
+
+@keyframes q-gear-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.q-maintenance-pulse-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid rgba(245, 158, 11, 0.35);
+  animation: q-ring-pulse 2s infinite ease-in-out;
+}
+
+@keyframes q-ring-pulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0.2; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+/* Status Pill */
+.q-maintenance-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 5px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-4);
+}
+
+[data-theme="dark"] .q-maintenance-status-badge {
+  color: #fbbf24;
+  background-color: rgba(245, 158, 11, 0.16);
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.q-maintenance-dot-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+  animation: q-dot-ping 1.5s infinite;
+}
+
+@keyframes q-dot-ping {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+/* Typography */
+.q-maintenance-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-3);
+  line-height: 1.3;
+}
+
+.q-maintenance-message {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  max-width: 580px;
+  margin-bottom: var(--space-6);
+}
+
+/* Estimated End Box */
+.q-maintenance-time-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border-default);
+  padding: 10px 18px;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-6);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.q-maintenance-time-icon {
+  color: var(--color-brand-primary);
+  flex-shrink: 0;
+}
+
+.q-maintenance-time-label {
+  color: var(--color-text-tertiary);
+  font-size: 12px;
+  margin-right: 4px;
+}
+
+/* Subsystem Status Indicators */
+.q-maintenance-subsystems {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+  margin-bottom: var(--space-6);
+}
+
+.q-maintenance-subsystem-item {
+  background-color: var(--color-surface-page);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 4px;
+}
+
+.q-subsystem-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.q-subsystem-status {
+  font-size: 11.5px;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.q-subsystem-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.q-subsystem-dot--ok {
+  background-color: var(--color-status-success);
+  box-shadow: 0 0 6px var(--color-status-success);
+}
+
+.q-subsystem-dot--progress {
+  background-color: #f59e0b;
+  box-shadow: 0 0 6px #f59e0b;
+}
+
+.q-subsystem-dot--paused {
+  background-color: var(--color-text-disabled);
+}
+
+/* Action Buttons */
+.q-maintenance-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.q-maintenance-feedback-toast {
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  animation: q-maintenance-in 0.2s ease-out;
+}
+
+.q-maintenance-feedback-toast--success {
+  background-color: var(--color-status-success-bg);
+  color: var(--color-status-success);
+  border: 1px solid var(--color-status-success-border);
+}
+
+.q-maintenance-feedback-toast--info {
+  background-color: var(--color-status-info-bg);
+  color: var(--color-status-info);
+  border: 1px solid var(--color-status-info-border);
+}
+
+/* Superadmin Emergency Bypass Section */
+.q-maintenance-bypass-wrap {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px dashed var(--color-border-default);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.q-maintenance-bypass-btn {
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  transition: all var(--motion-fast);
+}
+
+.q-maintenance-bypass-btn:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-hover);
+}
+
+.q-maintenance-bypass-form {
+  background-color: var(--color-surface-page);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+  animation: q-maintenance-in 0.2s ease-out;
+}
+
+.q-maintenance-bypass-form label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.q-maintenance-bypass-input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-default);
+  color: var(--color-text-primary);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.q-maintenance-bypass-input:focus {
+  border-color: var(--color-brand-primary);
+  box-shadow: var(--focus-ring);
+}
+
+/* Footer Copyright & NOC ID */
+.q-maintenance-footer {
+  margin-top: var(--space-6);
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .q-maintenance-card {
+    padding: 24px 18px;
+    border-radius: 16px;
+  }
+  .q-maintenance-subsystems {
+    grid-template-columns: 1fr;
+  }
+  .q-maintenance-title {
+    font-size: 20px;
+  }
+  .q-maintenance-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .q-maintenance-actions button,
+  .q-maintenance-actions a {
+    width: 100%;
+    justify-content: center;
+  }
+}
