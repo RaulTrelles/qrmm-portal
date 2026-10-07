@@ -856,7 +856,7 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
               </select>
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             {isOnline && (
               <>
                 {device.os_type === "linux" ? (
